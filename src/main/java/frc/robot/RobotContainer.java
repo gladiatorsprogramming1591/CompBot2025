@@ -41,7 +41,7 @@ public class RobotContainer {
     private final SendableChooser<Command> autoChooser;
     
     public RobotContainer() {
-        autoChooser = AutoBuilder.buildAutoChooser("Tests");
+        autoChooser = AutoBuilder.buildAutoChooser("Proccessor+Reef");
         SmartDashboard.putData("Auto Mode", autoChooser);
         
         configureBindings();
@@ -53,8 +53,8 @@ public class RobotContainer {
         drivetrain.setDefaultCommand(
                 // Drivetrain will execute this command periodically
                 drivetrain.applyRequest(() ->
-                        drive.withVelocityX(-joystick.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
-                                .withVelocityY(-joystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
+                        drive.withVelocityX(-(Math.pow(joystick.getLeftY(), 2) * joystick.getLeftY() / Math.abs(joystick.getLeftY())) * MaxSpeed) // Drive forward with negative Y (forward)
+                                .withVelocityY(-(Math.pow(joystick.getLeftX(), 2) * joystick.getLeftX() / Math.abs(joystick.getLeftX())) * MaxSpeed) // Drive left with negative X (left)
                                 .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
                 )
         );
