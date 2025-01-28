@@ -36,12 +36,13 @@ public class RobotContainer {
     
     private final CommandXboxController joystick = new CommandXboxController(0);
     
-    public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+    public static final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     
     private final SendableChooser<Command> autoChooser;
     
     public RobotContainer() {
-        autoChooser = AutoBuilder.buildAutoChooser("Proccessor+Reef");
+        autoChooser = AutoBuilder.buildAutoChooser("StraightLineAuto");
+        autoChooser.addOption("StraightLineAuto", getAutonomousCommand());
         SmartDashboard.putData("Auto Mode", autoChooser);
         
         configureBindings();

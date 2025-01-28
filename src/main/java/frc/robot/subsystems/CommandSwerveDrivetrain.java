@@ -20,13 +20,15 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-
+import frc.robot.generated.TunerConstants;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
+import frc.robot.RobotContainer;
 
 /**
  * Class that extends the Phoenix 6 SwerveDrivetrain class and implements
@@ -272,6 +274,13 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 m_hasAppliedOperatorPerspective = true;
             });
         }
+
+        SmartDashboard.putNumber("FL Vel",  getState().ModuleStates[0].speedMetersPerSecond);
+        SmartDashboard.putNumber("FR Vel",  getState().ModuleStates[1].speedMetersPerSecond);
+        SmartDashboard.putNumber("BL Vel",  getState().ModuleStates[2].speedMetersPerSecond);
+        SmartDashboard.putNumber("BR Vel",  getState().ModuleStates[3].speedMetersPerSecond);
+        SmartDashboard.putNumber("Heading", getState().Pose.getRotation().getDegrees());
+        SmartDashboard.putNumber("Heading", getState().RawHeading.getDegrees());
     }
     
     private void startSimThread() {
