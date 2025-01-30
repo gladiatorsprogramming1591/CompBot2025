@@ -281,7 +281,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         SmartDashboard.putNumber("BR Vel",  getState().ModuleStates[3].speedMetersPerSecond);
         SmartDashboard.putNumber("Heading", getState().Pose.getRotation().getDegrees());
         SmartDashboard.putNumber("Heading", getState().RawHeading.getDegrees());
-    }
+
+        SmartDashboard.putNumber("Swerve States", getState().ModuleStates.length);
+       }
     
     private void startSimThread() {
         m_lastSimTime = Utils.getCurrentTimeSeconds();
