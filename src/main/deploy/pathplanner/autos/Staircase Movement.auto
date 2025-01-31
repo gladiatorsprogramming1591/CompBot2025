@@ -7,25 +7,31 @@
         {
           "type": "path",
           "data": {
-            "pathName": "StartLineToF"
+            "pathName": "Forward 1"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "FToProcessor"
+            "pathName": "Left 1"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "ProcessorToCoralStationTop"
+            "pathName": "Forward 2"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "CoralStationTopToD"
+            "pathName": "Left 2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Forward 3"
           }
         }
       ]
