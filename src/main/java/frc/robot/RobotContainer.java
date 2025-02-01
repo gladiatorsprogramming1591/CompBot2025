@@ -6,6 +6,7 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
+import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -74,9 +75,14 @@ public class RobotContainer {
         
         // reset the field-centric heading on left bumper press
         joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+
+        joystick.leftTrigger().onTrue(Commands.runOnce(SignalLogger::start));
+        joystick.rightTrigger().onTrue(Commands.runOnce(SignalLogger::stop));
         
         drivetrain.registerTelemetry(logger::telemeterize);
     }
+
+    
     
     public Command getAutonomousCommand() {
         return autoChooser.getSelected();
