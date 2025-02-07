@@ -42,9 +42,10 @@ public class RobotContainer {
     private final SendableChooser<Command> autoChooser;
     
     public RobotContainer() {
-        autoChooser = AutoBuilder.buildAutoChooser("VAuto");
+        autoChooser = AutoBuilder.buildAutoChooser("Processor+Reef");
         autoChooser.addOption("StraightLineAuto", getAutonomousCommand());
         autoChooser.addOption("VAuto", getAutonomousCommand());
+        autoChooser.addOption("Processor+Reef", getAutonomousCommand());
         SmartDashboard.putData("Auto Mode", autoChooser);
         
         configureBindings();
@@ -79,6 +80,7 @@ public class RobotContainer {
 
         joystick.leftTrigger().onTrue(Commands.runOnce(SignalLogger::start));
         joystick.rightTrigger().onTrue(Commands.runOnce(SignalLogger::stop));
+
         
         drivetrain.registerTelemetry(logger::telemeterize);
     }
