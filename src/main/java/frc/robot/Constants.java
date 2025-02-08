@@ -7,4 +7,10 @@ public class Constants {
         public static final int RIGHT_CANID = 2;
 
     }
+
+    public class DriveConstants {
+
+        public static final int kPigeonCanId = 16;
+        
+    }
 }

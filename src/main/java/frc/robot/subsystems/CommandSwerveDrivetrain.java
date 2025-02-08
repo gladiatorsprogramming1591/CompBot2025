@@ -18,6 +18,8 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -30,6 +32,8 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.generated.TunerConstants;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
+import frc.robot.Constants;
+import frc.robot.Constants.DriveConstants;
 import frc.robot.RobotContainer;
 
 /**
@@ -258,9 +262,49 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     public Command sysIdDynamic(SysIdRoutine.Direction direction) {
         return m_sysIdRoutineToApply.dynamic(direction);
     }
-    
+
+
+    /**
+     * Returns the heading of the robot.
+     *
+     * @return the robot's heading in degrees, from -180 to 180
+     */
+    //TODO: Tie into actual pigeon
+    // public double getHeading() {
+        // return m_gyro.getYaw().getValueAsDouble();
+    // }
+
     @Override
     public void periodic() {
+        // double gyroAngle = getHeading();
+
+        //TODO: Finish vision updates
+        // updatePoseEstimationWithFilter();
+        
+        // m_poseEstimator.update(Rotation2d.fromDegrees(getHeading()), new SwerveModulePosition[] {
+        //         m_frontLeft.getPosition(),
+        //         m_frontRight.getPosition(),
+        //         m_rearLeft.getPosition(),
+        //         m_rearRight.getPosition()
+        // });
+
+        // SmartDashboard.putNumber("Distance to Speaker", getSpeakerDistance());
+        // SmartDashboard.putNumber("Distance to Moonshot", getMoonshotTargetDistance());
+
+        /*
+        SmartDashboard.putBoolean("FrontConnected", m_frontCamera.isConnected());
+        SmartDashboard.putBoolean("BackConnected", m_backCamera.isConnected());
+        try {
+            SmartDashboard.putNumber("Front Latency", m_frontCamera.getLatestResult().getLatencyMillis());
+            SmartDashboard.putNumber("Back Latency", m_backCamera.getLatestResult().getLatencyMillis());
+            double latencyThreshold = 12.0;
+            SmartDashboard.putBoolean("Front Latency OK", m_frontCamera.getLatestResult().getLatencyMillis() > latencyThreshold);
+            SmartDashboard.putBoolean("Back Latency OK", m_backamera.getLatestResult().getLatencyMillis() > latencyThreshold);
+        } catch(Exception e) {
+
+        }
+        */
+        
         /*
          * Periodically try to apply the operator perspective.
          * If we haven't applied the operator perspective before, then we should apply it regardless of DS state.
