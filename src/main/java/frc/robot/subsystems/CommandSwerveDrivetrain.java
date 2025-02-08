@@ -6,6 +6,8 @@ import java.util.function.Supplier;
 
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.Utils;
+import com.ctre.phoenix6.controls.CoastOut;
+import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -213,7 +215,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                             // PID constants for translation
                             new PIDConstants(15, 0, 0),
                             // PID constants for rotation
-                            new PIDConstants(3.5, 0, 0)
+                            new PIDConstants(3.5, 0.2, 0)
                     ),
                     config,
                     // Assume the path needs to be flipped for Red vs Blue, this is normally the case
@@ -300,5 +302,21 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             updateSimState(deltaTime, RobotController.getBatteryVoltage());
         });
         m_simNotifier.startPeriodic(kSimLoopPeriod);
+    }
+
+    public void setCoastMode()
+    {
+        for (int i = 0; i < 4; i++) {
+            getModule(i).getSteerMotor().setControl(new CoastOut());
+            getModule(i).getDriveMotor().setControl(new CoastOut());
+        }
+    }
+
+    public void setBrakeMode()
+    {
+        for (int i = 0; i < 4; i++) {
+            getModule(i).getSteerMotor().setControl(new StaticBrake());
+            getModule(i).getDriveMotor().setControl(new StaticBrake());
+        }
     }
 }
