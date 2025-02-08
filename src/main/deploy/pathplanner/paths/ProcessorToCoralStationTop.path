@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 11.5,
-        "y": 7.46
+        "x": 11.505,
+        "y": 7.559
       },
       "prevControl": null,
       "nextControl": {
-        "x": 11.936935658543138,
-        "y": 7.254403920369882
+        "x": 12.723954918032787,
+        "y": 6.803252049180327
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Processor"
     },
     {
       "anchor": {
-        "x": 15.4,
-        "y": 6.5
+        "x": 16.195389344262296,
+        "y": 6.991956967213114
       },
       "prevControl": {
-        "x": 15.163215487383038,
-        "y": 6.419793425551594
+        "x": 14.613012295081969,
+        "y": 6.6563012295081965
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "CoralStationTop"
     }
   ],
   "rotationTargets": [],
@@ -33,7 +33,7 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 1.5,
+    "maxVelocity": 2.5,
     "maxAcceleration": 2.5,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,

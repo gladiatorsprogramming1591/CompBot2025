@@ -7,6 +7,7 @@ package frc.robot;
 import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.SignalLogger;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -42,9 +43,12 @@ public class RobotContainer {
     private final SendableChooser<Command> autoChooser;
     
     public RobotContainer() {
-        autoChooser = AutoBuilder.buildAutoChooser("VAuto");
-        autoChooser.addOption("StraightLineAuto", getAutonomousCommand());
+        autoChooser = AutoBuilder.buildAutoChooser("Box");
+        autoChooser.addOption("XStraightLineAuto", getAutonomousCommand());
+        autoChooser.addOption("YStraightLineAuto", getAutonomousCommand());
+        autoChooser.addOption("Box", getAutonomousCommand());
         autoChooser.addOption("VAuto", getAutonomousCommand());
+        autoChooser.addOption("Processor+Reef", getAutonomousCommand());
         SmartDashboard.putData("Auto Mode", autoChooser);
         
         configureBindings();
@@ -66,6 +70,10 @@ public class RobotContainer {
         joystick.b().whileTrue(drivetrain.applyRequest(() ->
                 point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
         ));
+        joystick.y().onTrue(drivetrain.runOnce(() -> drivetrain.configNeutralMode(NeutralModeValue.Coast)));
+        joystick.x().onTrue(drivetrain.runOnce(() -> drivetrain.configNeutralMode(NeutralModeValue.Brake)));
+        // joystick.y().onTrue(drivetrain.runOnce(() -> drivetrain.setCoastMode()));
+        // joystick.x().onTrue(drivetrain.runOnce(() -> drivetrain.setBrakeMode()));
         
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.
@@ -79,6 +87,7 @@ public class RobotContainer {
 
         joystick.leftTrigger().onTrue(Commands.runOnce(SignalLogger::start));
         joystick.rightTrigger().onTrue(Commands.runOnce(SignalLogger::stop));
+
         
         drivetrain.registerTelemetry(logger::telemeterize);
     }
