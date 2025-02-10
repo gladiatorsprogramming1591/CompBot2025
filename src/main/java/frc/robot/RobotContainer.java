@@ -17,11 +17,22 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-
+import frc.robot.commands.IntakeCoral;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.subsystems.EndEffector;
+import frc.robot.subsystems.Wrist;
 
 public class RobotContainer {
+    //Subsystems 
+    private EndEffector endEffector;
+    public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+	public final EndEffector endAffector = new EndEffector();
+	private final Wrist wrist = new Wrist();
+	public final ElevatorSubsystem elevator = new ElevatorSubsystem();
+
+
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 1 1/2 of a rotation per second max angular velocity
 
@@ -36,7 +47,7 @@ public class RobotContainer {
     
     private final CommandXboxController joystick = new CommandXboxController(0);
     
-    public static final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+
     
     private final SendableChooser<Command> autoChooser;
     
@@ -74,6 +85,8 @@ public class RobotContainer {
         
         // reset the field-centric heading on left bumper press
         joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+
+        joystick.a().onTrue(new IntakeCoral(endEffector));
         
         drivetrain.registerTelemetry(logger::telemeterize);
     }
