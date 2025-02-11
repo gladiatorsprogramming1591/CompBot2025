@@ -43,10 +43,11 @@ public class RobotContainer {
     private final SendableChooser<Command> autoChooser;
     
     public RobotContainer() {
-        autoChooser = AutoBuilder.buildAutoChooser("XSHORTStraightLineAuto");
+        autoChooser = AutoBuilder.buildAutoChooser("Forward+Left");
         autoChooser.addOption("XSHORTStraightLineAuto", getAutonomousCommand());
         autoChooser.addOption("XStraightLineAuto", getAutonomousCommand());
         autoChooser.addOption("YStraightLineAuto", getAutonomousCommand());
+        autoChooser.addOption("Forward+Left", getAutonomousCommand());
         autoChooser.addOption("Box", getAutonomousCommand());
         autoChooser.addOption("Box One Path", getAutonomousCommand());
         autoChooser.addOption("VAuto", getAutonomousCommand());
@@ -72,8 +73,8 @@ public class RobotContainer {
         joystick.b().whileTrue(drivetrain.applyRequest(() ->
                 point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
         ));
-        joystick.y().onTrue(drivetrain.runOnce(() -> drivetrain.configNeutralMode(NeutralModeValue.Coast)));
-        joystick.x().onTrue(drivetrain.runOnce(() -> drivetrain.configNeutralMode(NeutralModeValue.Brake)));
+        // joystick.y().onTrue(drivetrain.runOnce(() -> drivetrain.configNeutralMode(NeutralModeValue.Coast)));
+        // joystick.x().onTrue(drivetrain.runOnce(() -> drivetrain.configNeutralMode(NeutralModeValue.Brake)));
         // joystick.y().onTrue(drivetrain.runOnce(() -> drivetrain.setCoastMode()));
         // joystick.x().onTrue(drivetrain.runOnce(() -> drivetrain.setBrakeMode()));
         
