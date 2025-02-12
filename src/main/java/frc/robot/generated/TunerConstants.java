@@ -141,12 +141,6 @@ public class TunerConstants {
     private static final Distance kFrontLeftXPos = Inches.of(10.375);
     private static final Distance kFrontLeftYPos = Inches.of(10.375);
 
-    private final TalonFX kLeftLeader = new TalonFX(kFrontLeftDriveMotorId); 
-    private final TalonFX kLeftFollower = new TalonFX(kBackLeftDriveMotorId); 
-    private final TalonFX kRightLeader = new TalonFX(kFrontRightDriveMotorId); 
-    private final TalonFX kRightFollower = new TalonFX(kBackRightDriveMotorId); 
-
-
     // Front Right
     private static final int kFrontRightDriveMotorId = 1;
     private static final int kFrontRightSteerMotorId = 0;

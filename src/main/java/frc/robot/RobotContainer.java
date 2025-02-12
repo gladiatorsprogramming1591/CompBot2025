@@ -38,7 +38,7 @@ public class RobotContainer {
     
     private final CommandXboxController joystick = new CommandXboxController(0);
     
-    public static final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+    public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     
     private final SendableChooser<Command> autoChooser;
     
