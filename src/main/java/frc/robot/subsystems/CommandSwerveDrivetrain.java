@@ -264,13 +264,13 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             DriverStation.reportError("Failed to load PathPlanner config and configure AutoBuilder", ex.getStackTrace());
         }
 
-        fieldLayout = AprilTagFields.k2025Reefscape.loadAprilTagLayoutField();
+        fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
 
         m_frontCamera = new PhotonCamera("Front");
 
         m_photonPoseEstimators = new PhotonPoseEstimator[] {
             new PhotonPoseEstimator(
-                AprilTagFields.k2025Reefscape.loadAprilTagLayoutField(),
+                AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape),
                 PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
                 kFrontCameraLocation
             )
@@ -361,8 +361,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         SmartDashboard.putBoolean("FrontConnected", m_frontCamera.isConnected());
         // SmartDashboard.putBoolean("BackConnected", m_backCamera.isConnected());
         try {
-            // TODO: getLatencyMillis is deprecated, need another way to determine latency (current docs still show it available :-\)
-            // SmartDashboard.putNumber("Front Latency", m_frontCamera.getLatestResult().getLatencyMillis());
+            //TODO: Learn more on why getAllUnreadResults() returns a list of PhotonPipelineResults instead of 1
+            SmartDashboard.putNumber("Front Latency", m_frontCamera.getAllUnreadResults().get(0).metadata.getLatencyMillis()); // get(0) is a placeholder for now.
             // SmartDashboard.putNumber("Back Latency", m_backCamera.getLatestResult().getLatencyMillis());
             // double latencyThreshold = 12.0;
             // SmartDashboard.putBoolean("Front Latency OK", m_frontCamera.getLatestResult().getLatencyMillis() > latencyThreshold);
