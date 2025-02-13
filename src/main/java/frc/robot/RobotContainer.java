@@ -15,14 +15,18 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import frc.robot.commands.ElevatorToPosition;
+import frc.robot.commands.IntakeAlgae;
 import frc.robot.commands.IntakeCoral;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.EndEffector;
 import frc.robot.subsystems.Wrist;
+import frc.robot.subsystems.ElevatorSubsystem.elevatorPositions;
 
 public class RobotContainer {
     //Subsystems 
@@ -70,24 +74,27 @@ public class RobotContainer {
                                 .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
                 )
         );
-        
-        joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
-        joystick.b().whileTrue(drivetrain.applyRequest(() ->
-                point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
-        ));
-        
-        // Run SysId routines when holding back/start and X/Y.
-        // Note that each routine should be run exactly once in a single log.
-        joystick.back().and(joystick.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
-        joystick.back().and(joystick.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
-        joystick.start().and(joystick.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
-        joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
-        
+
+        //Driver Controls
+        joystick.a().onTrue(new IntakeCoral(endEffector));
+        joystick.b().onTrue(new IntakeAlgae(endEffector)); 
+
+        joystick.rightTrigger().onTrue(new InstantCommand(()-> endEffector.ejectAlgae())); 
+        joystick.leftTrigger().onTrue(new InstantCommand(()-> endEffector.ejectCoral()));
+
+        joystick.rightTrigger().onTrue(new InstantCommand(()-> wrist.setAngle(30))
+            .andThen(()-> endEffector.ejectAlgae()));
+            
         // reset the field-centric heading on left bumper press
         joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
-        joystick.a().onTrue(new IntakeCoral(endEffector));
-        
+        joystick.povDown().onTrue(new ElevatorToPosition(elevator, elevatorPositions.L1)); 
+        joystick.povLeft().onTrue(new ElevatorToPosition(elevator, elevatorPositions.L2)); 
+        joystick.povUp().onTrue(new ElevatorToPosition(elevator, elevatorPositions.L3)); 
+        joystick.povRight().onTrue(new ElevatorToPosition(elevator, elevatorPositions.L4)); 
+
+        joystick.x().onTrue(new ElevatorToPosition(elevator, elevatorPositions.STOW)); 
+
         drivetrain.registerTelemetry(logger::telemeterize);
     }
     

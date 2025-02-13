@@ -3,11 +3,16 @@ package frc.robot.subsystems;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.ElevatorConstants;
+import frc.robot.commands.ElevatorToPosition;
+
 import java.util.EnumMap;
 
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.servohub.ServoHub.ResetMode;
 import com.revrobotics.spark.ClosedLoopSlot;
@@ -29,7 +34,7 @@ public class ElevatorSubsystem extends SubsystemBase{
     RelativeEncoder encoder; 
     SparkClosedLoopController controller; 
 
-    EnumMap<elevatorPositions, Double> mapAbs = new EnumMap<>(elevatorPositions.class);
+    EnumMap<elevatorPositions, Double> mapEnc = new EnumMap<>(elevatorPositions.class);
 
     public enum elevatorPositions {
         STOW, 
@@ -52,17 +57,13 @@ public class ElevatorSubsystem extends SubsystemBase{
         encoder = leader.getEncoder();
         controller = leader.getClosedLoopController();
         
-        mapAbs.put(elevatorPositions.STOW, ElevatorConstants.kSTOW);
-        mapAbs.put(elevatorPositions.L1, ElevatorConstants.kL1);
-        mapAbs.put(elevatorPositions.L2, ElevatorConstants.kL2);
-        mapAbs.put(elevatorPositions.L3, ElevatorConstants.kL3);
-        mapAbs.put(elevatorPositions.L4, ElevatorConstants.kL4);
-        mapAbs.put(elevatorPositions.PROCESSOR, ElevatorConstants.kPROCESSOR);
-        mapAbs.put(elevatorPositions.NETSHOOT, ElevatorConstants.kNET);        
-    }
-    
-    public void setPosition() {
-
+        mapEnc.put(elevatorPositions.STOW, ElevatorConstants.kSTOW);
+        mapEnc.put(elevatorPositions.L1, ElevatorConstants.kL1);
+        mapEnc.put(elevatorPositions.L2, ElevatorConstants.kL2);
+        mapEnc.put(elevatorPositions.L3, ElevatorConstants.kL3);
+        mapEnc.put(elevatorPositions.L4, ElevatorConstants.kL4);
+        mapEnc.put(elevatorPositions.PROCESSOR, ElevatorConstants.kPROCESSOR);
+        mapEnc.put(elevatorPositions.NETSHOOT, ElevatorConstants.kNET);        
     }
 
     public void getHeight() { 
@@ -75,11 +76,6 @@ public class ElevatorSubsystem extends SubsystemBase{
 
     public void elevatorOff() {
         leader.set(0);
-    }
-
-    public void elevatorToPosition(double ref){ 
-        double m_targetPos = mapAbs.get(ref); 
-        elevatorToPosition(ref);
     }
 
     public double getPositionRotations() {
@@ -95,5 +91,9 @@ public class ElevatorSubsystem extends SubsystemBase{
         }
     }
 
+    public void ElevatorToPosition(elevatorPositions positions){
+        double ref = mapEnc.get(positions); 
+        ElevatorToPosition(positions); 
+    }
 
 }
