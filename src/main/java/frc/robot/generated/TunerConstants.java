@@ -10,6 +10,8 @@ import com.ctre.phoenix6.swerve.*;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants.*;
 
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.measure.*;
@@ -180,6 +182,8 @@ public class TunerConstants {
     private static final Distance kBackRightXPos = Inches.of(-10.375);
     private static final Distance kBackRightYPos = Inches.of(-10.375);
 
+    public static final Matrix<N3, N1> odometryStd = VecBuilder.fill(0.06, 0.06, 0.01);
+    public static final Matrix<N3, N1> visionStd = VecBuilder.fill(0.35, 0.35, 0.8);
 
     public static final SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration> FrontLeft =
         ConstantCreator.createModuleConstants(
@@ -207,8 +211,9 @@ public class TunerConstants {
      * This should only be called once in your robot program,.
      */
     public static CommandSwerveDrivetrain createDrivetrain() {
+        double odometryUpdateFrequency = 250; // CAN FD update frequency in HZ
         return new CommandSwerveDrivetrain(
-            DrivetrainConstants, FrontLeft, FrontRight, BackLeft, BackRight
+            DrivetrainConstants, odometryUpdateFrequency, odometryStd, visionStd, FrontLeft, FrontRight, BackLeft, BackRight
         );
     }
 

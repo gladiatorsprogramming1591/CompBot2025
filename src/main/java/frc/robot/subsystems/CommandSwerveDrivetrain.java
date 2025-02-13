@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.*;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.SignalLogger;
@@ -16,12 +17,21 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -35,6 +45,13 @@ import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
 import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.RobotContainer;
+
+import org.photonvision.EstimatedRobotPose;
+import org.photonvision.PhotonCamera;
+import org.photonvision.PhotonPoseEstimator;
+import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 /**
  * Class that extends the Phoenix 6 SwerveDrivetrain class and implements
@@ -122,6 +139,23 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     
     /* The SysId routine to test */
     private SysIdRoutine m_sysIdRoutineToApply = m_sysIdRoutineSteer;
+
+    PhotonCamera m_frontCamera;
+    PhotonPoseEstimator[] m_photonPoseEstimators;
+    AprilTagFieldLayout fieldLayout;
+
+    // TODO: Determine actual camera location and angle, init values from 2024 Halo
+    private static final Transform3d kFrontCameraLocation = new Transform3d(
+        new Translation3d(Units.inchesToMeters(10.507), Units.inchesToMeters(5.673),
+            Units.inchesToMeters(6.789)),
+        new Rotation3d(0.0, Math.toRadians(-20.0), Math.toRadians(0.0)));
+
+    public static final double VISION_FIELD_MARGIN = 0.5;
+    public static final double VISION_Z_MARGIN = 0.75;
+    public static final double VISION_STD_XY_SCALE = 0.02;
+    public static final double VISION_STD_ROT_SCALE = 0.035;
+    public static final double FIELD_LENGTH = 16.5417;
+    public static final double FIELD_WIDTH = 8.0136;
     
     /**
      * Constructs a CTRE SwerveDrivetrain using the specified constants.
@@ -229,6 +263,19 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         } catch (Exception ex) {
             DriverStation.reportError("Failed to load PathPlanner config and configure AutoBuilder", ex.getStackTrace());
         }
+
+        fieldLayout = AprilTagFields.k2025Reefscape.loadAprilTagLayoutField();
+
+        m_frontCamera = new PhotonCamera("Front");
+
+        m_photonPoseEstimators = new PhotonPoseEstimator[] {
+            new PhotonPoseEstimator(
+                AprilTagFields.k2025Reefscape.loadAprilTagLayoutField(),
+                PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
+                kFrontCameraLocation
+            )
+        };
+
     }
     
     /**
@@ -263,47 +310,66 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return m_sysIdRoutineToApply.dynamic(direction);
     }
 
+    public void updatePoseEstimationWithFilter() {
+        Pose2d currentPose = getState().Pose;
+        for (PhotonPoseEstimator poseEstimator : m_photonPoseEstimators) {
+            // TODO: need to find the camera associated with a pose estimator, hard coded to front
+            var results = m_frontCamera.getAllUnreadResults();
+            PhotonPipelineResult result;
+            Optional<EstimatedRobotPose> pose = null;
+            if (!results.isEmpty()) {
+                // Camera processed a new frame since last
+                // Get the last one in the list.
+                result = results.get(results.size() - 1);            
+                pose = poseEstimator.update(result);
+            }
+            if (pose != null && pose.isPresent()) {
+                Pose3d pose3d = pose.get().estimatedPose;
+                Pose2d pose2d = pose3d.toPose2d();
+                if (
+                    pose3d.getX() >= -VISION_FIELD_MARGIN &&
+                    pose3d.getX() <= FIELD_LENGTH + VISION_FIELD_MARGIN &&
+                    pose3d.getY() >= -VISION_FIELD_MARGIN &&
+                    pose3d.getY() <= FIELD_WIDTH + VISION_FIELD_MARGIN &&
+                    pose3d.getZ() >= -VISION_Z_MARGIN &&
+                    pose3d.getZ() <= VISION_Z_MARGIN
+                ) {
+                    double sum = 0.0;
+                    for (PhotonTrackedTarget target : pose.get().targetsUsed) {
+                        Optional<Pose3d> tagPose =
+                            fieldLayout.getTagPose(target.getFiducialId());
+                        if (tagPose.isEmpty()) continue;
+                        sum += currentPose.getTranslation().getDistance(tagPose.get().getTranslation().toTranslation2d());
+                    }
 
-    /**
-     * Returns the heading of the robot.
-     *
-     * @return the robot's heading in degrees, from -180 to 180
-     */
-    //TODO: Tie into actual pigeon
-    // public double getHeading() {
-        // return m_gyro.getYaw().getValueAsDouble();
-    // }
+                    int tagCount = pose.get().targetsUsed.size();
+                    double stdScale = Math.pow(sum / tagCount, 2.0) / tagCount;
+                    double xyStd = VISION_STD_XY_SCALE * stdScale;
+                    double rotStd = VISION_STD_ROT_SCALE * stdScale;
+                    //time this as well
+                    addVisionMeasurement(pose2d, pose.get().timestampSeconds, VecBuilder.fill(xyStd, xyStd, rotStd));
+                    continue;
+                }
+            }
+        }
+    }
 
     @Override
     public void periodic() {
-        // double gyroAngle = getHeading();
-
-        //TODO: Finish vision updates
-        // updatePoseEstimationWithFilter();
+        updatePoseEstimationWithFilter();
         
-        // m_poseEstimator.update(Rotation2d.fromDegrees(getHeading()), new SwerveModulePosition[] {
-        //         m_frontLeft.getPosition(),
-        //         m_frontRight.getPosition(),
-        //         m_rearLeft.getPosition(),
-        //         m_rearRight.getPosition()
-        // });
-
-        // SmartDashboard.putNumber("Distance to Speaker", getSpeakerDistance());
-        // SmartDashboard.putNumber("Distance to Moonshot", getMoonshotTargetDistance());
-
-        /*
         SmartDashboard.putBoolean("FrontConnected", m_frontCamera.isConnected());
-        SmartDashboard.putBoolean("BackConnected", m_backCamera.isConnected());
+        // SmartDashboard.putBoolean("BackConnected", m_backCamera.isConnected());
         try {
-            SmartDashboard.putNumber("Front Latency", m_frontCamera.getLatestResult().getLatencyMillis());
-            SmartDashboard.putNumber("Back Latency", m_backCamera.getLatestResult().getLatencyMillis());
-            double latencyThreshold = 12.0;
-            SmartDashboard.putBoolean("Front Latency OK", m_frontCamera.getLatestResult().getLatencyMillis() > latencyThreshold);
-            SmartDashboard.putBoolean("Back Latency OK", m_backamera.getLatestResult().getLatencyMillis() > latencyThreshold);
+            // TODO: getLatencyMillis is deprecated, need another way to determine latency (current docs still show it available :-\)
+            // SmartDashboard.putNumber("Front Latency", m_frontCamera.getLatestResult().getLatencyMillis());
+            // SmartDashboard.putNumber("Back Latency", m_backCamera.getLatestResult().getLatencyMillis());
+            // double latencyThreshold = 12.0;
+            // SmartDashboard.putBoolean("Front Latency OK", m_frontCamera.getLatestResult().getLatencyMillis() > latencyThreshold);
+            // SmartDashboard.putBoolean("Back Latency OK", m_backamera.getLatestResult().getLatencyMillis() > latencyThreshold);
         } catch(Exception e) {
 
         }
-        */
         
         /*
          * Periodically try to apply the operator perspective.
@@ -327,7 +393,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         SmartDashboard.putNumber("FR Vel",  getState().ModuleStates[1].speedMetersPerSecond);
         SmartDashboard.putNumber("BL Vel",  getState().ModuleStates[2].speedMetersPerSecond);
         SmartDashboard.putNumber("BR Vel",  getState().ModuleStates[3].speedMetersPerSecond);
-        SmartDashboard.putNumber("Heading", getState().Pose.getRotation().getDegrees());
         SmartDashboard.putNumber("Heading", getState().RawHeading.getDegrees());
 
         SmartDashboard.putNumber("Swerve States", getState().ModuleStates.length);
