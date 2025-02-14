@@ -29,8 +29,8 @@ public class RobotContainer {
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 1 1/2 of a rotation per second max angular velocity
     // TODO: Move this into constants
     // public static final double INITIAL_DEADBAND = 0.10; // 10% Deadband
-    public static final double DEADBAND = 0.05; // 5% Deadband
-
+    public static final double DEADBAND = 0.10; // 10% Deadband
+    public static final double MIN_DEADBAND = 0.05; // 5% Deadband to perpendicular axis while robot is at max speed. (Scaled in between)
 
     /* Setting up bindings for necessary control of the swerve drive platform */
     // TODO: Issue: Deadband is not applied while bot is in motion (e.g. strafing while driving).
@@ -63,8 +63,8 @@ public class RobotContainer {
         drivetrain.setDefaultCommand(
                 // Drivetrain will execute this command periodically
                 drivetrain.applyRequest(() ->
-                        drive.withVelocityX(-MathUtil.applyDeadband(joystick.getLeftY(), DEADBAND) * MaxSpeed) // Drive forward with negative Y (forward)
-                                .withVelocityY(-MathUtil.applyDeadband(joystick.getLeftX(), DEADBAND) * MaxSpeed) // Drive left with negative X (left)
+                        drive.withVelocityX(-applyDynamicDeadband(joystick.getLeftY(), joystick.getLeftX(), DEADBAND, MIN_DEADBAND) * MaxSpeed) // Drive forward with negative Y (forward)
+                                .withVelocityY(-applyDynamicDeadband(joystick.getLeftX(), joystick.getLeftY(), DEADBAND, MIN_DEADBAND) * MaxSpeed) // Drive left with negative X (left)
                                 .withRotationalRate(-MathUtil.applyDeadband(joystick.getRightX(), DEADBAND) * MaxAngularRate) // Drive counterclockwise with negative X (left)
                 )
         );
@@ -95,7 +95,16 @@ public class RobotContainer {
         drivetrain.registerTelemetry(logger::telemeterize);
     }
 
-    
+    public double applyDynamicDeadband(double axis, double perpendicularAxis, double Deadband, double minDeadband)
+    {
+        return MathUtil.applyDeadband(axis, MathUtil.clamp(Math.abs(1 - perpendicularAxis) * Deadband, minDeadband, Deadband));
+    }
+
+    // public double applyDualDeadband(double axis, double perpendicularAxis, double staticDeadband, double kineticDeadband)
+    // {
+    //     MathUtil.applyDeadband(axis, MathUtil.clamp(Math.abs(1 - perpendicularAxis) * staticDeadband, kineticDeadband, staticDeadband));
+    //     return MathUtil.applyDeadband(axis, MathUtil.clamp(Math.abs(1 - perpendicularAxis) * staticDeadband, kineticDeadband, staticDeadband));
+    // }
     
     public Command getAutonomousCommand() {
         return autoChooser.getSelected();
