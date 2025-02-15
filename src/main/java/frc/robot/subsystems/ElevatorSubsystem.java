@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import static frc.robot.Constants.ElevatorConstants.*;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -7,7 +9,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.Constants.ElevatorConstants;
 import frc.robot.commands.ElevatorToPosition;
 
 import java.util.EnumMap;
@@ -47,23 +48,23 @@ public class ElevatorSubsystem extends SubsystemBase{
     }  
 
     public ElevatorSubsystem() {
-        leader = new SparkFlex(ElevatorConstants.ELEVATOR_LEADER_CAN_ID, MotorType.kBrushless); 
-        follower = new SparkFlex(ElevatorConstants.ELEVATOR_FOLLOWER_CAN_ID, MotorType.kBrushless);
+        leader = new SparkFlex(ELEVATOR_LEADER_CAN_ID, MotorType.kBrushless); 
+        follower = new SparkFlex(ELEVATOR_FOLLOWER_CAN_ID, MotorType.kBrushless);
         follower.configure(
-            ElevatorConstants.MOTOR_CONFIG.follow(0),
+            MOTOR_CONFIG.follow(ELEVATOR_LEADER_CAN_ID),
             SparkBase.ResetMode.kResetSafeParameters, 
             SparkBase.PersistMode.kPersistParameters); 
 
         encoder = leader.getEncoder();
         controller = leader.getClosedLoopController();
         
-        mapEnc.put(elevatorPositions.STOW, ElevatorConstants.kSTOW);
-        mapEnc.put(elevatorPositions.L1, ElevatorConstants.kL1);
-        mapEnc.put(elevatorPositions.L2, ElevatorConstants.kL2);
-        mapEnc.put(elevatorPositions.L3, ElevatorConstants.kL3);
-        mapEnc.put(elevatorPositions.L4, ElevatorConstants.kL4);
-        mapEnc.put(elevatorPositions.PROCESSOR, ElevatorConstants.kPROCESSOR);
-        mapEnc.put(elevatorPositions.NETSHOOT, ElevatorConstants.kNET);        
+        mapEnc.put(elevatorPositions.STOW, kSTOW);
+        mapEnc.put(elevatorPositions.L1, kL1);
+        mapEnc.put(elevatorPositions.L2, kL2);
+        mapEnc.put(elevatorPositions.L3, kL3);
+        mapEnc.put(elevatorPositions.L4, kL4);
+        mapEnc.put(elevatorPositions.PROCESSOR, kPROCESSOR);
+        mapEnc.put(elevatorPositions.NETSHOOT, kNET);        
     }
 
     public void getHeight() { 

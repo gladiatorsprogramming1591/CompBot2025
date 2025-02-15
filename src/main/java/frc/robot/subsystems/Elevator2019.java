@@ -14,7 +14,7 @@ import com.revrobotics.spark.SparkLowLevel;
 
 // TBD: Need to add current limits so we don't burn out motor if we hit top or bottom
 // TBD: Need to add PIDF controller
-public class Elevator extends SubsystemBase {
+public class Elevator2019 extends SubsystemBase {
 
     private DigitalInput elevatorBottomSwitch;
     private SparkFlex elevatorMotorLeft;
@@ -44,12 +44,12 @@ public class Elevator extends SubsystemBase {
     int CARGO_SHIP_POS = -183;
     int L2HATCH_POS = -356;
 
-    public Elevator() {
+    public Elevator2019() {
         // TBD: Need to update bottom switch to match electrical
         elevatorBottomSwitch = new DigitalInput(1);        
         
         
-        elevatorMotorLeft = new SparkFlex(Constants.ElevatorConstants.LEFT_CANID, SparkLowLevel.MotorType.kBrushless);
+        elevatorMotorLeft = new SparkFlex(0, SparkLowLevel.MotorType.kBrushless);
         // TBD: Need to add right motor following
         // elevatorMotorRight = new SparkFlex(Constants.ElevatorConstants.RIGHT_CANID, SparkLowLevel.MotorType.kBrushless);
         // elevatorMotorRight.follow(elevatorMotorLeft);

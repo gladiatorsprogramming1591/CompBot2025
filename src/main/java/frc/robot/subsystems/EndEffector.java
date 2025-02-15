@@ -2,17 +2,19 @@ package frc.robot.subsystems;
 
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.SparkLimitSwitch;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.EndEffectorConstants;
 
 public class EndEffector extends SubsystemBase {
     SparkFlex intakeMotor;
     DigitalInput placementCoralBeamBreak;
+    SparkLimitSwitch coralRearBeam;
+    SparkLimitSwitch coralFrontBeam;
 
    
     public EndEffector(){
@@ -23,6 +25,8 @@ public class EndEffector extends SubsystemBase {
                 SparkBase.PersistMode.kPersistParameters
             );
 
+            coralFrontBeam = intakeMotor.getForwardLimitSwitch();
+            coralRearBeam = intakeMotor.getReverseLimitSwitch();
             // intakeCoralBeamBreak = intakeMotor.getReverseLimitSwitch();
             // placementCoralBeamBreak = new DigitalInput(EndAffectorConstants.PLACEMENT_CORAL_BEAM_BREAK_ID);
 
@@ -58,6 +62,16 @@ public class EndEffector extends SubsystemBase {
         if(placementCoralBeamBreak.get() == false) { 
         }
             return false;
+    }
+
+    public boolean isCoralFrontBeamBroken()
+    {
+        return coralFrontBeam.isPressed();
+    }
+
+    public boolean isCoralRearBeamBroken()
+    {
+        return coralRearBeam.isPressed();
     }
 
     @Override
