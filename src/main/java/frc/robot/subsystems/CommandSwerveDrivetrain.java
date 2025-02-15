@@ -270,7 +270,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
         m_photonPoseEstimators = new PhotonPoseEstimator[] {
             new PhotonPoseEstimator(
-                AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape),
+                fieldLayout,
                 PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
                 kFrontCameraLocation
             )
