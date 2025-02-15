@@ -48,12 +48,12 @@ public class ElevatorToPosition extends Command {
 
     @Override
     public boolean isFinished(){
-        // return m_elevator.atLevel(m_targetPos);
-        return false;
+        // This command just sets the setpoint and is done, so return true.
+        return true;
     }
 
     @Override
     public void end(boolean isInterrupted){
-        if (!m_keepRunning) m_elevator.elevatorOff();
+        // Do nothing since we want the motors to continue running to/at the setpoint.
     }
 }

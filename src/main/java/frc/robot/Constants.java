@@ -9,16 +9,20 @@ public class Constants {
 
     
     public class ElevatorConstants {
-        public static final int ELEVATOR_LEADER_CAN_ID = 0;
-        public static final int ELEVATOR_FOLLOWER_CAN_ID = 0;
+        public static final int ELEVATOR_LEADER_CAN_ID = 7; // Right
+        public static final int ELEVATOR_FOLLOWER_CAN_ID = 11; // Left
 
         public static final boolean LEADER_INVERTED = false; 
+        public static final boolean FOLLOWER_INVERTED_FROM_LEADER = true;
         public static final double RAMP_RATE = 9.0; 
-        public static final int CURRENT_LIMIT = 12; 
+        public static final int CURRENT_LIMIT = 50; 
 
         public static final double OUTPUT_MAXIMUM = 0; 
         public static final double OUTPUT_MINIMUM = 0; 
-        
+
+        public static final double INCHES_PER_ROTATION = 22.0/9.0/4.0;
+        public static final double INITIAL_HEIGHT_INCHES = 0;
+
         //Constants for going up 
         public static final double P_UP = 0.2; 
         public static final double I_UP = 0; 
@@ -32,6 +36,7 @@ public class Constants {
         public static final double P_DOWN = .1; 
         public static final double I_DOWN = 0; 
         public static final double D_DOWN = 0; 
+        public static final double FF_DOWN = .623; 
 
         public static final double MAX_VEL_DOWN = 2000; 
         public static final double MAX_ACCEL_DOWN = 4000; 
@@ -63,12 +68,11 @@ public class Constants {
         //Elevator Positions
         public static final double kSTOW = 0; 
         public static final double kL1 = 0; 
-        public static final double kL2 = 0; 
-        public static final double kL3 = 0; 
-        public static final double kL4 = 0; 
+        public static final double kL2 = 7; 
+        public static final double kL3 = 15.5; 
+        public static final double kL4 = 23; 
         public static final double kPROCESSOR = 0; 
-        public static final double kNET = 0;
-        public static final int kCurrentLimitDefault = 0;
+        public static final double kNET = 27;
         public static final double STOW_ANGLE = 0; 
 
     }
