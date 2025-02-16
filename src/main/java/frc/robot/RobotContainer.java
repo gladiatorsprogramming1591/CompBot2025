@@ -11,13 +11,10 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.ElevatorToPosition;
 import frc.robot.commands.IntakeAlgae;
 import frc.robot.commands.IntakeCoral;
@@ -44,8 +41,8 @@ public class RobotContainer {
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
             .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
-    private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
-    private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
+    // private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
+    // private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
     
     private final Telemetry logger = new Telemetry(MaxSpeed);
     
@@ -75,6 +72,8 @@ public class RobotContainer {
                 )
         );
 
+        elevator.setMotorSpeed(joystick.getRightY());
+
         //Driver Controls
         joystick.a().onTrue(new IntakeCoral(endEffector));
         joystick.b().onTrue(new IntakeAlgae(endEffector)); 
@@ -94,6 +93,7 @@ public class RobotContainer {
         joystick.povRight().onTrue(new ElevatorToPosition(elevator, elevatorPositions.L4)); 
 
         joystick.x().onTrue(new ElevatorToPosition(elevator, elevatorPositions.STOW)); 
+        joystick.y().onTrue(new InstantCommand(() -> elevator.zeroElevator()));
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }
