@@ -347,6 +347,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                     double xyStd = VISION_STD_XY_SCALE * stdScale;
                     double rotStd = VISION_STD_ROT_SCALE * stdScale;
                     //time this as well
+                    SmartDashboard.putNumber("Vision x", pose2d.getX());
+                    SmartDashboard.putNumber("Vision y", pose2d.getY());
+                    SmartDashboard.putNumber("Vision ts", pose.get().timestampSeconds);
                     addVisionMeasurement(pose2d, pose.get().timestampSeconds, VecBuilder.fill(xyStd, xyStd, rotStd));
                     continue;
                 }
