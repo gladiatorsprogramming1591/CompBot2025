@@ -93,6 +93,7 @@ public class RobotContainer {
         joystick.povRight().onTrue(new ElevatorToPosition(elevator, elevatorPositions.L4)); 
 
         joystick.x().onTrue(new ElevatorToPosition(elevator, elevatorPositions.STOW)); 
+        joystick.y().onTrue(new InstantCommand(() -> elevator.zeroElevator()));
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }
