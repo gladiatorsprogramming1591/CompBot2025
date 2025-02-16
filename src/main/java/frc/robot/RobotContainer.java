@@ -6,6 +6,8 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
+import com.ctre.phoenix6.SignalLogger;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -36,8 +38,14 @@ public class RobotContainer {
 
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 1 1/2 of a rotation per second max angular velocity
+    // TODO: Move this into constants
+    public static final double DEADBAND = 0.10; // 10% Deadband
+    public static final double MIN_DEADBAND = 0.05; // 5% Deadband to perpendicular axis while robot is in motion
 
     /* Setting up bindings for necessary control of the swerve drive platform */
+    // TODO: Issue: Deadband is not applied while bot is in motion (e.g. strafing while driving).
+    // - Suspicion that output does not scale from 0 to max after the deadband (joystick is touchy). 
+    // TODO: Idea?: Try changing OpenLoopVoltage to Velocity if we switch to FOC
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
             .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
@@ -48,13 +56,12 @@ public class RobotContainer {
     
     private final CommandXboxController joystick = new CommandXboxController(0);
     
-
+    public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     
     private final SendableChooser<Command> autoChooser;
     
     public RobotContainer() {
-        autoChooser = AutoBuilder.buildAutoChooser("StraightLineAuto");
-        autoChooser.addOption("StraightLineAuto", getAutonomousCommand());
+        autoChooser = AutoBuilder.buildAutoChooser(); // A default auto can be passed in as parameter.
         SmartDashboard.putData("Auto Mode", autoChooser);
         
         configureBindings();
@@ -66,9 +73,12 @@ public class RobotContainer {
         drivetrain.setDefaultCommand(
                 // Drivetrain will execute this command periodically
                 drivetrain.applyRequest(() ->
+                        // drive.withVelocityX(-drivetrain.applyDynamicDeadband(joystick.getLeftY(), joystick.getLeftX(), DEADBAND) * MaxSpeed) // Drive forward with negative Y (forward)
+                        //         .withVelocityY(-drivetrain.applyDynamicDeadband(joystick.getLeftX(), joystick.getLeftY(), DEADBAND) * MaxSpeed) // Drive left with negative X (left)
+                        //         .withRotationalRate(-MathUtil.applyDeadband(joystick.getRightX(), DEADBAND) * MaxAngularRate) // Drive counterclockwise with negative X (left)
                         drive.withVelocityX(-joystick.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
-                                .withVelocityY(-joystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
-                                .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
+                                    .withVelocityY(-joystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
+                                    .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
                 )
         );
 
@@ -84,6 +94,23 @@ public class RobotContainer {
         joystick.rightTrigger().onTrue(new InstantCommand(()-> wrist.setAngle(30))
             .andThen(()-> endEffector.ejectAlgae()));
             
+        
+        joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
+        joystick.b().whileTrue(drivetrain.applyRequest(() ->
+                point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
+        ));
+        // joystick.y().onTrue(drivetrain.runOnce(() -> drivetrain.configNeutralMode(NeutralModeValue.Coast)));
+        // joystick.x().onTrue(drivetrain.runOnce(() -> drivetrain.configNeutralMode(NeutralModeValue.Brake)));
+        // joystick.y().onTrue(drivetrain.runOnce(() -> drivetrain.setCoastMode()));
+        // joystick.x().onTrue(drivetrain.runOnce(() -> drivetrain.setBrakeMode()));
+        
+        // Run SysId routines when holding back/start and X/Y.
+        // Note that each routine should be run exactly once in a single log.
+        joystick.back().and(joystick.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
+        joystick.back().and(joystick.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
+        joystick.start().and(joystick.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
+        joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+        
         // reset the field-centric heading on left bumper press
         joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
@@ -95,6 +122,11 @@ public class RobotContainer {
         joystick.x().onTrue(new ElevatorToPosition(elevator, elevatorPositions.STOW)); 
         joystick.y().onTrue(new InstantCommand(() -> elevator.zeroElevator()));
 
+
+        joystick.leftTrigger().onTrue(Commands.runOnce(SignalLogger::start));
+        joystick.rightTrigger().onTrue(Commands.runOnce(SignalLogger::stop));
+
+        
         drivetrain.registerTelemetry(logger::telemeterize);
     }
     

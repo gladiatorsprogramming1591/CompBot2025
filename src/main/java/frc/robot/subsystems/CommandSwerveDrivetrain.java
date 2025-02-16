@@ -6,6 +6,8 @@ import java.util.function.Supplier;
 
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.Utils;
+import com.ctre.phoenix6.controls.CoastOut;
+import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -14,6 +16,7 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
@@ -26,9 +29,7 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.generated.TunerConstants;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
-import frc.robot.RobotContainer;
 
 /**
  * Class that extends the Phoenix 6 SwerveDrivetrain class and implements
@@ -54,6 +55,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private final SwerveRequest.SysIdSwerveRotation m_rotationCharacterization = new SwerveRequest.SysIdSwerveRotation();
     
     /* SysId routine for characterizing translation. This is used to find PID gains for the drive motors. */
+    @SuppressWarnings("unused")
     private final SysIdRoutine m_sysIdRoutineTranslation = new SysIdRoutine(
             new SysIdRoutine.Config(
                     null,        // Use default ramp rate (1 V/s)
@@ -70,6 +72,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     );
     
     /* SysId routine for characterizing steer. This is used to find PID gains for the steer motors. */
+    // @SuppressWarnings("unused")
     private final SysIdRoutine m_sysIdRoutineSteer = new SysIdRoutine(
             new SysIdRoutine.Config(
                     null,        // Use default ramp rate (1 V/s)
@@ -90,6 +93,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
      * This is used to find PID gains for the FieldCentricFacingAngle HeadingController.
      * See the documentation of SwerveRequest.SysIdSwerveRotation for info on importing the log to SysId.
      */
+    @SuppressWarnings("unused")
     private final SysIdRoutine m_sysIdRoutineRotation = new SysIdRoutine(
             new SysIdRoutine.Config(
                     /* This is in radians per second², but SysId only supports "volts per second" */
@@ -110,6 +114,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                     null,
                     this
             )
+
     );
 
     
@@ -210,9 +215,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                     ),
                     new PPHolonomicDriveController(
                             // PID constants for translation
-                            new PIDConstants(10, 0, 0),
+                            new PIDConstants(7.5, 0, 0),
                             // PID constants for rotation
-                            new PIDConstants(7, 0, 0)
+                            new PIDConstants(3.5, 0.2, 0)
                     ),
                     config,
                     // Assume the path needs to be flipped for Red vs Blue, this is normally the case
@@ -300,4 +305,44 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         });
         m_simNotifier.startPeriodic(kSimLoopPeriod);
     }
+
+    // TODO: Use getConfigurator to set different control loops and edit on smartDashBoard
+
+    // TODO: Low Priority: Troubleshoot why setting idle mode to coast fights with the brake mode default
+    public void setCoastMode()
+    {
+        for (int i = 0; i < 4; i++) {
+            getModule(i).getSteerMotor().setControl(new CoastOut());
+            getModule(i).getDriveMotor().setControl(new CoastOut());
+        }
+    }
+
+    public void setBrakeMode()
+    {
+        for (int i = 0; i < 4; i++) {
+            getModule(i).getSteerMotor().setControl(new StaticBrake());
+            getModule(i).getDriveMotor().setControl(new StaticBrake());
+        }
+    }
+
+    // After initial deadband is broken, the perpendicular axis' deadband scales down linearly as the other axis increases.
+    // minDeadband: Deadband to perpendicular axis while robot is at max speed. (Scaled in between)
+    public double applyScaledDynamicDeadband(double axis, double perpendicularAxis, double Deadband, double minDeadband)
+    {
+        return MathUtil.applyDeadband(axis, MathUtil.clamp(Math.abs(1 - perpendicularAxis) * Deadband, minDeadband, Deadband));
+    }   // A way to change scale from minDeadband to Deadband (reverse of above) may be more useful to maintain accurate directional
+        // control at slow speeds, but still counteract drift. (10% deadband too large at low speed)
+
+    // Mimics CTRE's deadband function, but with properly scaled output between 0-1 after deadband.
+    public double applyDynamicDeadband(double axis, double perpendicularAxis, double deadband)
+    {
+        return applyDynamicDeadband(axis, perpendicularAxis, deadband, 0, false);
+    }
+
+    public double applyDynamicDeadband(double axis, double perpendicularAxis, double staticDeadband, double kineticDeadband, boolean squaredInputs)
+    {
+        if (squaredInputs) {axis = Math.pow(axis, 2);}
+        return MathUtil.applyDeadband(axis, (perpendicularAxis > staticDeadband ? kineticDeadband : staticDeadband));
+    }
+
 }
