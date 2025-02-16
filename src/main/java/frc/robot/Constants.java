@@ -1,6 +1,7 @@
 package frc.robot;
 
 import com.revrobotics.spark.ClosedLoopSlot;
+import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
@@ -8,8 +9,8 @@ public class Constants {
 
     
     public class ElevatorConstants {
-        public static final int ELEVATOR_LEADER_CAN_ID = 7; // Right
-        public static final int ELEVATOR_FOLLOWER_CAN_ID = 11; // Left
+        public static final int ELEVATOR_LEADER_CAN_ID = 1; // Right
+        public static final int ELEVATOR_FOLLOWER_CAN_ID = 2; // Left
         
         public static final boolean LEADER_INVERTED = false; 
         public static final boolean FOLLOWER_INVERTED_FROM_LEADER = true;
@@ -67,8 +68,8 @@ public class Constants {
 
 
         //Elevator Positions
-        public static final double kSTOW = 0; 
-        public static final double kL1 = 0; 
+        public static final double kSTOW = 0.1; 
+        public static final double kL1 = 0.2; 
         public static final double kL2 = 7; 
         public static final double kL3 = 15.5; 
         public static final double kL4 = 23; 
@@ -79,7 +80,7 @@ public class Constants {
     }
 
     public class EndEffectorConstants {
-        public static final int EE_MOTOR_ID = 0;
+        public static final int EE_MOTOR_ID = 3;
         public static final int INTAKE_CURRENT_LIMIT = 0; 
         public static final int INTAKE_RAMP_RATE = 30; 
         public static final boolean INTAKE_INVERTED = false;
@@ -111,7 +112,7 @@ public class Constants {
         public static final double kWRIST_STOW = 0; //placeholders (obviously)
         public static final double kGROUND_INTAKE = 0; 
         public static final double kCORAL_MARK_PICKUP = 0;
-        public static final int WRIST_CAN_ID = 0; 
+        public static final int WRIST_CAN_ID = 4; 
         public static final int WRIST_CURRENT_LIMIT = 12; 
         public static final boolean MOTOR_INVERTED = false; 
         public static final int RAMP_RATE = 12; 
@@ -120,14 +121,14 @@ public class Constants {
         public static final double WRIST_D = 0; 
 
         public static final SparkMaxConfig MOTOR_CONFIG = new SparkMaxConfig() {{
-            idleMode(IdleMode.kBrake);
+            idleMode(IdleMode.kCoast);
             smartCurrentLimit(WristConstants.WRIST_CURRENT_LIMIT);
             inverted(WristConstants.MOTOR_INVERTED);
             openLoopRampRate(WristConstants.RAMP_RATE);
             closedLoop.p(WristConstants.WRIST_P);
             closedLoop.i(WristConstants.WRIST_I);
             closedLoop.d(WristConstants.WRIST_D);
-            // closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
+            closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
             absoluteEncoder.positionConversionFactor(360);
         }};
 
