@@ -1,7 +1,6 @@
 package frc.robot;
 
 import com.revrobotics.spark.ClosedLoopSlot;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
@@ -11,7 +10,7 @@ public class Constants {
     public class ElevatorConstants {
         public static final int ELEVATOR_LEADER_CAN_ID = 7; // Right
         public static final int ELEVATOR_FOLLOWER_CAN_ID = 11; // Left
-
+        
         public static final boolean LEADER_INVERTED = false; 
         public static final boolean FOLLOWER_INVERTED_FROM_LEADER = true;
         public static final double RAMP_RATE = 9.0; 
@@ -47,6 +46,8 @@ public class Constants {
             smartCurrentLimit(ElevatorConstants.CURRENT_LIMIT);
             inverted(ElevatorConstants.LEADER_INVERTED);
             openLoopRampRate(ElevatorConstants.RAMP_RATE);
+            limitSwitch.reverseLimitSwitchEnabled(false);
+            limitSwitch.forwardLimitSwitchEnabled(false);
             closedLoop.outputRange(-0.1, OUTPUT_MAXIMUM, ClosedLoopSlot.kSlot0) // kslot 0 is up
                 .p(ElevatorConstants.P_UP, ClosedLoopSlot.kSlot0)
                 .i(ElevatorConstants.I_UP, ClosedLoopSlot.kSlot0)
@@ -94,11 +95,12 @@ public class Constants {
          
         
         public static final SparkFlexConfig MOTOR_CONFIG = new SparkFlexConfig() {{
-                    idleMode(IdleMode.kBrake);
-                    smartCurrentLimit(EndEffectorConstants.INTAKE_CURRENT_LIMIT);
+            idleMode(IdleMode.kBrake);
+            smartCurrentLimit(EndEffectorConstants.INTAKE_CURRENT_LIMIT);
             inverted(EndEffectorConstants.INTAKE_INVERTED);
             openLoopRampRate(EndEffectorConstants.INTAKE_RAMP_RATE);
-            limitSwitch.reverseLimitSwitchEnabled(true);
+            limitSwitch.reverseLimitSwitchEnabled(false);
+            limitSwitch.forwardLimitSwitchEnabled(false);
         }};
 
 

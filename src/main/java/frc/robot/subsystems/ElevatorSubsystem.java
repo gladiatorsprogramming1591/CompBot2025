@@ -1,38 +1,34 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ElevatorConstants;
-import frc.robot.commands.ElevatorToPosition;
 
 import java.util.EnumMap;
 
-import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.servohub.ServoHub.ResetMode;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
-import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkLimitSwitch;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.SparkFlexConfig;
-import com.revrobotics.spark.config.SparkFlexConfigAccessor;
 import com.revrobotics.spark.SparkBase.ControlType; 
 
 public class ElevatorSubsystem extends SubsystemBase{
-    DigitalInput coralBeamBreak; 
+    DigitalInput lowerLimit; 
+    Trigger zeroTrigger; 
 
     SparkBase leader; 
     SparkBase follower;
     
     RelativeEncoder encoder; 
     SparkClosedLoopController controller; 
+    SparkLimitSwitch bottomLimitSwitch;
 
     EnumMap<elevatorPositions, Double> mapEnc = new EnumMap<>(elevatorPositions.class);
 
@@ -63,7 +59,13 @@ public class ElevatorSubsystem extends SubsystemBase{
         mapEnc.put(elevatorPositions.L3, ElevatorConstants.kL3);
         mapEnc.put(elevatorPositions.L4, ElevatorConstants.kL4);
         mapEnc.put(elevatorPositions.PROCESSOR, ElevatorConstants.kPROCESSOR);
-        mapEnc.put(elevatorPositions.NETSHOOT, ElevatorConstants.kNET);        
+        mapEnc.put(elevatorPositions.NETSHOOT, ElevatorConstants.kNET);  
+        
+        //lowerLimit = new DigitalInput(ElevatorConstants.LOWER_LIMIT_ID);
+        // TODO: Confirm location of limit switch (leader/follower, forward/reverse)
+        bottomLimitSwitch = leader.getForwardLimitSwitch();
+        zeroTrigger = new Trigger(bottomLimitSwitch::isPressed);
+        zeroTrigger.onTrue(zeroElevator());
     }
 
     public void getHeight() { 
@@ -82,7 +84,15 @@ public class ElevatorSubsystem extends SubsystemBase{
         return encoder.getPosition(); 
     }
 
-    /**
+     /**
+     * Returns the current height
+     * @return the height, in inches
+     */
+    public double getPositionInches() {
+        return getPositionRotations()*ElevatorConstants.INCHES_PER_ROTATION+ElevatorConstants.INITIAL_HEIGHT_INCHES;
+    }
+
+   /**
      * Calculates the number of rotations to be at the specified number of inches.
      * @return the number of rotations
      */
@@ -102,6 +112,17 @@ public class ElevatorSubsystem extends SubsystemBase{
     public void ElevatorToPosition(elevatorPositions positions){
         double refInches = mapEnc.get(positions); 
         setPositionRotations(inchesToRotations(refInches)); 
+    }
+
+    public Command zeroElevator() {
+        return new InstantCommand(() -> encoder.setPosition(0));
+    }
+
+    @Override
+    public void periodic() {
+        SmartDashboard.putBoolean("Elevator lowerLimit", bottomLimitSwitch.isPressed());
+        SmartDashboard.putNumber("Elevator inches", getPositionInches());
+        SmartDashboard.putNumber("Elevator current", leader.getOutputCurrent());
     }
 
 }
