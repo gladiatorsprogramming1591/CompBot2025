@@ -48,7 +48,7 @@ public class ElevatorSubsystem extends SubsystemBase{
         leader = new SparkFlex(ELEVATOR_LEADER_CAN_ID, MotorType.kBrushless); 
         follower = new SparkFlex(ELEVATOR_FOLLOWER_CAN_ID, MotorType.kBrushless);
         follower.configure(
-            ElevatorConstants.MOTOR_CONFIG.follow(ElevatorConstants.ELEVATOR_LEADER_CAN_ID, ElevatorConstants.FOLLOWER_INVERTED_FROM_LEADER ),
+            MOTOR_CONFIG.follow(ELEVATOR_LEADER_CAN_ID, FOLLOWER_INVERTED_FROM_LEADER ),
             SparkBase.ResetMode.kResetSafeParameters, 
             SparkBase.PersistMode.kPersistParameters); 
 
@@ -85,7 +85,7 @@ public class ElevatorSubsystem extends SubsystemBase{
      * @return the height, in inches
      */
     public double getPositionInches() {
-        return getPositionRotations()*ElevatorConstants.INCHES_PER_ROTATION+ElevatorConstants.INITIAL_HEIGHT_INCHES;
+        return getPositionRotations()*INCHES_PER_ROTATION+INITIAL_HEIGHT_INCHES;
     }
 
    /**
@@ -93,13 +93,13 @@ public class ElevatorSubsystem extends SubsystemBase{
      * @return the number of rotations
      */
     public double inchesToRotations(double inches) {
-        return (inches-ElevatorConstants.INITIAL_HEIGHT_INCHES)/ElevatorConstants.INCHES_PER_ROTATION;
+        return (inches-INITIAL_HEIGHT_INCHES)/INCHES_PER_ROTATION;
     }
 
 
     public void setPositionRotations(double rotations) {
         if (rotations < getPositionRotations()) {
-            controller.setReference(rotations, ControlType.kMAXMotionPositionControl, ClosedLoopSlot.kSlot1, ElevatorConstants.FF_DOWN); // Down case; use max motion and slot 1
+            controller.setReference(rotations, ControlType.kMAXMotionPositionControl, ClosedLoopSlot.kSlot1, FF_DOWN); // Down case; use max motion and slot 1
         } else {
             controller.setReference(rotations, ControlType.kPosition, ClosedLoopSlot.kSlot0); // Up case; use plain position control, slot 0
         }

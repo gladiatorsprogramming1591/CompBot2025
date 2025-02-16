@@ -6,8 +6,6 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
-import com.ctre.phoenix6.SignalLogger;
-import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -30,7 +28,6 @@ import frc.robot.subsystems.ElevatorSubsystem.elevatorPositions;
 public class RobotContainer {
     //Subsystems 
     private EndEffector endEffector;
-    public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 	public final EndEffector endAffector = new EndEffector();
 	private final Wrist wrist = new Wrist();
 	public final ElevatorSubsystem elevator = new ElevatorSubsystem();
@@ -73,9 +70,6 @@ public class RobotContainer {
         drivetrain.setDefaultCommand(
                 // Drivetrain will execute this command periodically
                 drivetrain.applyRequest(() ->
-                        // drive.withVelocityX(-drivetrain.applyDynamicDeadband(joystick.getLeftY(), joystick.getLeftX(), DEADBAND) * MaxSpeed) // Drive forward with negative Y (forward)
-                        //         .withVelocityY(-drivetrain.applyDynamicDeadband(joystick.getLeftX(), joystick.getLeftY(), DEADBAND) * MaxSpeed) // Drive left with negative X (left)
-                        //         .withRotationalRate(-MathUtil.applyDeadband(joystick.getRightX(), DEADBAND) * MaxAngularRate) // Drive counterclockwise with negative X (left)
                         drive.withVelocityX(-joystick.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
                                     .withVelocityY(-joystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
                                     .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
@@ -88,29 +82,12 @@ public class RobotContainer {
         joystick.a().onTrue(new IntakeCoral(endEffector));
         joystick.b().onTrue(new IntakeAlgae(endEffector)); 
 
-        joystick.rightTrigger().onTrue(new InstantCommand(()-> endEffector.ejectAlgae())); 
+        joystick.rightTrigger().onTrue(new InstantCommand(()-> endEffector.ejectAlgae()));
         joystick.leftTrigger().onTrue(new InstantCommand(()-> endEffector.ejectCoral()));
 
-        joystick.rightTrigger().onTrue(new InstantCommand(()-> wrist.setAngle(30))
-            .andThen(()-> endEffector.ejectAlgae()));
-            
-        
-        joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
-        joystick.b().whileTrue(drivetrain.applyRequest(() ->
-                point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
-        ));
-        // joystick.y().onTrue(drivetrain.runOnce(() -> drivetrain.configNeutralMode(NeutralModeValue.Coast)));
-        // joystick.x().onTrue(drivetrain.runOnce(() -> drivetrain.configNeutralMode(NeutralModeValue.Brake)));
-        // joystick.y().onTrue(drivetrain.runOnce(() -> drivetrain.setCoastMode()));
-        // joystick.x().onTrue(drivetrain.runOnce(() -> drivetrain.setBrakeMode()));
-        
-        // Run SysId routines when holding back/start and X/Y.
-        // Note that each routine should be run exactly once in a single log.
-        joystick.back().and(joystick.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
-        joystick.back().and(joystick.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
-        joystick.start().and(joystick.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
-        joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
-        
+        // joystick.rightTrigger().onTrue(new InstantCommand(()-> wrist.setAngle(30))  // TODO: Button conflict
+        //     .andThen(()-> endEffector.ejectAlgae()));
+                    
         // reset the field-centric heading on left bumper press
         joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
@@ -122,11 +99,20 @@ public class RobotContainer {
         joystick.x().onTrue(new ElevatorToPosition(elevator, elevatorPositions.STOW)); 
         joystick.y().onTrue(new InstantCommand(() -> elevator.zeroElevator()));
 
+        // Tunning commands
+        // joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
+        // joystick.b().whileTrue(drivetrain.applyRequest(() ->
+        //         point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
+        // ));
+        // // Run SysId routines when holding back/start and X/Y.
+        // // Note that each routine should be run exactly once in a single log.
+        // joystick.back().and(joystick.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
+        // joystick.back().and(joystick.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
+        // joystick.start().and(joystick.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
+        // joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+        // joystick.leftTrigger().onTrue(Commands.runOnce(SignalLogger::start));
+        // joystick.rightTrigger().onTrue(Commands.runOnce(SignalLogger::stop));
 
-        joystick.leftTrigger().onTrue(Commands.runOnce(SignalLogger::start));
-        joystick.rightTrigger().onTrue(Commands.runOnce(SignalLogger::stop));
-
-        
         drivetrain.registerTelemetry(logger::telemeterize);
     }
     
