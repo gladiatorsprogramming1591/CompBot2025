@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.ElevatorToPosition;
 import frc.robot.commands.IntakeAlgae;
@@ -27,9 +28,8 @@ import frc.robot.subsystems.ElevatorSubsystem.elevatorPositions;
 
 public class RobotContainer {
     //Subsystems 
-    private EndEffector endEffector;
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
-	public final EndEffector endAffector = new EndEffector();
+	public final EndEffector endEffector = new EndEffector();
 	private final Wrist wrist = new Wrist();
 	public final ElevatorSubsystem elevator = new ElevatorSubsystem();
 
@@ -72,17 +72,19 @@ public class RobotContainer {
                 )
         );
 
-        elevator.setMotorSpeed(joystick.getRightY());
+        // elevator.setDefaultCommand(new RunCommand(() -> elevator.setMotorSpeed(joystick.getRightY()),elevator));
 
         //Driver Controls
         joystick.a().onTrue(new IntakeCoral(endEffector));
         joystick.b().onTrue(new IntakeAlgae(endEffector)); 
 
-        joystick.rightTrigger().onTrue(new InstantCommand(()-> endEffector.ejectAlgae())); 
-        joystick.leftTrigger().onTrue(new InstantCommand(()-> endEffector.ejectCoral()));
+        joystick.rightTrigger().whileTrue(new InstantCommand(()-> endEffector.ejectAlgae()))
+            .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(0)));
+        joystick.leftTrigger().whileTrue(new InstantCommand(()-> endEffector.ejectCoral()))
+            .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(0)));
 
-        joystick.rightTrigger().onTrue(new InstantCommand(()-> wrist.setAngle(30))
-            .andThen(()-> endEffector.ejectAlgae()));
+        // joystick.rightTrigger().onTrue(new InstantCommand(()-> wrist.setAngle(30))
+        //     .andThen(()-> endEffector.ejectAlgae()));
             
         // reset the field-centric heading on left bumper press
         joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));

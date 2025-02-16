@@ -44,7 +44,7 @@ public class Wrist extends SubsystemBase {
     }
 
      public void setAngle(double angle) {
-          wristController.setReference(holdAngle, ControlType.kPosition);
+          wristController.setReference(angle, ControlType.kPosition);
      }  
 
     
