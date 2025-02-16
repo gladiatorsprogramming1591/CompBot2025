@@ -16,6 +16,7 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
@@ -305,6 +306,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         m_simNotifier.startPeriodic(kSimLoopPeriod);
     }
 
+    // TODO: Use getConfigurator to set different control loops and edit on smartDashBoard
+
+    // TODO: Low Priority: Troubleshoot why setting idle mode to coast fights with the brake mode default
     public void setCoastMode()
     {
         for (int i = 0; i < 4; i++) {
@@ -320,4 +324,25 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             getModule(i).getDriveMotor().setControl(new StaticBrake());
         }
     }
+
+    // After initial deadband is broken, the perpendicular axis' deadband scales down linearly as the other axis increases.
+    // minDeadband: Deadband to perpendicular axis while robot is at max speed. (Scaled in between)
+    public double applyScaledDynamicDeadband(double axis, double perpendicularAxis, double Deadband, double minDeadband)
+    {
+        return MathUtil.applyDeadband(axis, MathUtil.clamp(Math.abs(1 - perpendicularAxis) * Deadband, minDeadband, Deadband));
+    }   // A way to change scale from minDeadband to Deadband (reverse of above) may be more useful to maintain accurate directional
+        // control at slow speeds, but still counteract drift. (10% deadband too large at low speed)
+
+    // Mimics CTRE's deadband function, but with properly scaled output between 0-1 after deadband.
+    public double applyDynamicDeadband(double axis, double perpendicularAxis, double deadband)
+    {
+        return applyDynamicDeadband(axis, perpendicularAxis, deadband, 0, false);
+    }
+
+    public double applyDynamicDeadband(double axis, double perpendicularAxis, double staticDeadband, double kineticDeadband, boolean squaredInputs)
+    {
+        if (squaredInputs) {axis = Math.pow(axis, 2);}
+        return MathUtil.applyDeadband(axis, (perpendicularAxis > staticDeadband ? kineticDeadband : staticDeadband));
+    }
+
 }

@@ -28,16 +28,15 @@ public class RobotContainer {
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 1 1/2 of a rotation per second max angular velocity
     // TODO: Move this into constants
-    // public static final double INITIAL_DEADBAND = 0.10; // 10% Deadband
     public static final double DEADBAND = 0.10; // 10% Deadband
-    public static final double MIN_DEADBAND = 0.05; // 5% Deadband to perpendicular axis while robot is at max speed. (Scaled in between)
+    public static final double MIN_DEADBAND = 0.05; // 5% Deadband to perpendicular axis while robot is in motion
 
     /* Setting up bindings for necessary control of the swerve drive platform */
     // TODO: Issue: Deadband is not applied while bot is in motion (e.g. strafing while driving).
     // - Suspicion that output does not scale from 0 to max after the deadband (joystick is touchy). 
     // TODO: Idea?: Try changing OpenLoopVoltage to Velocity if we switch to FOC
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-            // .withDeadband(MaxSpeed * INITIAL_DEADBAND).withRotationalDeadband(MaxAngularRate * INITIAL_DEADBAND) // Add a 10% deadband
+            .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
     private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
     private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
@@ -63,9 +62,12 @@ public class RobotContainer {
         drivetrain.setDefaultCommand(
                 // Drivetrain will execute this command periodically
                 drivetrain.applyRequest(() ->
-                        drive.withVelocityX(-applyDynamicDeadband(joystick.getLeftY(), joystick.getLeftX(), DEADBAND, MIN_DEADBAND) * MaxSpeed) // Drive forward with negative Y (forward)
-                                .withVelocityY(-applyDynamicDeadband(joystick.getLeftX(), joystick.getLeftY(), DEADBAND, MIN_DEADBAND) * MaxSpeed) // Drive left with negative X (left)
-                                .withRotationalRate(-MathUtil.applyDeadband(joystick.getRightX(), DEADBAND) * MaxAngularRate) // Drive counterclockwise with negative X (left)
+                        // drive.withVelocityX(-drivetrain.applyDynamicDeadband(joystick.getLeftY(), joystick.getLeftX(), DEADBAND) * MaxSpeed) // Drive forward with negative Y (forward)
+                        //         .withVelocityY(-drivetrain.applyDynamicDeadband(joystick.getLeftX(), joystick.getLeftY(), DEADBAND) * MaxSpeed) // Drive left with negative X (left)
+                        //         .withRotationalRate(-MathUtil.applyDeadband(joystick.getRightX(), DEADBAND) * MaxAngularRate) // Drive counterclockwise with negative X (left)
+                        drive.withVelocityX(-joystick.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
+                                    .withVelocityY(-joystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
+                                    .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
                 )
         );
         
@@ -94,17 +96,6 @@ public class RobotContainer {
         
         drivetrain.registerTelemetry(logger::telemeterize);
     }
-
-    public double applyDynamicDeadband(double axis, double perpendicularAxis, double Deadband, double minDeadband)
-    {
-        return MathUtil.applyDeadband(axis, MathUtil.clamp(Math.abs(1 - perpendicularAxis) * Deadband, minDeadband, Deadband));
-    }
-
-    // public double applyDualDeadband(double axis, double perpendicularAxis, double staticDeadband, double kineticDeadband)
-    // {
-    //     MathUtil.applyDeadband(axis, MathUtil.clamp(Math.abs(1 - perpendicularAxis) * staticDeadband, kineticDeadband, staticDeadband));
-    //     return MathUtil.applyDeadband(axis, MathUtil.clamp(Math.abs(1 - perpendicularAxis) * staticDeadband, kineticDeadband, staticDeadband));
-    // }
     
     public Command getAutonomousCommand() {
         return autoChooser.getSelected();
