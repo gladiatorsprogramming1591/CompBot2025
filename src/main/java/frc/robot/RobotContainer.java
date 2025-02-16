@@ -43,7 +43,7 @@ public class RobotContainer {
     private final SendableChooser<Command> autoChooser;
     
     public RobotContainer() {
-        autoChooser = AutoBuilder.buildAutoChooser("Box");
+        autoChooser = AutoBuilder.buildAutoChooser("Processor+Reef");
         autoChooser.addOption("XStraightLineAuto", getAutonomousCommand());
         autoChooser.addOption("YStraightLineAuto", getAutonomousCommand());
         autoChooser.addOption("Box", getAutonomousCommand());

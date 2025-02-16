@@ -68,7 +68,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private static final Rotation2d kRedAlliancePerspectiveRotation = Rotation2d.k180deg;
     /* Keep track if we've ever applied the operator perspective before or not */
     private boolean m_hasAppliedOperatorPerspective = false;
-    
+    /* Keep track if we have initialized pose with vision once */
+    private boolean m_hasAppliedVisionPose = false;
     private final SwerveRequest.ApplyRobotSpeeds m_pathApplyRobotSpeeds = new SwerveRequest.ApplyRobotSpeeds();
     
     /* Swerve requests to apply during SysId characterization */
@@ -320,7 +321,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             if (!results.isEmpty()) {
                 // Camera processed a new frame since last
                 // Get the last one in the list.
-                result = results.get(results.size() - 1);            
+                result = results.get(results.size() - 1);          
+                double latency = result.metadata.getLatencyMillis();  
+                SmartDashboard.putNumber("Front Latency", latency); 
+                double latencyThreshold = 12.0;
+                SmartDashboard.putBoolean("Front Latency OK", latency > latencyThreshold);
                 pose = poseEstimator.update(result);
             }
             if (pose != null && pose.isPresent()) {
@@ -349,8 +354,13 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                     //time this as well
                     SmartDashboard.putNumber("Vision x", pose2d.getX());
                     SmartDashboard.putNumber("Vision y", pose2d.getY());
+                    SmartDashboard.putNumber("Vision rot", pose2d.getRotation().getDegrees());
                     SmartDashboard.putNumber("Vision ts", pose.get().timestampSeconds);
-                    addVisionMeasurement(pose2d, pose.get().timestampSeconds, VecBuilder.fill(xyStd, xyStd, rotStd));
+                    SmartDashboard.putNumber("Vision xyStd", xyStd);
+                    SmartDashboard.putNumber("Vision rotStd", rotStd);
+                    // addVisionMeasurement(pose2d, pose.get().timestampSeconds, VecBuilder.fill(xyStd, xyStd, rotStd));
+                    if(!m_hasAppliedVisionPose) resetPose(pose2d);
+                    addVisionMeasurement(pose2d, pose.get().timestampSeconds);
                     continue;
                 }
             }
@@ -364,11 +374,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         SmartDashboard.putBoolean("FrontConnected", m_frontCamera.isConnected());
         // SmartDashboard.putBoolean("BackConnected", m_backCamera.isConnected());
         try {
-            //TODO: Learn more on why getAllUnreadResults() returns a list of PhotonPipelineResults instead of 1
-            SmartDashboard.putNumber("Front Latency", m_frontCamera.getAllUnreadResults().get(0).metadata.getLatencyMillis()); // get(0) is a placeholder for now.
-            // SmartDashboard.putNumber("Back Latency", m_backCamera.getLatestResult().getLatencyMillis());
-            // double latencyThreshold = 12.0;
-            // SmartDashboard.putBoolean("Front Latency OK", m_frontCamera.getLatestResult().getLatencyMillis() > latencyThreshold);
+            //TODO: Learn more on why getAllUnreadResults() returns a list of PhotonPipelineResults instead
             // SmartDashboard.putBoolean("Back Latency OK", m_backamera.getLatestResult().getLatencyMillis() > latencyThreshold);
         } catch(Exception e) {
 
