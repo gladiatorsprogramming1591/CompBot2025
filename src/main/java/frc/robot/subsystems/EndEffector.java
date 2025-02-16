@@ -27,9 +27,6 @@ public class EndEffector extends SubsystemBase {
 
             coralFrontBeam = intakeMotor.getForwardLimitSwitch();
             coralRearBeam = intakeMotor.getReverseLimitSwitch();
-            // intakeCoralBeamBreak = intakeMotor.getReverseLimitSwitch();
-            // placementCoralBeamBreak = new DigitalInput(EndAffectorConstants.PLACEMENT_CORAL_BEAM_BREAK_ID);
-
     }
 
     //Methods for Coral
@@ -45,6 +42,21 @@ public class EndEffector extends SubsystemBase {
         intakeMotor.set(EndEffectorConstants.CORAL_EJECT_SPEED);  
     }
 
+    public boolean isCoralSecure() { 
+        
+        return false;
+    }
+
+    public boolean isCoralFrontBeamBroken()
+    {
+        return coralFrontBeam.isPressed();
+    }
+
+    public boolean isCoralRearBeamBroken()
+    {
+        return coralRearBeam.isPressed();
+    }
+
     // Methods for Algae
     public boolean hasAlgae() {
         return intakeMotor.getOutputCurrent() > EndEffectorConstants.HAS_ALGAE_CURRENT;
@@ -56,22 +68,6 @@ public class EndEffector extends SubsystemBase {
 
     public void ejectAlgae() {
         intakeMotor.set(EndEffectorConstants.ALGAE_EJECT_SPEED); 
-    }
-
-    public boolean isCoralSecure() { 
-        if(placementCoralBeamBreak.get() == false) { 
-        }
-            return false;
-    }
-
-    public boolean isCoralFrontBeamBroken()
-    {
-        return coralFrontBeam.isPressed();
-    }
-
-    public boolean isCoralRearBeamBroken()
-    {
-        return coralRearBeam.isPressed();
     }
 
     @Override
