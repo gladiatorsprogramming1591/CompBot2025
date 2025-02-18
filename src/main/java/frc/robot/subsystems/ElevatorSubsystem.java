@@ -19,7 +19,9 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLimitSwitch;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.SparkBase.ControlType; 
+import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode; 
 
 public class ElevatorSubsystem extends SubsystemBase{
     DigitalInput lowerLimit; 
@@ -28,9 +30,12 @@ public class ElevatorSubsystem extends SubsystemBase{
     SparkBase leader; 
     SparkBase follower;
     
-    RelativeEncoder encoder; 
+    RelativeEncoder leadEncoder; 
+    RelativeEncoder followEncoder; 
     SparkClosedLoopController controller; 
     SparkLimitSwitch bottomLimitSwitch;
+
+    private double lastPos;
 
     EnumMap<elevatorPositions, Double> mapEnc = new EnumMap<>(elevatorPositions.class);
 
@@ -47,13 +52,20 @@ public class ElevatorSubsystem extends SubsystemBase{
     public ElevatorSubsystem() {
         leader = new SparkFlex(ELEVATOR_LEADER_CAN_ID, MotorType.kBrushless); 
         follower = new SparkFlex(ELEVATOR_FOLLOWER_CAN_ID, MotorType.kBrushless);
+        leader.configure(MOTOR_CONFIG,
+        ResetMode.kResetSafeParameters, 
+        PersistMode.kPersistParameters);
+
         follower.configure(
             MOTOR_CONFIG.follow(ELEVATOR_LEADER_CAN_ID, FOLLOWER_INVERTED_FROM_LEADER ),
             SparkBase.ResetMode.kResetSafeParameters, 
             SparkBase.PersistMode.kPersistParameters); 
 
-        encoder = leader.getEncoder();
+        leadEncoder = leader.getEncoder();
+        followEncoder = follower.getEncoder();
         controller = leader.getClosedLoopController();
+
+        lastPos = 0.0;
         
         mapEnc.put(elevatorPositions.STOW, kSTOW);
         mapEnc.put(elevatorPositions.L1, kL1);
@@ -77,7 +89,7 @@ public class ElevatorSubsystem extends SubsystemBase{
     }
 
     public double getPositionRotations() {
-        return encoder.getPosition(); 
+        return leadEncoder.getPosition(); 
     }
 
      /**
@@ -99,26 +111,35 @@ public class ElevatorSubsystem extends SubsystemBase{
 
     public void setPositionRotations(double rotations) {
         if (rotations < getPositionRotations()) {
-            controller.setReference(rotations, ControlType.kMAXMotionPositionControl, ClosedLoopSlot.kSlot1, FF_DOWN); // Down case; use max motion and slot 1
+            controller.setReference(rotations, ControlType.kMAXMotionPositionControl, ClosedLoopSlot.kSlot1); // Down case; use max motion and slot 1
         } else {
-            controller.setReference(rotations, ControlType.kPosition, ClosedLoopSlot.kSlot0); // Up case; use plain position control, slot 0
+            controller.setReference(rotations, ControlType.kPosition, ClosedLoopSlot.kSlot0, FF_UP); // Up case; use plain position control, slot 0
         }
     }
 
     public void ElevatorToPosition(elevatorPositions positions){
-        double refInches = mapEnc.get(positions); 
-        setPositionRotations(inchesToRotations(refInches)); 
+        lastPos = mapEnc.get(positions); 
+        setPositionRotations(inchesToRotations(lastPos)); 
     }
 
     public Command zeroElevator() {
-        return new InstantCommand(() -> encoder.setPosition(0));
+        return new InstantCommand(() -> leadEncoder.setPosition(0));
     }
 
     @Override
     public void periodic() {
-        SmartDashboard.putBoolean("Elevator lowerLimit", bottomLimitSwitch.isPressed());
+        // SmartDashboard.putBoolean("Elevator lowerLimit", bottomLimitSwitch.isPressed());
         SmartDashboard.putNumber("Elevator inches", getPositionInches());
         SmartDashboard.putNumber("Elevator current", leader.getOutputCurrent());
+        SmartDashboard.putNumber("LastPos", lastPos);
+        SmartDashboard.putNumber("Elevator Vel", leadEncoder.getVelocity());
+        SmartDashboard.putNumber("Follower Output Current", follower.getOutputCurrent());
+        SmartDashboard.putNumber("Follower Velocity", followEncoder.getVelocity()); 
+
+
+        if((lastPos == kSTOW) && (getPositionInches() < kSTOW+0.8)){
+            leader.stopMotor();
+        }
     }
 
 }

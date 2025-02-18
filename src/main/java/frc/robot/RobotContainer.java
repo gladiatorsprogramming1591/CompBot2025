@@ -86,8 +86,8 @@ public class RobotContainer {
         joystick.leftTrigger().whileTrue(new InstantCommand(()-> endEffector.ejectCoral()))
             .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(0)));
 
-        // joystick.rightTrigger().onTrue(new InstantCommand(()-> wrist.setAngle(30))  // TODO: Button conflict
-        //     .andThen(()-> endEffector.ejectAlgae()));
+        joystick.rightStick().onTrue(new InstantCommand(()-> wrist.setAngle(30))  // TODO: Button conflict
+            .andThen(()-> endEffector.ejectAlgae()));
                     
         // reset the field-centric heading on left bumper press
         joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
@@ -99,6 +99,7 @@ public class RobotContainer {
 
         joystick.x().onTrue(new ElevatorToPosition(elevator, elevatorPositions.STOW)); 
         joystick.y().onTrue(new InstantCommand(() -> elevator.zeroElevator()));
+
 
         // Tunning commands
         // joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));

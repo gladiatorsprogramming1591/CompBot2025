@@ -14,32 +14,32 @@ public class Constants {
         
         public static final boolean LEADER_INVERTED = false; 
         public static final boolean FOLLOWER_INVERTED_FROM_LEADER = true;
-        public static final double RAMP_RATE = 9.0; 
-        public static final int CURRENT_LIMIT = 50; 
+        public static final double RAMP_RATE = 0.1; 
+        public static final int CURRENT_LIMIT = 80; 
 
-        public static final double OUTPUT_MAXIMUM = 0; 
-        public static final double OUTPUT_MINIMUM = 0; 
+        public static final double OUTPUT_MAXIMUM = 1.0; 
+        public static final double OUTPUT_MINIMUM = -1.0; 
 
         public static final double INCHES_PER_ROTATION = 22.0/9.0/4.0;
         public static final double INITIAL_HEIGHT_INCHES = 0;
 
         //Constants for going up 
-        public static final double P_UP = 0.2; 
+        public static final double P_UP = 0.1; 
         public static final double I_UP = 0; 
         public static final double D_UP = 0; 
+        public static final double FF_UP = .623; 
 
         public static final double MAX_VEL_UP = 2000; 
         public static final double MAX_ACCEL_UP = 4000; 
         public static final double ALLOWERD_ERR_UP = 0.08; 
 
         //Constants for going down
-        public static final double P_DOWN = .1; 
+        public static final double P_DOWN = 0.1; 
         public static final double I_DOWN = 0; 
         public static final double D_DOWN = 0; 
-        public static final double FF_DOWN = .623; 
 
-        public static final double MAX_VEL_DOWN = 2000; 
-        public static final double MAX_ACCEL_DOWN = 4000; 
+        public static final double MAX_VEL_DOWN = 3500; 
+        public static final double MAX_ACCEL_DOWN = 6000;
         public static final double ALLOWERD_ERR_DOWN = 1.0; 
 
         public static final SparkFlexConfig MOTOR_CONFIG = new SparkFlexConfig() {{
@@ -68,11 +68,11 @@ public class Constants {
 
 
         //Elevator Positions
-        public static final double kSTOW = 0.1; 
+        public static final double kSTOW = 0.0; 
         public static final double kL1 = 0.2; 
         public static final double kL2 = 7; 
         public static final double kL3 = 15.5; 
-        public static final double kL4 = 23; 
+        public static final double kL4 = 27; 
         public static final double kPROCESSOR = 0; 
         public static final double kNET = 27;
         public static final double STOW_ANGLE = 0; 
@@ -115,7 +115,7 @@ public class Constants {
         public static final int WRIST_CAN_ID = 4; 
         public static final int WRIST_CURRENT_LIMIT = 12; 
         public static final boolean MOTOR_INVERTED = false; 
-        public static final int RAMP_RATE = 12; 
+        public static final double RAMP_RATE = 0.5; 
         public static final double WRIST_P = 0; 
         public static final double WRIST_I = 0; 
         public static final double WRIST_D = 0; 
@@ -130,6 +130,7 @@ public class Constants {
             closedLoop.d(WristConstants.WRIST_D);
             closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
             absoluteEncoder.positionConversionFactor(360);
+            absoluteEncoder.zeroOffset((360-30)/360.0);
         }};
 
     }

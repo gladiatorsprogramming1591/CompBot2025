@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -8,13 +9,14 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkRelativeEncoder;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.WristConstants;
 
 public class Wrist extends SubsystemBase {
     private final SparkBase wristMotor; 
-    RelativeEncoder wristEncoder; 
+    AbsoluteEncoder wristEncoder; 
     SparkClosedLoopController wristController; 
     double holdAngle; 
 
@@ -33,7 +35,7 @@ public class Wrist extends SubsystemBase {
                SparkBase.ResetMode.kResetSafeParameters,
                SparkBase.PersistMode.kPersistParameters
           );   
-          wristEncoder = wristMotor.getEncoder(); 
+          wristEncoder = wristMotor.getAbsoluteEncoder(); 
           wristController = wristMotor.getClosedLoopController(); 
           holdAngle = ElevatorConstants.STOW_ANGLE; 
         
@@ -50,6 +52,6 @@ public class Wrist extends SubsystemBase {
     
     @Override
     public void periodic() {
-
+        SmartDashboard.putNumber("Wrist Pos", wristEncoder.getPosition());
     }
 }
