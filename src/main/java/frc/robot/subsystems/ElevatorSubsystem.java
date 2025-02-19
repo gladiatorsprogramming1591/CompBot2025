@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.ElevatorConstants;
 
 import java.util.EnumMap;
 
@@ -66,7 +67,11 @@ public class ElevatorSubsystem extends SubsystemBase{
         controller = leader.getClosedLoopController();
 
         lastPos = 0.0;
-        
+
+        lowerLimit = new DigitalInput(ElevatorConstants.BOTTOM_LIMIT_SWITCH_ID);
+        zeroTrigger = new Trigger(lowerLimit::get);
+        zeroTrigger.onTrue(zeroElevator());
+
         mapEnc.put(elevatorPositions.STOW, kSTOW);
         mapEnc.put(elevatorPositions.L1, kL1);
         mapEnc.put(elevatorPositions.L2, kL2);
@@ -128,7 +133,7 @@ public class ElevatorSubsystem extends SubsystemBase{
 
     @Override
     public void periodic() {
-        // SmartDashboard.putBoolean("Elevator lowerLimit", bottomLimitSwitch.isPressed());
+        SmartDashboard.putBoolean("Elevator lowerLimit", bottomLimitSwitch.isPressed());
         SmartDashboard.putNumber("Elevator inches", getPositionInches());
         SmartDashboard.putNumber("Elevator current", leader.getOutputCurrent());
         SmartDashboard.putNumber("LastPos", lastPos);

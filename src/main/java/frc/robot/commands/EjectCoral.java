@@ -5,18 +5,18 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.EndEffectorConstants;
 import frc.robot.subsystems.EndEffector;
 
-public class IntakeCoral extends Command {
+public class EjectCoral extends Command {
     private EndEffector m_endEffector;
     private DigitalInput intakeBeamBreak; 
     private DigitalInput placementBeamBreak; 
-    public IntakeCoral(EndEffector endEffector) {
+    public EjectCoral(EndEffector endEffector) {
         m_endEffector = endEffector; 
         addRequirements(endEffector);
     }
 
     @Override
     public void initialize() {
-        m_endEffector.setCoralSpeed(EndEffectorConstants.CORAL_INTAKE_SPEED);
+        m_endEffector.setCoralSpeed(EndEffectorConstants.CORAL_EJECT_SPEED);
     }
 
     @Override 
@@ -26,6 +26,6 @@ public class IntakeCoral extends Command {
 
     @Override
     public boolean isFinished(){
-        return !intakeBeamBreak.get() && placementBeamBreak.get();
+        return intakeBeamBreak.get() && placementBeamBreak.get();
     }
 }

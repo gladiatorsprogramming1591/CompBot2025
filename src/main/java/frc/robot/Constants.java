@@ -11,6 +11,7 @@ public class Constants {
     public class ElevatorConstants {
         public static final int ELEVATOR_LEADER_CAN_ID = 1; // Right
         public static final int ELEVATOR_FOLLOWER_CAN_ID = 2; // Left
+        public static final int BOTTOM_LIMIT_SWITCH_ID = 16; 
         
         public static final boolean LEADER_INVERTED = false; 
         public static final boolean FOLLOWER_INVERTED_FROM_LEADER = true;
@@ -133,6 +134,10 @@ public class Constants {
             absoluteEncoder.zeroOffset((360-30)/360.0);
         }};
 
+    }
+
+    public class CANdleConstants {
+        
     }
 
 }

@@ -13,6 +13,7 @@ import frc.robot.Constants.EndEffectorConstants;
 public class EndEffector extends SubsystemBase {
     SparkFlex intakeMotor;
     DigitalInput placementCoralBeamBreak;
+    DigitalInput intakeBeamBreak;
     SparkLimitSwitch coralRearBeam;
     SparkLimitSwitch coralFrontBeam;
 
@@ -42,9 +43,13 @@ public class EndEffector extends SubsystemBase {
         intakeMotor.set(EndEffectorConstants.CORAL_EJECT_SPEED);  
     }
 
-    public boolean isCoralSecure() { 
-        
-        return false;
+    public boolean hasCoral() { 
+        if(placementCoralBeamBreak.get() == true || intakeBeamBreak.get() == true){ 
+            return true; 
+        }
+        else {
+            return false; 
+        }
     }
 
     public boolean isCoralFrontBeamBroken()
