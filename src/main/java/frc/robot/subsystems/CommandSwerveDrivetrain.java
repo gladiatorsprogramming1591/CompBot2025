@@ -356,11 +356,17 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                     SmartDashboard.putNumber("Vision y", pose2d.getY());
                     SmartDashboard.putNumber("Vision rot", pose2d.getRotation().getDegrees());
                     SmartDashboard.putNumber("Vision ts", pose.get().timestampSeconds);
+                    SmartDashboard.putNumber("Robot ts", Utils.getCurrentTimeSeconds());
                     SmartDashboard.putNumber("Vision xyStd", xyStd);
                     SmartDashboard.putNumber("Vision rotStd", rotStd);
                     // addVisionMeasurement(pose2d, pose.get().timestampSeconds, VecBuilder.fill(xyStd, xyStd, rotStd));
-                    if(!m_hasAppliedVisionPose) resetPose(pose2d);
-                    addVisionMeasurement(pose2d, pose.get().timestampSeconds);
+                    if(!m_hasAppliedVisionPose) {
+                        resetPose(pose2d);
+                        m_hasAppliedVisionPose = true;
+                    }
+                    // TODO: Try Utils.fpgaToCurrentTime instead of Utils.getCurrentTimeSeconds
+                    addVisionMeasurement(pose2d, Utils.getCurrentTimeSeconds());
+                    // addVisionMeasurement(pose2d, pose.get().timestampSeconds);
                     continue;
                 }
             }
