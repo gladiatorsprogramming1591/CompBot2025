@@ -109,7 +109,8 @@ public class Constants {
     
     public class WristConstants {
         // Wrist Positions
-        public static final double kWRIST_STOW = 0; //placeholders (obviously)
+        public static final double kWRIST_STOW = 2.1; 
+        public static final double REEF_ACQUIRE_ANGLE = 30;
         public static final double kGROUND_INTAKE = 0; 
         public static final double kCORAL_MARK_PICKUP = 0;
         public static final int WRIST_CAN_ID = 4; 
@@ -121,7 +122,7 @@ public class Constants {
         public static final double WRIST_D = 0; 
 
         public static final SparkMaxConfig MOTOR_CONFIG = new SparkMaxConfig() {{
-            idleMode(IdleMode.kCoast);
+            idleMode(IdleMode.kBrake);
             smartCurrentLimit(WristConstants.WRIST_CURRENT_LIMIT);
             inverted(WristConstants.MOTOR_INVERTED);
             openLoopRampRate(WristConstants.RAMP_RATE);

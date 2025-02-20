@@ -64,6 +64,7 @@ public class ElevatorSubsystem extends SubsystemBase{
         leadEncoder = leader.getEncoder();
         followEncoder = follower.getEncoder();
         controller = leader.getClosedLoopController();
+        bottomLimitSwitch = leader.getReverseLimitSwitch();
 
         lastPos = 0.0;
         
@@ -128,7 +129,7 @@ public class ElevatorSubsystem extends SubsystemBase{
 
     @Override
     public void periodic() {
-        // SmartDashboard.putBoolean("Elevator lowerLimit", bottomLimitSwitch.isPressed());
+        SmartDashboard.putBoolean("Elevator lowerLimit", bottomLimitSwitch.isPressed());
         SmartDashboard.putNumber("Elevator inches", getPositionInches());
         SmartDashboard.putNumber("Elevator current", leader.getOutputCurrent());
         SmartDashboard.putNumber("LastPos", lastPos);
