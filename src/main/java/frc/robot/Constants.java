@@ -81,20 +81,23 @@ public class Constants {
 
     public class EndEffectorConstants {
         public static final int EE_MOTOR_ID = 3;
-        public static final int INTAKE_CURRENT_LIMIT = 0; 
-        public static final int INTAKE_RAMP_RATE = 30; 
+        public static final int INTAKE_CURRENT_LIMIT = 30; 
+        public static final double INTAKE_RAMP_RATE = 0.2; 
         public static final boolean INTAKE_INVERTED = false;
+
 
         //Coral Constants
         public static final double CORAL_INTAKE_SPEED = 0.2; 
         public static final double CORAL_EJECT_SPEED = 0.5;
+        public static final double ARM_CORAL_SPEED = 0;
+        
 
         //Algae Constants
-        public static final double ALGAE_INTAKE_SPEED = -0.3; 
+        public static final double ALGAE_INTAKE_SPEED = -0.5; 
         public static final double HAS_ALGAE_CURRENT = 10;
-        public static final double ALGAE_EJECT_SPEED = 0.1; 
+        public static final double ALGAE_EJECT_SPEED = 0.3; 
          
-        
+
         public static final SparkFlexConfig MOTOR_CONFIG = new SparkFlexConfig() {{
             idleMode(IdleMode.kBrake);
             smartCurrentLimit(EndEffectorConstants.INTAKE_CURRENT_LIMIT);
@@ -103,18 +106,16 @@ public class Constants {
             limitSwitch.reverseLimitSwitchEnabled(false);
             limitSwitch.forwardLimitSwitchEnabled(false);
         }};
-
-
     }
     
     public class WristConstants {
         // Wrist Positions
-        public static final double kWRIST_STOW = 2.1; 
-        public static final double REEF_ACQUIRE_ANGLE = 30;
-        public static final double kGROUND_INTAKE = 0; 
-        public static final double kCORAL_MARK_PICKUP = 0;
+        public static final double WRIST_STOW = 159.0; 
+        public static final double ELEVATOR_WRIST = 200.0; 
+        public static final double REEF_ACQUIRE_ANGLE = 185.0;
+        public static final double GROUND_INTAKE = 228.0; 
         public static final int WRIST_CAN_ID = 4; 
-        public static final int WRIST_CURRENT_LIMIT = 12; 
+        public static final int WRIST_CURRENT_LIMIT = 30; 
         public static final boolean MOTOR_INVERTED = false; 
         public static final double RAMP_RATE = 0.5; 
         public static final double WRIST_P = 0; 
@@ -122,7 +123,8 @@ public class Constants {
         public static final double WRIST_D = 0; 
 
         public static final SparkMaxConfig MOTOR_CONFIG = new SparkMaxConfig() {{
-            idleMode(IdleMode.kBrake);
+            idleMode(IdleMode.kBrake
+            );
             smartCurrentLimit(WristConstants.WRIST_CURRENT_LIMIT);
             inverted(WristConstants.MOTOR_INVERTED);
             openLoopRampRate(WristConstants.RAMP_RATE);
@@ -131,7 +133,7 @@ public class Constants {
             closedLoop.d(WristConstants.WRIST_D);
             closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
             absoluteEncoder.positionConversionFactor(360);
-            absoluteEncoder.zeroOffset((360-30)/360.0);
+            absoluteEncoder.zeroOffset(210/360);
         }};
 
     }

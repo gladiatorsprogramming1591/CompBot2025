@@ -16,7 +16,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.EndEffectorConstants;
+import frc.robot.Constants.WristConstants;
 import frc.robot.commands.ElevatorToPosition;
 import frc.robot.commands.IntakeAlgae;
 import frc.robot.commands.IntakeCoral;
@@ -53,7 +55,8 @@ public class RobotContainer {
     
     private final Telemetry logger = new Telemetry(MaxSpeed);
     
-    private final CommandXboxController joystick = new CommandXboxController(0);
+    private final CommandXboxController driverController = new CommandXboxController(0);
+    private final CommandXboxController operatorController = new CommandXboxController(1);
         
     private final SendableChooser<Command> autoChooser;
     
@@ -70,9 +73,9 @@ public class RobotContainer {
         drivetrain.setDefaultCommand(
                 // Drivetrain will execute this command periodically
                 drivetrain.applyRequest(() ->
-                        drive.withVelocityX(-joystick.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
-                                    .withVelocityY(-joystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
-                                    .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
+                        drive.withVelocityX(-driverController.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
+                                    .withVelocityY(-driverController.getLeftX() * MaxSpeed) // Drive left with negative X (left)
+                                    .withRotationalRate(-driverController.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
                 )
         );
 
@@ -81,32 +84,37 @@ public class RobotContainer {
         // wrist.setDefaultCommand(new RunCommand(()-> wrist.setWristMotor(joystick.getRightY()*0.20), wrist));
 
         //Driver Controls
-        joystick.a().whileTrue(new IntakeCoral(endEffector));
-        joystick.b().whileTrue(new InstantCommand(()-> endEffector.setCoralSpeed(EndEffectorConstants.ALGAE_INTAKE_SPEED))); 
+        driverController.a().whileTrue(endEffector.intakeCoralCommand())
+            .onFalse(new InstantCommand(()-> endEffector.setCoralSpeed(0)));
+        driverController.b().whileTrue(new InstantCommand(()-> endEffector.setCoralSpeed(EndEffectorConstants.ALGAE_INTAKE_SPEED)))
+            .onFalse(new InstantCommand(()-> endEffector.setCoralSpeed(0)));; 
 
-        joystick.y().whileTrue(new InstantCommand(()-> endEffector.ejectAlgae()))
+        driverController.y().whileTrue(new InstantCommand(()-> endEffector.ejectAlgae()))
             .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(0)));
-        joystick.x().whileTrue(new InstantCommand(()-> endEffector.ejectCoral()))
+        driverController.x().whileTrue(new InstantCommand(()-> endEffector.ejectCoral()))
             .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(0)));
 
         // joystick.rightStick().onTrue(new InstantCommand(()-> wrist.setAngle(30))  // TODO: Button conflict
         //     .andThen(()-> endEffector.ejectAlgae()));
                     
-        joystick.rightTrigger().whileTrue(new RunCommand(()-> wrist.setWristMotor(joystick.getRightTriggerAxis()*0.20), wrist))
+        operatorController.rightTrigger().whileTrue(new RunCommand(()-> wrist.setWristMotor(operatorController.getRightTriggerAxis()*0.20), wrist))
         .onFalse(new InstantCommand(()-> wrist.setWristMotor(0)));
-        joystick.leftTrigger().whileTrue(new RunCommand(()-> wrist.setWristMotor(-joystick.getLeftTriggerAxis()*0.20), wrist))
+        operatorController.leftTrigger().whileTrue(new RunCommand(()-> wrist.setWristMotor(-operatorController.getLeftTriggerAxis()*0.20), wrist))
         .onFalse(new InstantCommand(()-> wrist.setWristMotor(0)));;
         // reset the field-centric heading on left bumper press
-        joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+        driverController.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
-        joystick.povDown().onTrue(new ElevatorToPosition(elevator, elevatorPositions.L1)); 
-        joystick.povLeft().onTrue(new ElevatorToPosition(elevator, elevatorPositions.L2)); 
-        joystick.povUp().onTrue(new ElevatorToPosition(elevator, elevatorPositions.L3)); 
-        joystick.povRight().onTrue(new ElevatorToPosition(elevator, elevatorPositions.L4)); 
+        operatorController.povDown().onTrue(new ElevatorToPosition(elevator, elevatorPositions.L1)); 
+        operatorController.povLeft().onTrue(new ElevatorToPosition(elevator, elevatorPositions.L2)); 
+        operatorController.povUp().onTrue(new ElevatorToPosition(elevator, elevatorPositions.L3)); 
+        operatorController.povRight().onTrue(new ElevatorToPosition(elevator, elevatorPositions.L4)); 
 
-        joystick.start().onTrue(new ElevatorToPosition(elevator, elevatorPositions.STOW)); 
-        joystick.back().onTrue(new InstantCommand(() -> elevator.zeroElevator()));
+        operatorController.start().onTrue(new ElevatorToPosition(elevator, elevatorPositions.STOW)); 
+        operatorController.back().onTrue(new InstantCommand(() -> elevator.zeroElevator()));
 
+        operatorController.a().onTrue(new RunCommand(()-> wrist.setAngle(WristConstants.ELEVATOR_WRIST))); 
+        operatorController.b().onTrue(new RunCommand(()-> wrist.setAngle(WristConstants.WRIST_STOW))); 
+        operatorController.x().onTrue(new RunCommand(()-> wrist.setAngle(WristConstants.GROUND_INTAKE)));  
 
 
         drivetrain.registerTelemetry(logger::telemeterize);

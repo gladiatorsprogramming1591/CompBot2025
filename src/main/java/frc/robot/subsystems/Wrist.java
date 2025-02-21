@@ -23,6 +23,9 @@ public class Wrist extends SubsystemBase {
     private SparkAbsoluteEncoder angleEncoder;
     private SparkClosedLoopController angleClosedLoop;
     private double holdAngle;
+    //Ground Acquire angle = 228.0
+    //L2 acquire = 185.0
+
 
     public Wrist ()
     {
@@ -34,13 +37,14 @@ public class Wrist extends SubsystemBase {
          );   
          angleClosedLoop = angleMotor.getClosedLoopController();
          angleEncoder = angleMotor.getAbsoluteEncoder();
-         holdAngle = WristConstants.kWRIST_STOW;
+         holdAngle = WristConstants.WRIST_STOW;
     }
 
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Hold Angle", holdAngle);
         SmartDashboard.putNumber("Wrist Encoder Angle", getAngle());
+        SmartDashboard.putNumber("Wrist Current", angleMotor.getOutputCurrent()); 
     }
 
     /**
@@ -63,6 +67,7 @@ public class Wrist extends SubsystemBase {
 
     public void setWristMotor(double speed)
     {
+        SmartDashboard.putNumber("Wrist Motor Speed", speed);
         angleMotor.set(speed);
     }
 
@@ -82,7 +87,7 @@ public class Wrist extends SubsystemBase {
         return new InstantCommand(()->setAngle(WristConstants.REEF_ACQUIRE_ANGLE));
     }     
     public Command StowPositionCommand(){
-         return new InstantCommand(()->setAngle(WristConstants.kWRIST_STOW)); 
+         return new InstantCommand(()->setAngle(WristConstants.WRIST_STOW)); 
     }
     public Command HoldPositionCommand()
     {

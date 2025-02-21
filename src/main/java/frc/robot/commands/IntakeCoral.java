@@ -6,8 +6,10 @@ import frc.robot.subsystems.EndEffector;
 
 public class IntakeCoral extends Command {
     private EndEffector m_endEffector;
+
+
     public IntakeCoral(EndEffector endEffector) {
-        m_endEffector = endEffector; 
+        m_endEffector = endEffector;  
         addRequirements(endEffector);
     }
 
@@ -23,6 +25,6 @@ public class IntakeCoral extends Command {
 
     @Override
     public boolean isFinished(){
-        return false; //TODO: read beam break sensor
+        return (m_endEffector.isCoralFrontBeamBroken() && !m_endEffector.isCoralRearBeamBroken());
     }
 }
