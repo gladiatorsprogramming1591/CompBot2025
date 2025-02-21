@@ -5,6 +5,8 @@ import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
+import edu.wpi.first.wpilibj.DigitalInput;
+
 public class Constants {
 
     
@@ -132,6 +134,12 @@ public class Constants {
             absoluteEncoder.positionConversionFactor(360);
         }};
 
+    }
+
+    public class robotInitConstants {
+        public static final DigitalInput dIO_port = new DigitalInput(0);
+        // .get() returns true if DIO port is unused, and false if DIO port is jumped (with a resistor). Chaz will always be jumped on this channel.
+        public static final boolean isCompBot = dIO_port.get();
     }
 
 }

@@ -16,10 +16,12 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Constants.robotInitConstants;
 import frc.robot.commands.ElevatorToPosition;
 import frc.robot.commands.IntakeAlgae;
 import frc.robot.commands.IntakeCoral;
 import frc.robot.generated.TunerConstants;
+import frc.robot.generated.TunerConstants.*;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.EndEffector;
@@ -29,12 +31,13 @@ import frc.robot.subsystems.ElevatorSubsystem.elevatorPositions;
 public class RobotContainer {
     //Subsystems 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
-	public final EndEffector endEffector = new EndEffector();
-	private final Wrist wrist = new Wrist();
-	public final ElevatorSubsystem elevator = new ElevatorSubsystem();
+	public final EndEffector endEffector = robotInitConstants.isCompBot ? new EndEffector() : null;
+	private final Wrist wrist = robotInitConstants.isCompBot ? new Wrist() : null;
+	public final ElevatorSubsystem elevator = robotInitConstants.isCompBot ? new ElevatorSubsystem() : null;
 
 
-    private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
+    private double MaxSpeed = robotInitConstants.isCompBot ? PoseidonTunerConstants.kSpeedAt12Volts.in(MetersPerSecond)
+            : ChazTunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 1 1/2 of a rotation per second max angular velocity
     // TODO: Move this into constants
     public static final double DEADBAND = 0.10; // 10% Deadband
@@ -75,32 +78,40 @@ public class RobotContainer {
                 )
         );
 
-        // elevator.setDefaultCommand(new RunCommand(() -> elevator.setMotorSpeed(joystick.getRightY()),elevator));
+        // Driver Controls
 
-        //Driver Controls
-        joystick.a().onTrue(new IntakeCoral(endEffector));
-        joystick.b().onTrue(new IntakeAlgae(endEffector)); 
-
-        joystick.rightTrigger().whileTrue(new InstantCommand(()-> endEffector.ejectAlgae()))
-            .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(0)));
-        joystick.leftTrigger().whileTrue(new InstantCommand(()-> endEffector.ejectCoral()))
-            .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(0)));
-
-        // joystick.rightTrigger().onTrue(new InstantCommand(()-> wrist.setAngle(30))  // TODO: Button conflict
-        //     .andThen(()-> endEffector.ejectAlgae()));
-                    
         // reset the field-centric heading on left bumper press
         joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
-        joystick.povDown().onTrue(new ElevatorToPosition(elevator, elevatorPositions.L1)); 
-        joystick.povLeft().onTrue(new ElevatorToPosition(elevator, elevatorPositions.L2)); 
-        joystick.povUp().onTrue(new ElevatorToPosition(elevator, elevatorPositions.L3)); 
-        joystick.povRight().onTrue(new ElevatorToPosition(elevator, elevatorPositions.L4)); 
+        // Subsystems
+        // All Poseidon-specific commands MUST be within if-statement, or a NullPointerException will be thrown.
+        if (robotInitConstants.isCompBot) {
+            // End Effector
+            joystick.a().onTrue(new IntakeCoral(endEffector));
+            joystick.b().onTrue(new IntakeAlgae(endEffector)); 
 
-        joystick.x().onTrue(new ElevatorToPosition(elevator, elevatorPositions.STOW)); 
-        joystick.y().onTrue(new InstantCommand(() -> elevator.zeroElevator()));
+            joystick.rightTrigger().whileTrue(new InstantCommand(()-> endEffector.ejectAlgae()))
+                .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(0)));
+            joystick.leftTrigger().whileTrue(new InstantCommand(()-> endEffector.ejectCoral()))
+                .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(0)));
 
-        // Tunning commands
+            // Wrist
+            // joystick.rightTrigger().onTrue(new InstantCommand(()-> wrist.setAngle(30))  // TODO: Button conflict
+            //     .andThen(()-> endEffector.ejectAlgae()));
+
+            // Elevator
+            // elevator.setDefaultCommand(new RunCommand(() -> elevator.setMotorSpeed(joystick.getRightY()),elevator));
+            joystick.povDown().onTrue(new ElevatorToPosition(elevator, elevatorPositions.L1)); 
+            joystick.povLeft().onTrue(new ElevatorToPosition(elevator, elevatorPositions.L2)); 
+            joystick.povUp().onTrue(new ElevatorToPosition(elevator, elevatorPositions.L3)); 
+            joystick.povRight().onTrue(new ElevatorToPosition(elevator, elevatorPositions.L4)); 
+
+            joystick.x().onTrue(new ElevatorToPosition(elevator, elevatorPositions.STOW)); 
+            joystick.y().onTrue(new InstantCommand(() -> elevator.zeroElevator()));
+            
+        }
+
+        // Drivetrain tunning commands
         // joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
         // joystick.b().whileTrue(drivetrain.applyRequest(() ->
         //         point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
