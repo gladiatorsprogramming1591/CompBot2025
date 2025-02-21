@@ -43,12 +43,7 @@ public class RobotContainer {
     private final SendableChooser<Command> autoChooser;
     
     public RobotContainer() {
-        autoChooser = AutoBuilder.buildAutoChooser("Processor+Reef");
-        autoChooser.addOption("XStraightLineAuto", getAutonomousCommand());
-        autoChooser.addOption("YStraightLineAuto", getAutonomousCommand());
-        autoChooser.addOption("Box", getAutonomousCommand());
-        autoChooser.addOption("VAuto", getAutonomousCommand());
-        autoChooser.addOption("Processor+Reef", getAutonomousCommand());
+        autoChooser = AutoBuilder.buildAutoChooser();
         SmartDashboard.putData("Auto Mode", autoChooser);
         
         configureBindings();

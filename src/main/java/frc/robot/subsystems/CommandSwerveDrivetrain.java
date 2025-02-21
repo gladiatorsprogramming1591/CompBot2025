@@ -364,9 +364,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                         resetPose(pose2d);
                         m_hasAppliedVisionPose = true;
                     }
-                    // TODO: Try Utils.fpgaToCurrentTime instead of Utils.getCurrentTimeSeconds
-                    addVisionMeasurement(pose2d, Utils.getCurrentTimeSeconds());
-                    // addVisionMeasurement(pose2d, pose.get().timestampSeconds);
+                    addVisionMeasurement(pose2d, Utils.fpgaToCurrentTime(pose.get().timestampSeconds));
                     continue;
                 }
             }
