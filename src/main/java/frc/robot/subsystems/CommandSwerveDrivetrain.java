@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.*;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.SignalLogger;
@@ -16,11 +17,19 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -30,6 +39,13 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
+
+import org.photonvision.EstimatedRobotPose;
+import org.photonvision.PhotonCamera;
+import org.photonvision.PhotonPoseEstimator;
+import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 /**
  * Class that extends the Phoenix 6 SwerveDrivetrain class and implements
@@ -46,7 +62,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private static final Rotation2d kRedAlliancePerspectiveRotation = Rotation2d.k180deg;
     /* Keep track if we've ever applied the operator perspective before or not */
     private boolean m_hasAppliedOperatorPerspective = false;
-    
+    /* Keep track if we have initialized pose with vision once */
+    private boolean m_hasAppliedVisionPose = false;
     private final SwerveRequest.ApplyRobotSpeeds m_pathApplyRobotSpeeds = new SwerveRequest.ApplyRobotSpeeds();
     
     /* Swerve requests to apply during SysId characterization */
@@ -119,7 +136,24 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     
     /* The SysId routine to test */
-    private SysIdRoutine m_sysIdRoutineToApply = m_sysIdRoutineTranslation;
+    private SysIdRoutine m_sysIdRoutineToApply = m_sysIdRoutineSteer;
+
+    PhotonCamera m_frontCamera;
+    PhotonPoseEstimator[] m_photonPoseEstimators;
+    AprilTagFieldLayout fieldLayout;
+
+    // TODO: Determine actual camera location and angle, init values from 2024 Halo
+    private static final Transform3d kFrontCameraLocation = new Transform3d(
+        new Translation3d(Units.inchesToMeters(10.507), Units.inchesToMeters(5.673),
+            Units.inchesToMeters(6.789)),
+        new Rotation3d(0.0, Math.toRadians(-20.0), Math.toRadians(0.0)));
+
+    public static final double VISION_FIELD_MARGIN = 0.5;
+    public static final double VISION_Z_MARGIN = 0.75;
+    public static final double VISION_STD_XY_SCALE = 0.02;
+    public static final double VISION_STD_ROT_SCALE = 0.035;
+    public static final double FIELD_LENGTH = 16.5417;
+    public static final double FIELD_WIDTH = 8.0136;
     
     /**
      * Constructs a CTRE SwerveDrivetrain using the specified constants.
@@ -227,6 +261,19 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         } catch (Exception ex) {
             DriverStation.reportError("Failed to load PathPlanner config and configure AutoBuilder", ex.getStackTrace());
         }
+
+        fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
+
+        m_frontCamera = new PhotonCamera("Front");
+
+        m_photonPoseEstimators = new PhotonPoseEstimator[] {
+            new PhotonPoseEstimator(
+                fieldLayout,
+                PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
+                kFrontCameraLocation
+            )
+        };
+
     }
     
     /**
@@ -260,9 +307,80 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     public Command sysIdDynamic(SysIdRoutine.Direction direction) {
         return m_sysIdRoutineToApply.dynamic(direction);
     }
-    
+
+    public void updatePoseEstimationWithFilter() {
+        Pose2d currentPose = getState().Pose;
+        for (PhotonPoseEstimator poseEstimator : m_photonPoseEstimators) {
+            // TODO: need to find the camera associated with a pose estimator, hard coded to front
+            var results = m_frontCamera.getAllUnreadResults();
+            PhotonPipelineResult result;
+            Optional<EstimatedRobotPose> pose = null;
+            if (!results.isEmpty()) {
+                // Camera processed a new frame since last
+                // Get the last one in the list.
+                result = results.get(results.size() - 1);          
+                double latency = result.metadata.getLatencyMillis();  
+                SmartDashboard.putNumber("Front Latency", latency); 
+                double latencyThreshold = 12.0;
+                SmartDashboard.putBoolean("Front Latency OK", latency > latencyThreshold);
+                pose = poseEstimator.update(result);
+            }
+            if (pose != null && pose.isPresent()) {
+                Pose3d pose3d = pose.get().estimatedPose;
+                Pose2d pose2d = pose3d.toPose2d();
+                if (
+                    pose3d.getX() >= -VISION_FIELD_MARGIN &&
+                    pose3d.getX() <= FIELD_LENGTH + VISION_FIELD_MARGIN &&
+                    pose3d.getY() >= -VISION_FIELD_MARGIN &&
+                    pose3d.getY() <= FIELD_WIDTH + VISION_FIELD_MARGIN &&
+                    pose3d.getZ() >= -VISION_Z_MARGIN &&
+                    pose3d.getZ() <= VISION_Z_MARGIN
+                ) {
+                    double sum = 0.0;
+                    for (PhotonTrackedTarget target : pose.get().targetsUsed) {
+                        Optional<Pose3d> tagPose =
+                            fieldLayout.getTagPose(target.getFiducialId());
+                        if (tagPose.isEmpty()) continue;
+                        sum += currentPose.getTranslation().getDistance(tagPose.get().getTranslation().toTranslation2d());
+                    }
+
+                    int tagCount = pose.get().targetsUsed.size();
+                    double stdScale = Math.pow(sum / tagCount, 2.0) / tagCount;
+                    double xyStd = VISION_STD_XY_SCALE * stdScale;
+                    double rotStd = VISION_STD_ROT_SCALE * stdScale;
+                    //time this as well
+                    SmartDashboard.putNumber("Vision x", pose2d.getX());
+                    SmartDashboard.putNumber("Vision y", pose2d.getY());
+                    SmartDashboard.putNumber("Vision rot", pose2d.getRotation().getDegrees());
+                    SmartDashboard.putNumber("Vision ts", pose.get().timestampSeconds);
+                    SmartDashboard.putNumber("Robot ts", Utils.getCurrentTimeSeconds());
+                    SmartDashboard.putNumber("Vision xyStd", xyStd);
+                    SmartDashboard.putNumber("Vision rotStd", rotStd);
+                    // addVisionMeasurement(pose2d, pose.get().timestampSeconds, VecBuilder.fill(xyStd, xyStd, rotStd));
+                    if(!m_hasAppliedVisionPose) {
+                        resetPose(pose2d);
+                        m_hasAppliedVisionPose = true;
+                    }
+                    addVisionMeasurement(pose2d, Utils.fpgaToCurrentTime(pose.get().timestampSeconds));
+                    continue;
+                }
+            }
+        }
+    }
+
     @Override
     public void periodic() {
+        updatePoseEstimationWithFilter();
+        
+        SmartDashboard.putBoolean("FrontConnected", m_frontCamera.isConnected());
+        // SmartDashboard.putBoolean("BackConnected", m_backCamera.isConnected());
+        try {
+            //TODO: Learn more on why getAllUnreadResults() returns a list of PhotonPipelineResults instead
+            // SmartDashboard.putBoolean("Back Latency OK", m_backamera.getLatestResult().getLatencyMillis() > latencyThreshold);
+        } catch(Exception e) {
+
+        }
+        
         /*
          * Periodically try to apply the operator perspective.
          * If we haven't applied the operator perspective before, then we should apply it regardless of DS state.
@@ -285,7 +403,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         SmartDashboard.putNumber("FR Vel",  getState().ModuleStates[1].speedMetersPerSecond);
         SmartDashboard.putNumber("BL Vel",  getState().ModuleStates[2].speedMetersPerSecond);
         SmartDashboard.putNumber("BR Vel",  getState().ModuleStates[3].speedMetersPerSecond);
-        SmartDashboard.putNumber("Heading", getState().Pose.getRotation().getDegrees());
         SmartDashboard.putNumber("Heading", getState().RawHeading.getDegrees());
 
         SmartDashboard.putNumber("Swerve States", getState().ModuleStates.length);

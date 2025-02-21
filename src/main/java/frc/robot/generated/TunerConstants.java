@@ -10,6 +10,7 @@ import com.ctre.phoenix6.swerve.*;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants.*;
 
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.measure.*;
@@ -20,7 +21,6 @@ import frc.robot.Constants.robotInitConstants;
 // https://v6.docs.ctr-electronics.com/en/stable/docs/tuner/tuner-swerve/index.html
 public class TunerConstants {
 
-    // TODO: Paste Poseidon tuner constants here
     public class PoseidonTunerConstants {
         // Both sets of gains need to be tuned to your individual robot.
 
@@ -374,12 +374,18 @@ public class TunerConstants {
                 ChazTunerConstants.kBackRightXPos, ChazTunerConstants.kBackRightYPos, ChazTunerConstants.kInvertRightSide, ChazTunerConstants.kBackRightSteerMotorInverted, ChazTunerConstants.kBackRightEncoderInverted
             );
 
+    public static final Matrix<N3, N1> odometryStd = VecBuilder.fill(0.06, 0.06, 0.01);
+    public static final Matrix<N3, N1> visionStd = VecBuilder.fill(0.35, 0.35, 0.8);        
+
     /**
      * Creates a CommandSwerveDrivetrain instance.
      * This should only be called once in your robot program,.
      */
     public static CommandSwerveDrivetrain createDrivetrain() {
-        return new CommandSwerveDrivetrain(DrivetrainConstants, FrontLeft, FrontRight, BackLeft, BackRight);
+        double odometryUpdateFrequency = 250; // CAN FD update frequency in HZ
+        return new CommandSwerveDrivetrain(
+            DrivetrainConstants, odometryUpdateFrequency, odometryStd, visionStd, FrontLeft, FrontRight, BackLeft, BackRight
+        );
     }
 
 
