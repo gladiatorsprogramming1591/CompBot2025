@@ -15,8 +15,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.robotInitConstants;
+import frc.robot.Constants.ElevatorConstants;
+import frc.robot.Constants.EndEffectorConstants;
+import frc.robot.Constants.WristConstants;
 import frc.robot.commands.ElevatorToPosition;
 import frc.robot.commands.IntakeAlgae;
 import frc.robot.commands.IntakeCoral;
@@ -55,7 +59,8 @@ public class RobotContainer {
     
     private final Telemetry logger = new Telemetry(MaxSpeed);
     
-    private final CommandXboxController joystick = new CommandXboxController(0);
+    private final CommandXboxController driverController = new CommandXboxController(0);
+    private final CommandXboxController operatorController = new CommandXboxController(1);
         
     private final SendableChooser<Command> autoChooser;
     
@@ -72,43 +77,55 @@ public class RobotContainer {
         drivetrain.setDefaultCommand(
                 // Drivetrain will execute this command periodically
                 drivetrain.applyRequest(() ->
-                        drive.withVelocityX(-joystick.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
-                                    .withVelocityY(-joystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
-                                    .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
+                        drive.withVelocityX(-driverController.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
+                                    .withVelocityY(-driverController.getLeftX() * MaxSpeed) // Drive left with negative X (left)
+                                    .withRotationalRate(-driverController.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
                 )
         );
-
-        // Driver Controls
-
+        
         // reset the field-centric heading on left bumper press
-        joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
-
+        driverController.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+        
         // Subsystems
         // All Poseidon-specific commands MUST be within if-statement, or a NullPointerException will be thrown.
-        if (robotInitConstants.isCompBot) {
+        if (robotInitConstants.isCompBot) {    
+            // =====================================  Driver Controls  =====================================
+            // Elevator
+            driverController.start().onTrue(complexElevatorStowCommand(elevatorPositions.STOW));
+            
             // End Effector
-            joystick.a().onTrue(new IntakeCoral(endEffector));
-            joystick.b().onTrue(new IntakeAlgae(endEffector)); 
-
-            joystick.rightTrigger().whileTrue(new InstantCommand(()-> endEffector.ejectAlgae()))
+            driverController.a().whileTrue(endEffector.intakeCoralCommand())
+                .onFalse(new InstantCommand(()-> endEffector.setCoralSpeed(0)));
+            driverController.b().whileTrue(new RunCommand(()-> endEffector.setCoralSpeed(EndEffectorConstants.ALGAE_INTAKE_SPEED)))
+                .onFalse(new RunCommand(()-> endEffector.algaeCheckRoutine()));
+                
+            driverController.y().whileTrue(new InstantCommand(()-> endEffector.ejectAlgae()))
                 .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(0)));
-            joystick.leftTrigger().whileTrue(new InstantCommand(()-> endEffector.ejectCoral()))
+            driverController.x().whileTrue(new InstantCommand(()-> endEffector.ejectCoral()))
                 .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(0)));
+                
+            // Wrist
+            driverController.rightTrigger().whileTrue(new RunCommand(()-> wrist.setWristMotor(driverController.getRightTriggerAxis()*0.20), wrist))
+                .onFalse(new InstantCommand(()-> wrist.setWristMotor(0)));
+            driverController.leftTrigger().whileTrue(new RunCommand(()-> wrist.setWristMotor(-driverController.getLeftTriggerAxis()*0.20), wrist))
+                .onFalse(new InstantCommand(()-> wrist.setWristMotor(0)));;
+                
+            // ===================================== Operator Controls =====================================
+            // Elevator
+            operatorController.povDown().onTrue(complexElevatorScoreCommand(elevatorPositions.L1)); 
+            operatorController.povLeft().onTrue(complexElevatorScoreCommand(elevatorPositions.L2)); 
+            operatorController.povRight().onTrue(complexElevatorScoreCommand(elevatorPositions.L3)); 
+            operatorController.povUp().onTrue(complexElevatorScoreCommand(elevatorPositions.L4));
+            // operatorController.back().onTrue(new InstantCommand(() -> elevator.zeroElevator()));
 
             // Wrist
-            // joystick.rightTrigger().onTrue(new InstantCommand(()-> wrist.setAngle(30))  // TODO: Button conflict
-            //     .andThen(()-> endEffector.ejectAlgae()));
+            operatorController.a().onTrue(new InstantCommand(()-> wrist.setAngle(WristConstants.WRIST_STOW)));
+            operatorController.b().onTrue(new InstantCommand(()-> wrist.setAngle(WristConstants.WRIST_STOW)));
+            operatorController.x().onTrue(new InstantCommand(()-> wrist.setAngle(WristConstants.GROUND_INTAKE)));
 
-            // Elevator
-            // elevator.setDefaultCommand(new RunCommand(() -> elevator.setMotorSpeed(joystick.getRightY()),elevator));
-            joystick.povDown().onTrue(new ElevatorToPosition(elevator, elevatorPositions.L1)); 
-            joystick.povLeft().onTrue(new ElevatorToPosition(elevator, elevatorPositions.L2)); 
-            joystick.povUp().onTrue(new ElevatorToPosition(elevator, elevatorPositions.L3)); 
-            joystick.povRight().onTrue(new ElevatorToPosition(elevator, elevatorPositions.L4)); 
-
-            joystick.x().onTrue(new ElevatorToPosition(elevator, elevatorPositions.STOW)); 
-            joystick.y().onTrue(new InstantCommand(() -> elevator.zeroElevator()));
-            
+            // Default Commands
+            // wrist.setDefaultCommand(new RunCommand(()-> wrist.setWristMotor(operatorController.getRightY()*0.20), wrist));
+            // elevator.setDefaultCommand(new RunCommand(() -> elevator.setMotorSpeed(operatorController.getRightY()*0.50), elevator));
         }
 
         // Drivetrain tunning commands
@@ -125,7 +142,20 @@ public class RobotContainer {
         // joystick.leftTrigger().onTrue(Commands.runOnce(SignalLogger::start));
         // joystick.rightTrigger().onTrue(Commands.runOnce(SignalLogger::stop));
 
+
         drivetrain.registerTelemetry(logger::telemeterize);
+    }
+
+    public Command complexElevatorScoreCommand(elevatorPositions position) {
+        return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
+        .andThen((new ElevatorToPosition(elevator,position)))
+        .andThen(new WaitUntilCommand(elevator::atSetpoint))
+        .andThen(new InstantCommand(()-> wrist.setAngle(WristConstants.WRIST_HOVER)));
+    }
+
+    public Command complexElevatorStowCommand(elevatorPositions position) {
+        return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
+        .andThen((new ElevatorToPosition(elevator,position)));
     }
     
     public Command getAutonomousCommand() {
