@@ -5,6 +5,7 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
+import static frc.robot.Constants.ElevatorConstants.kSTOW;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -15,6 +16,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.robotInitConstants;
@@ -94,8 +96,10 @@ public class RobotContainer {
             driverController.start().onTrue(complexElevatorStowCommand(elevatorPositions.STOW));
             
             // End Effector
-            driverController.a().whileTrue(endEffector.intakeCoralCommand())
-                .onFalse(new InstantCommand(()-> endEffector.setCoralSpeed(0)));
+            // driverController.a().whileTrue(endEffector.intakeCoralCommand())
+            //     .onFalse(new InstantCommand(()-> endEffector.setCoralSpeed(0)));
+            driverController.a().whileTrue(complexIntakeCommand(elevatorPositions.STOW)) 
+                .onFalse(new RunCommand(()-> endEffector.setCoralSpeed(0))); 
             driverController.b().whileTrue(new RunCommand(()-> endEffector.setCoralSpeed(EndEffectorConstants.ALGAE_INTAKE_SPEED)))
                 .onFalse(new RunCommand(()-> endEffector.algaeCheckRoutine()));
                 
@@ -120,8 +124,9 @@ public class RobotContainer {
 
             // Wrist
             operatorController.a().onTrue(new InstantCommand(()-> wrist.setAngle(WristConstants.WRIST_STOW)));
-            operatorController.b().onTrue(new InstantCommand(()-> wrist.setAngle(WristConstants.WRIST_STOW)));
+            operatorController.b().onTrue(new InstantCommand(()-> wrist.setAngle(WristConstants.WRIST_PROCESSOR)));
             operatorController.x().onTrue(new InstantCommand(()-> wrist.setAngle(WristConstants.GROUND_INTAKE)));
+            operatorController.y().onTrue(new InstantCommand(()-> wrist.setAngle(WristConstants.REEF_ACQUIRE_ANGLE)));
 
             // Default Commands
             // wrist.setDefaultCommand(new RunCommand(()-> wrist.setWristMotor(operatorController.getRightY()*0.20), wrist));
@@ -147,15 +152,33 @@ public class RobotContainer {
     }
 
     public Command complexElevatorScoreCommand(elevatorPositions position) {
-        return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
+        return new SequentialCommandGroup(
+        wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
         .andThen((new ElevatorToPosition(elevator,position)))
         .andThen(new WaitUntilCommand(elevator::atSetpoint))
-        .andThen(new InstantCommand(()-> wrist.setAngle(WristConstants.WRIST_HOVER)));
+        .andThen(new InstantCommand(()-> wrist.setAngle(WristConstants.WRIST_HOVER))));
     }
 
     public Command complexElevatorStowCommand(elevatorPositions position) {
-        return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
-        .andThen((new ElevatorToPosition(elevator,position)));
+        return new SequentialCommandGroup(
+        wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
+        .andThen((new ElevatorToPosition(elevator,position))));
+    }
+
+    public Command complexProcessorCommand(elevatorPositions position) {
+        return new SequentialCommandGroup(
+        wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
+        .andThen(new ElevatorToPosition(elevator, position))
+        .andThen(new WaitUntilCommand(elevator::atSetpoint))
+        .andThen(new InstantCommand(()-> wrist.setAngle(WristConstants.WRIST_PROCESSOR)))); 
+    }
+
+    public Command complexIntakeCommand(elevatorPositions position) {
+         return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
+        .andThen(new ElevatorToPosition(elevator, position))
+        .andThen(new WaitUntilCommand(elevator::atSetpoint))
+        .andThen(new InstantCommand(()-> wrist.setAngle(WristConstants.WRIST_INTAKE)))
+        .andThen(endEffector.intakeCoralCommand()); 
     }
     
     public Command getAutonomousCommand() {

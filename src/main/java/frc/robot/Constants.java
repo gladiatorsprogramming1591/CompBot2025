@@ -116,7 +116,9 @@ public class Constants {
         public static final double WRIST_INTAKE = 163.0;  
         public static final double REEF_ACQUIRE_ANGLE = 185.0;
         public static final double GROUND_INTAKE = 228.0; 
+        public static final double WRIST_PROCESSOR = 172; //placeholder 
         public static final double WRIST_HOVER = 195.0; //191 forever <3
+        public static final double WRIST_HOVER_L4 = 172; //placeholder 
         public static final double WRIST_TOLERANCE = 5; 
 
         public static final int WRIST_CAN_ID = 4; 
@@ -142,8 +144,7 @@ public class Constants {
             closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
             absoluteEncoder.positionConversionFactor(360);
             absoluteEncoder.zeroOffset(210/360);
-        }};
-        
+        }};         
 
     }
 

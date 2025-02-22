@@ -371,16 +371,16 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     @Override
     public void periodic() {
-        updatePoseEstimationWithFilter();
+        // updatePoseEstimationWithFilter();
         
-        SmartDashboard.putBoolean("FrontConnected", m_frontCamera.isConnected());
-        // SmartDashboard.putBoolean("BackConnected", m_backCamera.isConnected());
-        try {
-            //TODO: Learn more on why getAllUnreadResults() returns a list of PhotonPipelineResults instead
-            // SmartDashboard.putBoolean("Back Latency OK", m_backamera.getLatestResult().getLatencyMillis() > latencyThreshold);
-        } catch(Exception e) {
+        // SmartDashboard.putBoolean("FrontConnected", m_frontCamera.isConnected());
+        // // SmartDashboard.putBoolean("BackConnected", m_backCamera.isConnected());
+        // try {
+        //     //TODO: Learn more on why getAllUnreadResults() returns a list of PhotonPipelineResults instead
+        //     // SmartDashboard.putBoolean("Back Latency OK", m_backamera.getLatestResult().getLatencyMillis() > latencyThreshold);
+        // } catch(Exception e) {
 
-        }
+        // }
         
         /*
          * Periodically try to apply the operator perspective.
