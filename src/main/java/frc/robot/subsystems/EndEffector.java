@@ -89,12 +89,20 @@ public class EndEffector extends SubsystemBase {
         return ((!isCoralRearBeamBroken()) && isCoralFrontBeamBroken());
     }
 
+    public Command IntakeAlgaeCommand() {
+        return new RunCommand(() -> setCoralSpeed(EndEffectorConstants.ALGAE_INTAKE_SPEED));
+    }
+
+    public void algaeCheckRoutine() {
+        if(intakeMotor.getOutputCurrent() < EndEffectorConstants.HAS_ALGAE_CURRENT){intakeMotor.stopMotor();}//Multiple loop check routine
+    }
+
     /**
      * Runs the intake until the robot has coral, slowing down as coral progresses through the system
      * @return the command
      */
      public Command intakeCoralCommand() {
-        return new SequentialCommandGroup( new RunCommand(() -> setCoralSpeed(0.1))
+        return new SequentialCommandGroup(new RunCommand(() -> setCoralSpeed(0.1))
             .until(this::hasCoral),
             new RunCommand(() -> setCoralSpeed(-0.1))
             .until(this::coralArmed),

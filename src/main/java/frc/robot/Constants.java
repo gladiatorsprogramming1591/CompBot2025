@@ -70,7 +70,7 @@ public class Constants {
         //Elevator Positions
         public static final double kSTOW = 0.0; 
         public static final double kL1 = 0.2; 
-        public static final double kL2 = 7; 
+        public static final double kL2 = 7.25; 
         public static final double kL3 = 15.5; 
         public static final double kL4 = 27; 
         public static final double kPROCESSOR = 0; 
@@ -81,8 +81,8 @@ public class Constants {
 
     public class EndEffectorConstants {
         public static final int EE_MOTOR_ID = 3;
-        public static final int INTAKE_CURRENT_LIMIT = 30; 
-        public static final double INTAKE_RAMP_RATE = 0.2; 
+        public static final int INTAKE_CURRENT_LIMIT = 40; 
+        public static final double INTAKE_RAMP_RATE = 0.1; 
         public static final boolean INTAKE_INVERTED = false;
 
 
@@ -93,8 +93,8 @@ public class Constants {
         
 
         //Algae Constants
-        public static final double ALGAE_INTAKE_SPEED = -0.5; 
-        public static final double HAS_ALGAE_CURRENT = 10;
+        public static final double ALGAE_INTAKE_SPEED = -1; 
+        public static final double HAS_ALGAE_CURRENT = 30;
         public static final double ALGAE_EJECT_SPEED = 0.3; 
          
 
@@ -110,17 +110,20 @@ public class Constants {
     
     public class WristConstants {
         // Wrist Positions
-        public static final double WRIST_STOW = 159.0; 
-        public static final double ELEVATOR_WRIST = 200.0; 
+        public static final double WRIST_STOW = 172.0;
+        public static final double WRIST_INTAKE = 163.0;  
         public static final double REEF_ACQUIRE_ANGLE = 185.0;
         public static final double GROUND_INTAKE = 228.0; 
+        public static final double WRIST_HOVER = 195.0; //191 forever <3
+        public static final double WRIST_TOLERANCE = 5; 
+
         public static final int WRIST_CAN_ID = 4; 
         public static final int WRIST_CURRENT_LIMIT = 30; 
-        public static final boolean MOTOR_INVERTED = false; 
-        public static final double RAMP_RATE = 0.5; 
-        public static final double WRIST_P = 0; 
+        public static final boolean MOTOR_INVERTED = true; 
+        public static final double RAMP_RATE = 0.1; 
+        public static final double WRIST_P = 0.03; 
         public static final double WRIST_I = 0; 
-        public static final double WRIST_D = 0; 
+        public static final double WRIST_D = 0.01; 
 
         public static final SparkMaxConfig MOTOR_CONFIG = new SparkMaxConfig() {{
             idleMode(IdleMode.kBrake
@@ -131,10 +134,14 @@ public class Constants {
             closedLoop.p(WristConstants.WRIST_P);
             closedLoop.i(WristConstants.WRIST_I);
             closedLoop.d(WristConstants.WRIST_D);
+            // closedLoop.maxMotion.allowedClosedLoopError(3);
+            // closedLoop.maxMotion.maxAcceleration(100000);
+            // closedLoop.maxMotion.maxVelocity(120000);
             closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
             absoluteEncoder.positionConversionFactor(360);
             absoluteEncoder.zeroOffset(210/360);
         }};
+        
 
     }
 

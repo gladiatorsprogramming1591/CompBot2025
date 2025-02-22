@@ -82,6 +82,11 @@ public class Wrist extends SubsystemBase {
          angleClosedLoop.setReference(holdAngle, ControlType.kPosition);
     }
 
+    public boolean atSetpoint(){
+     double tolerance = 5;
+          return Math.abs(getAngle() - holdAngle) < tolerance; 
+    }
+
     public Command AquirePositionCommand()
     {
         return new InstantCommand(()->setAngle(WristConstants.REEF_ACQUIRE_ANGLE));

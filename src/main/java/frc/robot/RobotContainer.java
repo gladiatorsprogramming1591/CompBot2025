@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.EndEffectorConstants;
@@ -86,8 +87,8 @@ public class RobotContainer {
         //Driver Controls
         driverController.a().whileTrue(endEffector.intakeCoralCommand())
             .onFalse(new InstantCommand(()-> endEffector.setCoralSpeed(0)));
-        driverController.b().whileTrue(new InstantCommand(()-> endEffector.setCoralSpeed(EndEffectorConstants.ALGAE_INTAKE_SPEED)))
-            .onFalse(new InstantCommand(()-> endEffector.setCoralSpeed(0)));; 
+        driverController.b().whileTrue(new RunCommand(()-> endEffector.setCoralSpeed(EndEffectorConstants.ALGAE_INTAKE_SPEED)))
+            .onFalse(new RunCommand(()-> endEffector.algaeCheckRoutine()));
 
         driverController.y().whileTrue(new InstantCommand(()-> endEffector.ejectAlgae()))
             .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(0)));
@@ -97,27 +98,38 @@ public class RobotContainer {
         // joystick.rightStick().onTrue(new InstantCommand(()-> wrist.setAngle(30))  // TODO: Button conflict
         //     .andThen(()-> endEffector.ejectAlgae()));
                     
-        operatorController.rightTrigger().whileTrue(new RunCommand(()-> wrist.setWristMotor(operatorController.getRightTriggerAxis()*0.20), wrist))
+        driverController.rightTrigger().whileTrue(new RunCommand(()-> wrist.setWristMotor(driverController.getRightTriggerAxis()*0.20), wrist))
         .onFalse(new InstantCommand(()-> wrist.setWristMotor(0)));
-        operatorController.leftTrigger().whileTrue(new RunCommand(()-> wrist.setWristMotor(-operatorController.getLeftTriggerAxis()*0.20), wrist))
+        driverController.leftTrigger().whileTrue(new RunCommand(()-> wrist.setWristMotor(-driverController.getLeftTriggerAxis()*0.20), wrist))
         .onFalse(new InstantCommand(()-> wrist.setWristMotor(0)));;
         // reset the field-centric heading on left bumper press
         driverController.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
-        operatorController.povDown().onTrue(new ElevatorToPosition(elevator, elevatorPositions.L1)); 
-        operatorController.povLeft().onTrue(new ElevatorToPosition(elevator, elevatorPositions.L2)); 
-        operatorController.povUp().onTrue(new ElevatorToPosition(elevator, elevatorPositions.L3)); 
-        operatorController.povRight().onTrue(new ElevatorToPosition(elevator, elevatorPositions.L4)); 
+        operatorController.povDown().onTrue(complexElevatorScoreCommand(elevatorPositions.L1)); 
+        operatorController.povLeft().onTrue(complexElevatorScoreCommand(elevatorPositions.L2)); 
+        operatorController.povRight().onTrue(complexElevatorScoreCommand(elevatorPositions.L3)); 
+        operatorController.povUp().onTrue(complexElevatorScoreCommand(elevatorPositions.L4)); 
 
-        operatorController.start().onTrue(new ElevatorToPosition(elevator, elevatorPositions.STOW)); 
-        operatorController.back().onTrue(new InstantCommand(() -> elevator.zeroElevator()));
+        driverController.start().onTrue(complexElevatorStowCommand(elevatorPositions.STOW));         // operatorController.back().onTrue(new InstantCommand(() -> elevator.zeroElevator()));
 
-        operatorController.a().onTrue(new RunCommand(()-> wrist.setAngle(WristConstants.ELEVATOR_WRIST))); 
-        operatorController.b().onTrue(new RunCommand(()-> wrist.setAngle(WristConstants.WRIST_STOW))); 
-        operatorController.x().onTrue(new RunCommand(()-> wrist.setAngle(WristConstants.GROUND_INTAKE)));  
+        operatorController.a().onTrue(new InstantCommand(()-> wrist.setAngle(WristConstants.WRIST_STOW))); 
+        operatorController.b().onTrue(new InstantCommand(()-> wrist.setAngle(WristConstants.WRIST_STOW))); 
+        operatorController.x().onTrue(new InstantCommand(()-> wrist.setAngle(WristConstants.GROUND_INTAKE)));  
 
 
         drivetrain.registerTelemetry(logger::telemeterize);
+    }
+
+    public Command complexElevatorScoreCommand(elevatorPositions position) {
+        return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
+        .andThen((new ElevatorToPosition(elevator,position)))
+        .andThen(new WaitUntilCommand(elevator::atSetpoint))
+        .andThen(new InstantCommand(()-> wrist.setAngle(WristConstants.WRIST_HOVER)));
+    }
+
+    public Command complexElevatorStowCommand(elevatorPositions position) {
+        return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
+        .andThen((new ElevatorToPosition(elevator,position)));
     }
     
     public Command getAutonomousCommand() {

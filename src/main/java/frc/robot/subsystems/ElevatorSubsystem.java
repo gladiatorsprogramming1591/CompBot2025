@@ -118,6 +118,11 @@ public class ElevatorSubsystem extends SubsystemBase{
         }
     }
 
+    public boolean atSetpoint(){
+        double tolerance = 0.5;
+             return Math.abs(getPositionInches() - lastPos) < tolerance; 
+       }
+
     public void ElevatorToPosition(elevatorPositions positions){
         lastPos = mapEnc.get(positions); 
         setPositionRotations(inchesToRotations(lastPos)); 
