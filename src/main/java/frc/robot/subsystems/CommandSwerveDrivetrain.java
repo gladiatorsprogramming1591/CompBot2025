@@ -38,6 +38,7 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.Constants.robotInitConstants;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
 
 import org.photonvision.EstimatedRobotPose;
@@ -403,10 +404,16 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         SmartDashboard.putNumber("FR Vel",  getState().ModuleStates[1].speedMetersPerSecond);
         SmartDashboard.putNumber("BL Vel",  getState().ModuleStates[2].speedMetersPerSecond);
         SmartDashboard.putNumber("BR Vel",  getState().ModuleStates[3].speedMetersPerSecond);
+        SmartDashboard.putNumber("FL Drive OCurrent",  getModule(0).getDriveMotor().getStatorCurrent().getValueAsDouble());
+        SmartDashboard.putNumber("FR Drive OCurrent",  getModule(1).getDriveMotor().getStatorCurrent().getValueAsDouble());
+        SmartDashboard.putNumber("BL Drive OCurrent",  getModule(2).getDriveMotor().getStatorCurrent().getValueAsDouble());
+        SmartDashboard.putNumber("BR Drive OCurrent",  getModule(3).getDriveMotor().getStatorCurrent().getValueAsDouble());
         SmartDashboard.putNumber("Heading", getState().RawHeading.getDegrees());
 
         SmartDashboard.putNumber("Swerve States", getState().ModuleStates.length);
-       }
+
+        SmartDashboard.putBoolean("DIO channel 0", robotInitConstants.dIO_port.get());
+    }
     
     private void startSimThread() {
         m_lastSimTime = Utils.getCurrentTimeSeconds();
