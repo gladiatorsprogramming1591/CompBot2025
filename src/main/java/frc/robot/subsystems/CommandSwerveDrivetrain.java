@@ -451,22 +451,37 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     // After initial deadband is broken, the perpendicular axis' deadband scales down linearly as the other axis increases.
     // minDeadband: Deadband to perpendicular axis while robot is at max speed. (Scaled in between)
-    public double applyScaledDynamicDeadband(double axis, double perpendicularAxis, double Deadband, double minDeadband)
+    public double apply2dScaledDynamicDeadband(double axis, double perpendicularAxis, double Deadband, double minDeadband)
     {
         return MathUtil.applyDeadband(axis, MathUtil.clamp(Math.abs(1 - perpendicularAxis) * Deadband, minDeadband, Deadband));
     }   // A way to change scale from minDeadband to Deadband (reverse of above) may be more useful to maintain accurate directional
         // control at slow speeds, but still counteract drift. (10% deadband too large at low speed)
 
     // Mimics CTRE's deadband function, but with properly scaled output between 0-1 after deadband.
-    public double applyDynamicDeadband(double axis, double perpendicularAxis, double deadband)
+    public double apply2dDynamicDeadband(double axis, double perpendicularAxis, double deadband)
     {
-        return applyDynamicDeadband(axis, perpendicularAxis, deadband, 0, false);
+        return apply2dDynamicDeadband(axis, perpendicularAxis, deadband, 0, false);
     }
 
-    public double applyDynamicDeadband(double axis, double perpendicularAxis, double staticDeadband, double kineticDeadband, boolean squaredInputs)
+    public double apply2dDynamicDeadband(double axis, double perpendicularAxis, double staticDeadband, double kineticDeadband, boolean squaredInputs)
     {
-        if (squaredInputs) {axis = Math.pow(axis, 2);}
-        return MathUtil.applyDeadband(axis, (perpendicularAxis > staticDeadband ? kineticDeadband : staticDeadband));
+        SmartDashboard.putNumber("axis apply2dDynamicDeadband", axis);
+
+        // if (squaredInputs) {axis = Math.pow(axis, 2) * (axis / Math.abs(axis));}
+        double sign = axis / Math.abs(axis);
+        double deadband = Math.abs(perpendicularAxis) > staticDeadband ? kineticDeadband : staticDeadband;
+        double result = MathUtil.applyDeadband(axis, deadband);
+
+        SmartDashboard.putNumber("axis squared apply2dDynamicDeadband", axis);
+        SmartDashboard.putNumber("deadband apply2dDynamicDeadband", deadband);
+        SmartDashboard.putNumber("result apply2dDynamicDeadband", result);
+        return squaredInputs ? Math.pow(result, 2) * sign : result;
+    }
+
+    public double squaredInputs(double axis)
+    {
+        double sign = axis / Math.abs(axis);
+        return Math.pow(axis, 2) * sign;
     }
 
 }

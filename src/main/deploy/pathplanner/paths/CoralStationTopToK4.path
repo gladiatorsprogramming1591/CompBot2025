@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 15.534393387424972,
-        "y": 6.553943922658874
+        "x": 15.317988260108947,
+        "y": 6.720001120487142
       },
       "isLocked": false,
       "linkedName": "CoralStationTop"
@@ -20,8 +20,8 @@
         "y": 5.412437913907284
       },
       "prevControl": {
-        "x": 13.706274809072596,
-        "y": 5.268526328600785
+        "x": 14.115123967577416,
+        "y": 5.556349825886435
       },
       "nextControl": null,
       "isLocked": false,
