@@ -97,7 +97,7 @@ public class Constants {
         //Algae Constants
         public static final double ALGAE_INTAKE_SPEED = -1; 
         public static final double HAS_ALGAE_CURRENT = 30;
-        public static final double ALGAE_EJECT_SPEED = 0.3; 
+        public static final double ALGAE_EJECT_SPEED = 1.0; 
          
 
         public static final SparkFlexConfig MOTOR_CONFIG = new SparkFlexConfig() {{
@@ -116,7 +116,7 @@ public class Constants {
         public static final double WRIST_INTAKE = 163.0;  
         public static final double REEF_ACQUIRE_ANGLE = 185.0;
         public static final double GROUND_INTAKE = 228.0; 
-        public static final double WRIST_PROCESSOR = 172; //placeholder 
+        public static final double WRIST_PROCESSOR = 188; //placeholder 
         public static final double WRIST_HOVER = 195.0; //191 forever <3
         public static final double WRIST_HOVER_L4 = 172; //placeholder 
         public static final double WRIST_TOLERANCE = 5; 

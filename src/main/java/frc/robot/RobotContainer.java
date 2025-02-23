@@ -86,33 +86,34 @@ public class RobotContainer {
         );
         
         // reset the field-centric heading on left bumper press
-        driverController.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+        driverController.back().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
         
         // Subsystems
         // All Poseidon-specific commands MUST be within if-statement, or a NullPointerException will be thrown.
         if (robotInitConstants.isCompBot) {    
             // =====================================  Driver Controls  =====================================
             // Elevator
-            driverController.start().onTrue(complexElevatorStowCommand(elevatorPositions.STOW));
+
             
             // End Effector
             // driverController.a().whileTrue(endEffector.intakeCoralCommand())
             //     .onFalse(new InstantCommand(()-> endEffector.setCoralSpeed(0)));
-            driverController.a().whileTrue(complexIntakeCommand(elevatorPositions.STOW)) 
-                .onFalse(new RunCommand(()-> endEffector.setCoralSpeed(0))); 
-            driverController.b().whileTrue(new RunCommand(()-> endEffector.setCoralSpeed(EndEffectorConstants.ALGAE_INTAKE_SPEED)))
-                .onFalse(new RunCommand(()-> endEffector.algaeCheckRoutine()));
-                
-            driverController.y().whileTrue(new InstantCommand(()-> endEffector.ejectAlgae()))
+            driverController.a().whileTrue(complexIntakeCommand(elevatorPositions.STOW))
                 .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(0)));
-            driverController.x().whileTrue(new InstantCommand(()-> endEffector.ejectCoral()))
+            driverController.rightBumper().whileTrue(new InstantCommand(()-> endEffector.setCoralSpeed(EndEffectorConstants.ALGAE_INTAKE_SPEED)))
+                .onFalse(new InstantCommand(()-> wrist.setWristMotor(0)));
+            
+                
+            driverController.leftBumper().whileTrue(new RunCommand(()-> endEffector.ejectAlgae()))
+                .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(0)));
+            driverController.x().whileTrue(new RunCommand(()-> endEffector.ejectCoral()))
                 .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(0)));
                 
             // Wrist
             driverController.rightTrigger().whileTrue(new RunCommand(()-> wrist.setWristMotor(driverController.getRightTriggerAxis()*0.20), wrist))
                 .onFalse(new InstantCommand(()-> wrist.setWristMotor(0)));
             driverController.leftTrigger().whileTrue(new RunCommand(()-> wrist.setWristMotor(-driverController.getLeftTriggerAxis()*0.20), wrist))
-                .onFalse(new InstantCommand(()-> wrist.setWristMotor(0)));;
+                .onFalse(new InstantCommand(()-> wrist.setWristMotor(0)));
                 
             // ===================================== Operator Controls =====================================
             // Elevator
@@ -120,6 +121,7 @@ public class RobotContainer {
             operatorController.povLeft().onTrue(complexElevatorScoreCommand(elevatorPositions.L2)); 
             operatorController.povRight().onTrue(complexElevatorScoreCommand(elevatorPositions.L3)); 
             operatorController.povUp().onTrue(complexElevatorScoreCommand(elevatorPositions.L4));
+            operatorController.leftBumper().onTrue(complexElevatorStowCommand(elevatorPositions.STOW));
             // operatorController.back().onTrue(new InstantCommand(() -> elevator.zeroElevator()));
 
             // Wrist
@@ -152,36 +154,37 @@ public class RobotContainer {
     }
 
     public Command complexElevatorScoreCommand(elevatorPositions position) {
-        return new SequentialCommandGroup(
-        wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
+        return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
         .andThen((new ElevatorToPosition(elevator,position)))
         .andThen(new WaitUntilCommand(elevator::atSetpoint))
-        .andThen(new InstantCommand(()-> wrist.setAngle(WristConstants.WRIST_HOVER))));
+        .andThen(new InstantCommand(()-> wrist.setAngle(WristConstants.WRIST_HOVER)));
     }
 
     public Command complexElevatorStowCommand(elevatorPositions position) {
-        return new SequentialCommandGroup(
-        wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
-        .andThen((new ElevatorToPosition(elevator,position))));
+        return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
+        .andThen((new ElevatorToPosition(elevator,position)));
     }
 
     public Command complexProcessorCommand(elevatorPositions position) {
-        return new SequentialCommandGroup(
-        wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
+        return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
         .andThen(new ElevatorToPosition(elevator, position))
         .andThen(new WaitUntilCommand(elevator::atSetpoint))
-        .andThen(new InstantCommand(()-> wrist.setAngle(WristConstants.WRIST_PROCESSOR)))); 
+        .andThen(new InstantCommand(()-> wrist.setAngle(WristConstants.WRIST_PROCESSOR))); 
     }
 
-    public Command complexIntakeCommand(elevatorPositions position) {
+    public Command 
+    complexIntakeCommand(elevatorPositions position) {
+        System.out.println("Running complex intake command"); 
          return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
         .andThen(new ElevatorToPosition(elevator, position))
         .andThen(new WaitUntilCommand(elevator::atSetpoint))
         .andThen(new InstantCommand(()-> wrist.setAngle(WristConstants.WRIST_INTAKE)))
-        .andThen(endEffector.intakeCoralCommand()); 
+        .andThen(endEffector.intakeCoralCommand())
+        .andThen(wrist.StowPositionCommand()); 
     }
     
     public Command getAutonomousCommand() {
         return autoChooser.getSelected();
+
     }
 }
