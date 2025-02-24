@@ -19,13 +19,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "ProcessorToCoralStationBottom"
+            "pathName": "ProcessorToCoralStationRight"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "CoralStationBottomToCD"
+            "pathName": "CoralStationRightToCD"
           }
         }
       ]
