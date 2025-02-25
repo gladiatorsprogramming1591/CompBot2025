@@ -12,6 +12,7 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -56,7 +57,7 @@ public class RobotContainer {
     // - Suspicion that output does not scale from 0 to max after the deadband (joystick is touchy). 
     // TODO: Idea?: Try changing OpenLoopVoltage to Velocity if we switch to FOC
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-            .withDeadband(MaxSpeed * CTRE_DEADBAND).withRotationalDeadband(MaxAngularRate * CTRE_DEADBAND) // Add a 10% deadband
+            // .withDeadband(MaxSpeed * CTRE_DEADBAND).withRotationalDeadband(MaxAngularRate * CTRE_DEADBAND) // Add a 10% deadband
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
     // private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
     // private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
@@ -81,12 +82,12 @@ public class RobotContainer {
         drivetrain.setDefaultCommand(
                 // Drivetrain will execute this command periodically
                 drivetrain.applyRequest(() ->
-                        drive.withVelocityX(-driverController.getLeftY() * MaxSpeed * MAX_SPEED_PERCENT) // Drive forward with negative Y (forward)
-                                    .withVelocityY(-driverController.getLeftX() * MaxSpeed * MAX_SPEED_PERCENT) // Drive left with negative X (left)
-                                    .withRotationalRate(-driverController.getRightX() * MaxAngularRate * MAX_ANGULAR_RATE_PERCENT) // Drive counterclockwise with negative X (left)
-                        // drive.withVelocityX(-drivetrain.apply2dDynamicDeadband(driverController.getLeftY(), driverController.getLeftX(), STATIC_DEADBAND, KINETIC_DEADBAND, false) * MaxSpeed * MAX_SPEED_PERCENT) // Drive forward with negative Y (forward)
-                        //             .withVelocityY(-drivetrain.apply2dDynamicDeadband(driverController.getLeftX(), driverController.getLeftY(), STATIC_DEADBAND, KINETIC_DEADBAND, false) * MaxSpeed * MAX_SPEED_PERCENT) // Drive left with negative X (left)
-                        //             .withRotationalRate(-MathUtil.applyDeadband(driverController.getRightX(), STATIC_DEADBAND) * MaxAngularRate * MAX_ANGULAR_RATE_PERCENT). // Drive counterclockwise with negative X (left)
+                        // drive.withVelocityX(-MathUtil.applyDeadband(driverController.getLeftY(), 0, MAX_SPEED_PERCENT) * MaxSpeed) // Drive forward with negative Y (forward)
+                        //             .withVelocityY(-MathUtil.applyDeadband(driverController.getLeftX(), 0, MAX_SPEED_PERCENT) * MaxSpeed) // Drive left with negative X (left)
+                        //             .withRotationalRate(-MathUtil.applyDeadband(driverController.getRightX(), 0, MAX_ANGULAR_RATE_PERCENT) * MaxAngularRate) // Drive counterclockwise with negative X (left)
+                        drive.withVelocityX(-drivetrain.apply2dDynamicDeadband(driverController.getLeftY(), driverController.getLeftX(), STATIC_DEADBAND, KINETIC_DEADBAND, false) * MaxSpeed * MAX_SPEED_PERCENT) // Drive forward with negative Y (forward)
+                                    .withVelocityY(-drivetrain.apply2dDynamicDeadband(driverController.getLeftX(), driverController.getLeftY(), STATIC_DEADBAND, KINETIC_DEADBAND, false) * MaxSpeed * MAX_SPEED_PERCENT) // Drive left with negative X (left)
+                                    .withRotationalRate(-MathUtil.applyDeadband(driverController.getRightX(), STATIC_DEADBAND, MAX_ANGULAR_RATE_PERCENT) * MaxAngularRate) // Drive counterclockwise with negative X (left)
                 )
         );
         
