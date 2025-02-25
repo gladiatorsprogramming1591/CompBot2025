@@ -7,13 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "XStraightLineREVERSE"
+            "pathName": "StartLineToF"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": null
           }
         }
       ]
     }
   },
-  "resetOdom": true,
-  "folder": "Testing",
+  "resetOdom": false,
+  "folder": null,
   "choreoAuto": false
 }
