@@ -10,6 +10,7 @@ import static frc.robot.Constants.ElevatorConstants.kSTOW;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -126,7 +127,7 @@ public class RobotContainer {
             operatorController.povRight().onTrue(complexElevatorScoreCommand(elevatorPositions.L3)); 
             operatorController.povUp().onTrue(complexElevatorScoreCommand(elevatorPositions.L4));
             operatorController.leftBumper().onTrue(complexElevatorStowCommand(elevatorPositions.STOW));
-            // operatorController.back().onTrue(new InstantCommand(() -> elevator.zeroElevator()));
+            operatorController.back().onTrue(new InstantCommand(() -> elevator.zeroElevator()));
 
             // Wrist
             operatorController.a().onTrue(new InstantCommand(()-> wrist.setAngle(WristConstants.WRIST_STOW)));
@@ -190,5 +191,11 @@ public class RobotContainer {
     public Command getAutonomousCommand() {
         return autoChooser.getSelected();
 
+    }
+    
+    public void registerNamedCommands(){
+        NamedCommands.registerCommand("IntakeCoral", complexIntakeCommand(elevatorPositions.STOW));
+        NamedCommands.registerCommand("ComplexScoreCommand", complexElevatorScoreCommand(elevatorPositions.L2));
+        NamedCommands.registerCommand("ScoreCoral", new RunCommand(()-> endEffector.ejectCoral()).until(()-> !endEffector.isCoralFrontBeamBroken()));
     }
 }
