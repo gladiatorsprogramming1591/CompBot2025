@@ -70,10 +70,12 @@ public class RobotContainer {
     private final SendableChooser<Command> autoChooser;
     
     public RobotContainer() {
+        registerNamedCommands();
         autoChooser = AutoBuilder.buildAutoChooser(); // A default auto can be passed in as parameter.
         SmartDashboard.putData("Auto Mode", autoChooser);
         
         configureBindings();
+        
     }
     
     private void configureBindings() {
@@ -160,6 +162,7 @@ public class RobotContainer {
     }
 
     public Command complexElevatorScoreCommand(elevatorPositions position) {
+        System.out.println("Running complex score command"); 
         return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
         .andThen((new ElevatorToPosition(elevator,position)))
         .andThen(new WaitUntilCommand(elevator::atSetpoint))
@@ -189,6 +192,7 @@ public class RobotContainer {
         .andThen(wrist.StowPositionCommand()); 
     }
     
+    // 2.3976 is the y postion of StartLineToF
     public Command getAutonomousCommand() {
         return autoChooser.getSelected();
 
@@ -196,7 +200,7 @@ public class RobotContainer {
     
     public void registerNamedCommands(){
         NamedCommands.registerCommand("IntakeCoral", complexIntakeCommand(elevatorPositions.STOW));
-        NamedCommands.registerCommand("ComplexScoreCommand", complexElevatorScoreCommand(elevatorPositions.L2));
-        NamedCommands.registerCommand("ScoreCoral", new RunCommand(()-> endEffector.ejectCoral()).until(()-> !endEffector.isCoralFrontBeamBroken()));
+        NamedCommands.registerCommand("ComplexScoreCommand", complexElevatorScoreCommand(elevatorPositions.L2).andThen(()-> System.out.println("Complex Score Command")));
+        NamedCommands.registerCommand("ScoreCoral", new RunCommand(()-> endEffector.ejectCoral()).until(()-> !endEffector.isCoralFrontBeamBroken())); 
     }
 }

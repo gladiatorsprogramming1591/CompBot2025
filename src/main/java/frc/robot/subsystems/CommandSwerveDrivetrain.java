@@ -265,15 +265,15 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
         fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
 
-        m_frontCamera = new PhotonCamera("Front");
+        // m_frontCamera = new PhotonCamera("Front");
 
-        m_photonPoseEstimators = new PhotonPoseEstimator[] {
-            new PhotonPoseEstimator(
-                fieldLayout,
-                PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-                kFrontCameraLocation
-            )
-        };
+        // m_photonPoseEstimators = new PhotonPoseEstimator[] {
+        //     new PhotonPoseEstimator(
+        //         fieldLayout,
+        //         PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
+        //         kFrontCameraLocation
+        //     )
+        // };
 
     }
     
