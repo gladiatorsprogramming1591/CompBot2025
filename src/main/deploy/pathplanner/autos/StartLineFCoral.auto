@@ -31,13 +31,73 @@
         {
           "type": "path",
           "data": {
-            "pathName": "FToCoralStation"
+            "pathName": "FToCoralStationR"
           }
         },
         {
           "type": "named",
           "data": {
             "name": "IntakeCoral"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "CoralStationRToD"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ComplexScoreCommand"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ScoreCoral"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ComplexStow"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "DToCoralStationR"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "IntakeCoral"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "CoralStationRToB"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ComplexScoreCommand"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ScoreCoral"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ComplexStow"
           }
         }
       ]
