@@ -19,32 +19,34 @@ import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.WristConstants;
 
 public class Wrist extends SubsystemBase {
-    private final SparkBase angleMotor;
-    private SparkAbsoluteEncoder angleEncoder;
-    private SparkClosedLoopController angleClosedLoop;
-    private double holdAngle;
-    //Ground Acquire angle = 228.0
-    //L2 acquire = 185.0
-
-
-    public Wrist ()
-    {
-      
-         angleMotor = new SparkMax(WristConstants.WRIST_CAN_ID, MotorType.kBrushless); 
-         angleMotor.configure(WristConstants.MOTOR_CONFIG,
-              SparkBase.ResetMode.kResetSafeParameters,
-              SparkBase.PersistMode.kPersistParameters
-         );   
-         angleClosedLoop = angleMotor.getClosedLoopController();
-         angleEncoder = angleMotor.getAbsoluteEncoder();
-         holdAngle = WristConstants.WRIST_STOW;
+    private final SparkBase wristMotor; 
+    AbsoluteEncoder wristEncoder; 
+    SparkClosedLoopController wristController; 
+    double holdAngle;
+    
+    public Wrist() {
+        wristMotor = new SparkMax(WristConstants.WRIST_CAN_ID, MotorType.kBrushless); 
+          wristMotor.configure(WristConstants.MOTOR_CONFIG,
+               SparkBase.ResetMode.kResetSafeParameters,
+               SparkBase.PersistMode.kPersistParameters
+          );   
+          wristEncoder = wristMotor.getAbsoluteEncoder(); 
+          wristController = wristMotor.getClosedLoopController(); 
+          holdAngle = ElevatorConstants.STOW_ANGLE; 
+        
     }
+
+    public double getPosition() {
+        return wristEncoder.getPosition(); 
+    }
+
+     
 
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Hold Angle", holdAngle);
         SmartDashboard.putNumber("Wrist Encoder Angle", getAngle());
-        SmartDashboard.putNumber("Wrist Current", angleMotor.getOutputCurrent()); 
+        SmartDashboard.putNumber("Wrist Current", wristMotor.getOutputCurrent()); 
     }
 
     /**
@@ -53,7 +55,7 @@ public class Wrist extends SubsystemBase {
      */
     public double getAngle()
     {
-         return angleEncoder.getPosition();
+         return wristEncoder.getPosition();
     }
 
     /**
@@ -68,18 +70,18 @@ public class Wrist extends SubsystemBase {
     public void setWristMotor(double speed)
     {
         SmartDashboard.putNumber("Wrist Motor Speed", speed);
-        angleMotor.set(speed);
+        wristMotor.set(speed);
     }
 
     public void setAngle(double angle)
     {
          holdAngle = angle;
-         angleClosedLoop.setReference(holdAngle, ControlType.kPosition);
+         wristController.setReference(holdAngle, ControlType.kPosition);
     }  
 
     public void setHoldAngle()
     {
-         angleClosedLoop.setReference(holdAngle, ControlType.kPosition);
+         wristController.setReference(holdAngle, ControlType.kPosition);
     }
 
     public boolean atSetpoint(){
@@ -96,9 +98,8 @@ public class Wrist extends SubsystemBase {
     }
 
     public Command IntakePositionCommand(){
-     return new InstantCommand(()->setAngle(WristConstants.WRIST_INTAKE)); 
-}
-
+         return new InstantCommand(()->setAngle(WristConstants.WRIST_INTAKE)); 
+    }
 
     public Command ProcessorPositionCommand(){ 
           return new InstantCommand(()-> setAngle(WristConstants.WRIST_PROCESSOR)); 
@@ -110,5 +111,9 @@ public class Wrist extends SubsystemBase {
     public Command HoldPositionCommand()
     {
          return new RunCommand(()->setHoldAngle(),this);
+    }
+
+    public Command manualWristMovement(double speed){
+        return new RunCommand(()-> setWristMotor(speed)); 
     }
 }

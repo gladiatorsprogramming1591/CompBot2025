@@ -43,21 +43,15 @@ public class EndEffector extends SubsystemBase {
     }
 
     public void ejectCoral() {
-        intakeMotor.set(EndEffectorConstants.CORAL_EJECT_SPEED);  
+        intakeMotor.set(EndEffectorConstants.CORAL_EJECT_SPEED);
     }
 
-    public boolean isCoralSecure() { 
-        
-        return false;
-    }
 
-    public  boolean isCoralFrontBeamBroken()
-    {
+    public boolean isCoralFrontBeamBroken() {
         return coralFrontBeam.isPressed();
     }
 
-    public boolean isCoralRearBeamBroken()
-    {
+    public boolean isCoralRearBeamBroken(){
         return coralRearBeam.isPressed();
     }
 
@@ -89,12 +83,12 @@ public class EndEffector extends SubsystemBase {
         return ((!isCoralRearBeamBroken()) && isCoralFrontBeamBroken());
     }
 
-    public Command IntakeAlgaeCommand() {
-        return new RunCommand(() -> setCoralSpeed(EndEffectorConstants.ALGAE_INTAKE_SPEED));
-    }
-
     public void algaeCheckRoutine() {
         if(intakeMotor.getOutputCurrent() < EndEffectorConstants.HAS_ALGAE_CURRENT){intakeMotor.stopMotor();}//Multiple loop check routine
+    }
+
+    public Command intakeAlgaeCommand() {
+        return new RunCommand(() -> setCoralSpeed(EndEffectorConstants.ALGAE_INTAKE_SPEED));
     }
 
     /**
@@ -114,6 +108,11 @@ public class EndEffector extends SubsystemBase {
             .until(()-> (!isCoralRearBeamBroken()) && !isCoralFrontBeamBroken()),
             new InstantCommand(() ->setCoralSpeed(0)));
     }
+
+    public Command ejectAlgaeCommand(){
+        return new InstantCommand(()-> ejectAlgae()); 
+    }
+    
 
 
 

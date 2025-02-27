@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.ElevatorConstants;
 
 import java.util.EnumMap;
 
@@ -63,8 +64,11 @@ public class ElevatorSubsystem extends SubsystemBase{
 
         leadEncoder = leader.getEncoder();
         followEncoder = follower.getEncoder();
-        controller = leader.getClosedLoopController();
-        bottomLimitSwitch = leader.getReverseLimitSwitch();
+        controller = leader.getClosedLoopController(); 
+
+        lowerLimit = new DigitalInput(ElevatorConstants.LOWER_LIMIT_ID);
+        zeroTrigger = new Trigger(lowerLimit::get);
+        zeroTrigger.onTrue(zeroElevator());
 
         lastPos = 0.0;
         
@@ -121,7 +125,7 @@ public class ElevatorSubsystem extends SubsystemBase{
     public boolean atSetpoint(){
         double tolerance = 0.5;
              return Math.abs(getPositionInches() - lastPos) < tolerance; 
-       }
+    }
 
     public void ElevatorToPosition(elevatorPositions positions){
         lastPos = mapEnc.get(positions); 
@@ -134,7 +138,7 @@ public class ElevatorSubsystem extends SubsystemBase{
 
     @Override
     public void periodic() {
-        SmartDashboard.putBoolean("Elevator lowerLimit", bottomLimitSwitch.isPressed());
+        // SmartDashboard.putBoolean("Elevator lowerLimit", bottomLimitSwitch.isPressed());
         SmartDashboard.putNumber("Elevator inches", getPositionInches());
         SmartDashboard.putNumber("Elevator current", leader.getOutputCurrent());
         SmartDashboard.putNumber("LastPos", lastPos);

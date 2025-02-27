@@ -111,17 +111,17 @@ public class RobotContainer {
             //     .onFalse(new InstantCommand(()-> endEffector.setCoralSpeed(0)));
             driverController.a().whileTrue(complexIntakeCommand())
                 .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(0)));
-            driverController.rightBumper().whileTrue(new InstantCommand(()-> endEffector.setCoralSpeed(EndEffectorConstants.ALGAE_INTAKE_SPEED)))
+            driverController.rightBumper().whileTrue(endEffector.intakeAlgaeCommand())
                 .onFalse(new InstantCommand(()-> wrist.setWristMotor(0)));
             
                 
-            driverController.leftBumper().whileTrue(new RunCommand(()-> endEffector.ejectAlgae()))
+            driverController.leftBumper().whileTrue(endEffector.ejectAlgaeCommand())
                 .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(0)));
             driverController.x().onTrue(endEffector.ejectCoralCommand());                
             // Wrist
-            driverController.rightTrigger().whileTrue(new RunCommand(()-> wrist.setWristMotor(driverController.getRightTriggerAxis()*0.20), wrist))
+            driverController.rightTrigger().whileTrue(wrist.manualWristMovement(-driverController.getRightTriggerAxis()*-0.20))
                 .onFalse(new InstantCommand(()-> wrist.setWristMotor(0)));
-            driverController.leftTrigger().whileTrue(new RunCommand(()-> wrist.setWristMotor(-driverController.getLeftTriggerAxis()*0.20), wrist))
+            driverController.leftTrigger().whileTrue(wrist.manualWristMovement(-driverController.getLeftTriggerAxis()*0.20))
                 .onFalse(new InstantCommand(()-> wrist.setWristMotor(0)));
                 
             // ===================================== Operator Controls =====================================
