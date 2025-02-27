@@ -38,8 +38,8 @@ public class RobotContainer {
     public static final double CTRE_DEADBAND = 0.05;
     public static final double STATIC_DEADBAND = 0.10; // 10% Deadband before robot moves
     public static final double KINETIC_DEADBAND = 0.02; // 2% Deadband to perpendicular axis while robot is in motion
-    public static final double MAX_SPEED_PERCENT = 1.00;
-    public static final double MAX_ANGULAR_RATE_PERCENT = 1.00;
+    public static double MAX_SPEED_PERCENT = 1.00;
+    public static double MAX_ANGULAR_RATE_PERCENT = 1.00;
 
     //Subsystems 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
@@ -89,12 +89,15 @@ public class RobotContainer {
                         //             .withRotationalRate(-MathUtil.applyDeadband(driverController.getRightX(), 0, MAX_ANGULAR_RATE_PERCENT) * MaxAngularRate) // Drive counterclockwise with negative X (left)
                         drive.withVelocityX(-drivetrain.apply2dDynamicDeadband(driverController.getLeftY(), driverController.getLeftX(), STATIC_DEADBAND, KINETIC_DEADBAND, false) * MaxSpeed * MAX_SPEED_PERCENT) // Drive forward with negative Y (forward)
                                     .withVelocityY(-drivetrain.apply2dDynamicDeadband(driverController.getLeftX(), driverController.getLeftY(), STATIC_DEADBAND, KINETIC_DEADBAND, false) * MaxSpeed * MAX_SPEED_PERCENT) // Drive left with negative X (left)
-                                    .withRotationalRate(-MathUtil.applyDeadband(driverController.getRightX(), STATIC_DEADBAND, MAX_ANGULAR_RATE_PERCENT) * MaxAngularRate) // Drive counterclockwise with negative X (left)
+                                    .withRotationalRate(-MathUtil.applyDeadband(driverController.getRightX(), STATIC_DEADBAND) * MaxAngularRate * MAX_ANGULAR_RATE_PERCENT) // Drive counterclockwise with negative X (left)
                 )
         );
         
         // reset the field-centric heading on left bumper press
         driverController.back().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+        driverController.start().onTrue(new InstantCommand(()-> slowMode(true)))
+            .onFalse(new InstantCommand(()-> slowMode(false)));
+        
         
         // Subsystems
         // All Poseidon-specific commands MUST be within if-statement, or a NullPointerException will be thrown.
@@ -106,7 +109,7 @@ public class RobotContainer {
             // End Effector
             // driverController.a().whileTrue(endEffector.intakeCoralCommand())
             //     .onFalse(new InstantCommand(()-> endEffector.setCoralSpeed(0)));
-            driverController.a().whileTrue(complexIntakeCommand(elevatorPositions.STOW))
+            driverController.a().whileTrue(complexIntakeCommand())
                 .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(0)));
             driverController.rightBumper().whileTrue(new InstantCommand(()-> endEffector.setCoralSpeed(EndEffectorConstants.ALGAE_INTAKE_SPEED)))
                 .onFalse(new InstantCommand(()-> wrist.setWristMotor(0)));
@@ -114,9 +117,7 @@ public class RobotContainer {
                 
             driverController.leftBumper().whileTrue(new RunCommand(()-> endEffector.ejectAlgae()))
                 .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(0)));
-            driverController.x().whileTrue(new RunCommand(()-> endEffector.ejectCoral()))
-                .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(0)));
-                
+            driverController.x().onTrue(endEffector.ejectCoralCommand());                
             // Wrist
             driverController.rightTrigger().whileTrue(new RunCommand(()-> wrist.setWristMotor(driverController.getRightTriggerAxis()*0.20), wrist))
                 .onFalse(new InstantCommand(()-> wrist.setWristMotor(0)));
@@ -127,8 +128,8 @@ public class RobotContainer {
             // Elevator
             operatorController.povDown().onTrue(complexElevatorScoreCommand(elevatorPositions.L1)); 
             operatorController.povLeft().onTrue(complexElevatorScoreCommand(elevatorPositions.L2)); 
-            operatorController.povRight().onTrue(complexElevatorScoreCommand(elevatorPositions.L3)); 
-            operatorController.povUp().onTrue(complexElevatorScoreCommand(elevatorPositions.L4));
+            operatorController.povRight().onTrue(complexElevatorScoreCommand(elevatorPositions.L4)); 
+            operatorController.povUp().onTrue(complexElevatorScoreCommand(elevatorPositions.L3));
             operatorController.leftBumper().onTrue(complexElevatorStowCommand(elevatorPositions.STOW));
             operatorController.back().onTrue(new InstantCommand(() -> elevator.zeroElevator()));
 
@@ -161,12 +162,23 @@ public class RobotContainer {
         drivetrain.registerTelemetry(logger::telemeterize);
     }
 
+    public void slowMode(boolean isSlow){
+        if(isSlow){
+            MAX_ANGULAR_RATE_PERCENT = 0.2; 
+            MAX_SPEED_PERCENT = 0.2; 
+        }
+        else {
+           MAX_ANGULAR_RATE_PERCENT = 1.0; 
+           MAX_SPEED_PERCENT = 1.0;  
+        }
+    }
+
     public Command complexElevatorScoreCommand(elevatorPositions position) {
         System.out.println("Running complex score command"); 
         return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
         .andThen((new ElevatorToPosition(elevator,position)))
         .andThen(new WaitUntilCommand(elevator::atSetpoint))
-        .andThen(new InstantCommand(()-> wrist.setAngle(WristConstants.WRIST_HOVER)));
+        .andThen(wrist.HoverPositionCommand());
     }
 
     public Command complexElevatorStowCommand(elevatorPositions position) {
@@ -178,18 +190,19 @@ public class RobotContainer {
         return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
         .andThen(new ElevatorToPosition(elevator, position))
         .andThen(new WaitUntilCommand(elevator::atSetpoint))
-        .andThen(new InstantCommand(()-> wrist.setAngle(WristConstants.WRIST_PROCESSOR))); 
+        .andThen(wrist.ProcessorPositionCommand()); 
     }
 
-    public Command 
-    complexIntakeCommand(elevatorPositions position) {
-        System.out.println("Running complex intake command"); 
+    public Command complexIntakeCommand() { 
          return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
-        .andThen(new ElevatorToPosition(elevator, position))
+        .andThen(new InstantCommand(()-> System.out.println("Running complex intake command")))
+        .andThen(new ElevatorToPosition(elevator, elevatorPositions.STOW))
         .andThen(new WaitUntilCommand(elevator::atSetpoint))
-        .andThen(new InstantCommand(()-> wrist.setAngle(WristConstants.WRIST_INTAKE)))
+        .andThen(wrist.IntakePositionCommand())
         .andThen(endEffector.intakeCoralCommand())
-        .andThen(wrist.StowPositionCommand()); 
+        .andThen(wrist.StowPositionCommand())
+        .andThen(new ElevatorToPosition(elevator, elevatorPositions.L2))
+        .andThen(new WaitUntilCommand(elevator::atSetpoint)); 
     }
     
     // 2.3976 is the y postion of StartLineToF
@@ -199,8 +212,9 @@ public class RobotContainer {
     }
     
     public void registerNamedCommands(){
-        NamedCommands.registerCommand("IntakeCoral", complexIntakeCommand(elevatorPositions.STOW));
-        NamedCommands.registerCommand("ComplexScoreCommand", complexElevatorScoreCommand(elevatorPositions.L2).andThen(()-> System.out.println("Complex Score Command")));
-        NamedCommands.registerCommand("ScoreCoral", new RunCommand(()-> endEffector.ejectCoral()).until(()-> !endEffector.isCoralFrontBeamBroken())); 
+        NamedCommands.registerCommand("IntakeCoral", complexIntakeCommand());
+        NamedCommands.registerCommand("ComplexScoreCommand", complexElevatorScoreCommand(elevatorPositions.L4).andThen(()-> System.out.println("Complex Score Command")));
+        NamedCommands.registerCommand("ScoreCoral", endEffector.ejectCoralCommand()); 
+        NamedCommands.registerCommand("ComplexStow", complexElevatorStowCommand(elevatorPositions.STOW));
     }
 }

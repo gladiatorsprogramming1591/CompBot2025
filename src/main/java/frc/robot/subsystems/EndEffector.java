@@ -109,6 +109,13 @@ public class EndEffector extends SubsystemBase {
             new RunCommand(() ->setCoralSpeed(0)));
     }
 
+    public Command ejectCoralCommand() {
+        return new SequentialCommandGroup(new RunCommand(() -> ejectCoral())
+            .until(()-> (!isCoralRearBeamBroken()) && !isCoralFrontBeamBroken()),
+            new InstantCommand(() ->setCoralSpeed(0)));
+    }
+
+
 
 
 

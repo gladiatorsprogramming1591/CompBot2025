@@ -27,6 +27,18 @@
           "data": {
             "name": "ComplexStow"
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "FToCoralStation"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "IntakeCoral"
+          }
         }
       ]
     }

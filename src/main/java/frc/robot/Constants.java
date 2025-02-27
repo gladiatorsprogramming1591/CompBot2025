@@ -77,7 +77,7 @@ public class Constants {
         public static final double kL4 = 27; 
         public static final double kPROCESSOR = 0; 
         public static final double kNET = 27;
-        public static final double STOW_ANGLE = 0; 
+        public static final double STOW_ANGLE = 0;
 
     }
 
