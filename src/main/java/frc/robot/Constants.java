@@ -16,7 +16,7 @@ public class Constants {
         
         public static final boolean LEADER_INVERTED = false; 
         public static final boolean FOLLOWER_INVERTED_FROM_LEADER = true;
-        public static final double RAMP_RATE = 0.1; 
+        public static final double RAMP_RATE = 0.01; 
         public static final int CURRENT_LIMIT = 80; 
 
         public static final double OUTPUT_MAXIMUM = 1.0; 
@@ -36,11 +36,11 @@ public class Constants {
         public static final double ALLOWERD_ERR_UP = 0.08; 
 
         //Constants for going down
-        public static final double P_DOWN = 0.1; 
+        public static final double P_DOWN = 0.05; 
         public static final double I_DOWN = 0; 
         public static final double D_DOWN = 0; 
 
-        public static final double MAX_VEL_DOWN = 3500; 
+        public static final double MAX_VEL_DOWN = 3200; 
         public static final double MAX_ACCEL_DOWN = 6000;
         public static final double ALLOWERD_ERR_DOWN = 1.0; 
 
@@ -70,13 +70,13 @@ public class Constants {
 
 
         //Elevator Positions
-        public static final double kSTOW = 0.0; 
-        public static final double kL1 = 0.2; 
+        public static final double kSTOW = 0.2; 
+        public static final double kL1 = 0.3; 
         public static final double kL2 = 7.25; 
         public static final double kL3 = 15.5; 
-        public static final double kL4 = 27; 
+        public static final double kL4 = 26.0; 
         public static final double kPROCESSOR = 0; 
-        public static final double kNET = 27;
+        public static final double kNET = kL4;
         public static final double STOW_ANGLE = 0;
 
     }

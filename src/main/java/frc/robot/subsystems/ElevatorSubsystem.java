@@ -66,9 +66,9 @@ public class ElevatorSubsystem extends SubsystemBase{
         followEncoder = follower.getEncoder();
         controller = leader.getClosedLoopController(); 
 
-        lowerLimit = new DigitalInput(ElevatorConstants.LOWER_LIMIT_ID);
-        zeroTrigger = new Trigger(lowerLimit::get);
-        zeroTrigger.onTrue(zeroElevator());
+        bottomLimitSwitch = leader.getReverseLimitSwitch();
+        zeroTrigger = new Trigger(this::isElevatorNotAtBottom);
+        // zeroTrigger.onTrue(zeroElevatorCommand());
 
         lastPos = 0.0;
         
@@ -79,6 +79,10 @@ public class ElevatorSubsystem extends SubsystemBase{
         mapEnc.put(elevatorPositions.L4, kL4);
         mapEnc.put(elevatorPositions.PROCESSOR, kPROCESSOR);
         mapEnc.put(elevatorPositions.NETSHOOT, kNET);        
+    }
+
+    private boolean isElevatorNotAtBottom() {
+        return !bottomLimitSwitch.isPressed();
     }
 
     public void getHeight() { 
@@ -124,31 +128,43 @@ public class ElevatorSubsystem extends SubsystemBase{
 
     public boolean atSetpoint(){
         double tolerance = 0.5;
-             return Math.abs(getPositionInches() - lastPos) < tolerance; 
+        boolean atTarget = Math.abs(getPositionInches() - lastPos) < tolerance; 
+        if (atTarget) System.out.println("Elevator at setpoint");
+        return atTarget;
     }
 
     public void ElevatorToPosition(elevatorPositions positions){
+        if(lastPos == kSTOW) {
+            System.out.println("Zeroing Elevator in ETP");
+            zeroElevator(); // Zero the elevator if we are leaving the stow position
+        }
         lastPos = mapEnc.get(positions); 
         setPositionRotations(inchesToRotations(lastPos)); 
     }
 
-    public Command zeroElevator() {
-        return new InstantCommand(() -> leadEncoder.setPosition(0));
+    public Command zeroElevatorCommand() {
+        return new InstantCommand(() -> {System.out.println("ZeroCommand");leadEncoder.setPosition(0);});
+    }
+
+    public void zeroElevator() {
+        leadEncoder.setPosition(0);
     }
 
     @Override
     public void periodic() {
-        // SmartDashboard.putBoolean("Elevator lowerLimit", bottomLimitSwitch.isPressed());
+        SmartDashboard.putBoolean("Elevator lowerLimit", bottomLimitSwitch.isPressed());
         SmartDashboard.putNumber("Elevator inches", getPositionInches());
         SmartDashboard.putNumber("Elevator current", leader.getOutputCurrent());
         SmartDashboard.putNumber("LastPos", lastPos);
         SmartDashboard.putNumber("Elevator Vel", leadEncoder.getVelocity());
         SmartDashboard.putNumber("Follower Output Current", follower.getOutputCurrent());
         SmartDashboard.putNumber("Follower Velocity", followEncoder.getVelocity()); 
+        SmartDashboard.putNumber("Elevator lastPos", lastPos);
 
-
-        if((lastPos == kSTOW) && (getPositionInches() < kSTOW+0.8)){
+        if((lastPos == kSTOW) && (getPositionInches() < kSTOW+0.32)){
             leader.stopMotor();
+            System.out.println("Zeroing Elevator");
+            zeroElevator();
         }
     }
 

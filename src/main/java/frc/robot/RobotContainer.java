@@ -131,7 +131,7 @@ public class RobotContainer {
             operatorController.povRight().onTrue(complexElevatorScoreCommand(elevatorPositions.L4)); 
             operatorController.povUp().onTrue(complexElevatorScoreCommand(elevatorPositions.L3));
             operatorController.leftBumper().onTrue(complexElevatorStowCommand(elevatorPositions.STOW));
-            operatorController.back().onTrue(new InstantCommand(() -> elevator.zeroElevator()));
+            operatorController.back().onTrue(new InstantCommand(() -> elevator.zeroElevatorCommand()));
 
             // Wrist
             operatorController.a().onTrue(new InstantCommand(()-> wrist.setAngle(WristConstants.WRIST_STOW)));
@@ -164,7 +164,7 @@ public class RobotContainer {
 
     public void slowMode(boolean isSlow){
         if(isSlow){
-            MAX_ANGULAR_RATE_PERCENT = 0.2; 
+            MAX_ANGULAR_RATE_PERCENT = 0.1; 
             MAX_SPEED_PERCENT = 0.2; 
         }
         else {
@@ -197,10 +197,15 @@ public class RobotContainer {
          return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
         .andThen(new InstantCommand(()-> System.out.println("Running complex intake command")))
         .andThen(new ElevatorToPosition(elevator, elevatorPositions.STOW))
+        .andThen(new InstantCommand(()-> System.out.println("Running elevator stow command")))
         .andThen(new WaitUntilCommand(elevator::atSetpoint))
+        .andThen(new InstantCommand(()-> System.out.println("Running wrist intake command")))
         .andThen(wrist.IntakePositionCommand())
+        .andThen(new InstantCommand(()-> System.out.println("Running intake coral command")))
         .andThen(endEffector.intakeCoralCommand())
+        .andThen(new InstantCommand(()-> System.out.println("Running stow command")))
         .andThen(wrist.StowPositionCommand())
+        .andThen(new InstantCommand(()-> System.out.println("Running elevator L2 command")))
         .andThen(new ElevatorToPosition(elevator, elevatorPositions.L2))
         .andThen(new WaitUntilCommand(elevator::atSetpoint)); 
     }
