@@ -7,25 +7,25 @@
         {
           "type": "path",
           "data": {
-            "pathName": "StartLineToI4"
+            "pathName": "StartLineToEF"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "I4ToProcessor"
+            "pathName": "EFToProcessor"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "ProcessorToCoralStationTop"
+            "pathName": "ProcessorToCoralStationRight"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "CoralStationTopToK4"
+            "pathName": "CoralStationRightToCD"
           }
         }
       ]

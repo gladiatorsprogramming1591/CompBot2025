@@ -7,31 +7,31 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Box1"
+            "pathName": "StartLineToF"
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "Box2"
+            "name": "ComplexScoreCommand"
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "Box3"
+            "name": "ScoreCoral"
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "Box4"
+            "name": "ComplexStow"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Testing",
+  "folder": null,
   "choreoAuto": false
 }

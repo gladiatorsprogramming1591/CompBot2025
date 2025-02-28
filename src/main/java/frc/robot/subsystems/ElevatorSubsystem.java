@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.ElevatorConstants;
 
 import java.util.EnumMap;
 
@@ -63,8 +64,11 @@ public class ElevatorSubsystem extends SubsystemBase{
 
         leadEncoder = leader.getEncoder();
         followEncoder = follower.getEncoder();
-        controller = leader.getClosedLoopController();
+        controller = leader.getClosedLoopController(); 
+
         bottomLimitSwitch = leader.getReverseLimitSwitch();
+        zeroTrigger = new Trigger(this::isElevatorNotAtBottom);
+        // zeroTrigger.onTrue(zeroElevatorCommand());
 
         lastPos = 0.0;
         
@@ -75,6 +79,10 @@ public class ElevatorSubsystem extends SubsystemBase{
         mapEnc.put(elevatorPositions.L4, kL4);
         mapEnc.put(elevatorPositions.PROCESSOR, kPROCESSOR);
         mapEnc.put(elevatorPositions.NETSHOOT, kNET);        
+    }
+
+    private boolean isElevatorNotAtBottom() {
+        return !bottomLimitSwitch.isPressed();
     }
 
     public void getHeight() { 
@@ -120,16 +128,26 @@ public class ElevatorSubsystem extends SubsystemBase{
 
     public boolean atSetpoint(){
         double tolerance = 0.5;
-             return Math.abs(getPositionInches() - lastPos) < tolerance; 
-       }
+        boolean atTarget = Math.abs(getPositionInches() - lastPos) < tolerance; 
+        if (atTarget) System.out.println("Elevator at setpoint");
+        return atTarget;
+    }
 
     public void ElevatorToPosition(elevatorPositions positions){
+        if(lastPos == kSTOW) {
+            System.out.println("Zeroing Elevator in ETP");
+            zeroElevator(); // Zero the elevator if we are leaving the stow position
+        }
         lastPos = mapEnc.get(positions); 
         setPositionRotations(inchesToRotations(lastPos)); 
     }
 
-    public Command zeroElevator() {
-        return new InstantCommand(() -> leadEncoder.setPosition(0));
+    public Command zeroElevatorCommand() {
+        return new InstantCommand(() -> {System.out.println("ZeroCommand");leadEncoder.setPosition(0);});
+    }
+
+    public void zeroElevator() {
+        leadEncoder.setPosition(0);
     }
 
     @Override
@@ -141,10 +159,12 @@ public class ElevatorSubsystem extends SubsystemBase{
         SmartDashboard.putNumber("Elevator Vel", leadEncoder.getVelocity());
         SmartDashboard.putNumber("Follower Output Current", follower.getOutputCurrent());
         SmartDashboard.putNumber("Follower Velocity", followEncoder.getVelocity()); 
+        SmartDashboard.putNumber("Elevator lastPos", lastPos);
 
-
-        if((lastPos == kSTOW) && (getPositionInches() < kSTOW+0.8)){
+        if((lastPos == kSTOW) && (getPositionInches() < kSTOW+0.32)){
             leader.stopMotor();
+            System.out.println("Zeroing Elevator");
+            zeroElevator();
         }
     }
 

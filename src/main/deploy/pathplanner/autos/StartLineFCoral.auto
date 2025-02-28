@@ -1,0 +1,73 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "StartLineToF"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ComplexScoreCommand"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ScoreCoral"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ComplexStow"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "FToCoralStationR"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "IntakeCoral"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "CoralStationRToD"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ComplexScoreCommand"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ScoreCoral"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ComplexStow"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}
