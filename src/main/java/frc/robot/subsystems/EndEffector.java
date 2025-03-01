@@ -29,8 +29,8 @@ public class EndEffector extends SubsystemBase {
                 SparkBase.PersistMode.kPersistParameters
             );
 
-            coralFrontBeam = intakeMotor.getForwardLimitSwitch();
-            coralRearBeam = intakeMotor.getReverseLimitSwitch();
+            coralFrontBeam = intakeMotor.getReverseLimitSwitch();
+            coralRearBeam = intakeMotor.getForwardLimitSwitch();
     }
 
     //Methods for Coral

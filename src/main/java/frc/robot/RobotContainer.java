@@ -21,9 +21,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.robotInitConstants;
+import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.WristConstants;
 import frc.robot.commands.AlignToReefCommand;
 import frc.robot.commands.ElevatorToPosition;
@@ -107,6 +109,10 @@ public class RobotContainer {
         driverController.start().onTrue(new InstantCommand(()-> slowMode(true)))
             .onFalse(new InstantCommand(()-> slowMode(false)));
         
+        driverController.rightTrigger()
+            .whileTrue(new RunCommand(()->AutoScoreAlign()))
+			.onFalse(new InstantCommand(()->{aligning=false;})); // this needs to be cleaned up ASAP
+
         // End Effector
         driverController.a().whileTrue(complexIntakeCommand())
             .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(0)));
@@ -118,10 +124,10 @@ public class RobotContainer {
         driverController.x().onTrue(endEffector.ejectCoralCommand());   
 
         // Wrist
-        driverController.rightTrigger().whileTrue(wrist.manualWristMovement(-driverController.getRightTriggerAxis()*-0.20))
-            .onFalse(new InstantCommand(()-> wrist.setWristMotor(0)));
-        driverController.leftTrigger().whileTrue(wrist.manualWristMovement(-driverController.getLeftTriggerAxis()*0.20))
-            .onFalse(new InstantCommand(()-> wrist.setWristMotor(0)));
+        // driverController.rightTrigger().whileTrue(wrist.manualWristMovement(-driverController.getRightTriggerAxis()*-0.20))
+        //     .onFalse(new InstantCommand(()-> wrist.setWristMotor(0)));
+        // driverController.leftTrigger().whileTrue(wrist.manualWristMovement(-driverController.getLeftTriggerAxis()*0.20))
+        //     .onFalse(new InstantCommand(()-> wrist.setWristMotor(0)));
             
         // ===================================== Operator Controls =====================================
         // Elevator
@@ -243,8 +249,8 @@ public class RobotContainer {
                                     INITIAL_LIMIT * Math.pow(LIMIT_SCALE_PER_INCH, elevator.getPositionInches()), TIME_TO_STOP)) // Drive left with negative X (left)
                             .withRotationalRate(-MathUtil.applyDeadband(driverController.getRightX(), STATIC_DEADBAND, maxAngularRatePercent) * MaxAngularRate); // Drive counterclockwise with negative X (left)
 
-            boolean isTeleopActive = (Math.abs(teleopDrive.VelocityX) > teleopDrive.Deadband ||
-                                      Math.abs(teleopDrive.VelocityY) > teleopDrive.Deadband);
+            boolean isTeleopActive = (Math.abs(teleopDrive.VelocityX) > STATIC_DEADBAND ||
+                                      Math.abs(teleopDrive.VelocityY) > STATIC_DEADBAND);
             // Get the current robot pose.
             Pose2d currentPose = drivetrain.getState().Pose;
             double desiredHeading = 0;
