@@ -9,6 +9,14 @@ import edu.wpi.first.wpilibj.DigitalInput;
 
 public class Constants {
 
+    public static final class DriveConstants {
+        public static final double STATIC_DEADBAND = 0.10; // 10% Deadband before robot moves
+        public static final double KINETIC_DEADBAND = 0.00; // 0% Deadband to perpendicular axis while robot is in motion
+
+        public static final double TIME_TO_STOP = 0.75;
+        public static final double INITIAL_LIMIT = 10.0;
+        public static final double LIMIT_SCALE_PER_INCH = 0.92;
+    }    
     
     public class ElevatorConstants {
         public static final int ELEVATOR_LEADER_CAN_ID = 1; // Right
