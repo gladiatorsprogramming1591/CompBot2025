@@ -13,6 +13,9 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -20,7 +23,9 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.robotInitConstants;
+import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.WristConstants;
+import frc.robot.commands.AlignToReefCommand;
 import frc.robot.commands.ElevatorToPosition;
 import frc.robot.generated.TunerConstants;
 import frc.robot.generated.TunerConstants.*;
@@ -29,6 +34,7 @@ import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.EndEffector;
 import frc.robot.subsystems.Wrist;
 import frc.robot.utilities.DynamicRateLimiter;
+import frc.robot.utilities.FieldConstants;
 import frc.robot.subsystems.ElevatorSubsystem.elevatorPositions;
 
 public class RobotContainer {
@@ -65,6 +71,11 @@ public class RobotContainer {
     private final CommandXboxController operatorController = new CommandXboxController(1);
         
     private final SendableChooser<Command> autoChooser;
+    private boolean aligning = false;
+    private final PIDController headingController = new PIDController(0.1, 0, 0);
+    private final SwerveRequest.RobotCentric reefAlign = new SwerveRequest.RobotCentric()
+        .withDeadband(MaxSpeed * 0.05).withRotationalDeadband(MaxAngularRate * 0.05) // Add a 5% deadband
+        .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
     
     public RobotContainer() {
         registerNamedCommands();
@@ -179,41 +190,98 @@ public class RobotContainer {
         }
     }
 
-    public Command complexElevatorScoreCommand(elevatorPositions position) {
-        System.out.println("Running complex score command"); 
-        return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
-        .andThen((new ElevatorToPosition(elevator,position)))
-        .andThen(new WaitUntilCommand(elevator::atSetpoint))
-        .andThen(wrist.HoverPositionCommand());
-    }
-
-    public Command complexElevatorStowCommand(elevatorPositions position) {
-        return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
-        .andThen((new ElevatorToPosition(elevator,position)));
-    }
-
-    public Command complexProcessorCommand(elevatorPositions position) {
-        return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
-        .andThen(new ElevatorToPosition(elevator, position))
-        .andThen(new WaitUntilCommand(elevator::atSetpoint))
-        .andThen(wrist.ProcessorPositionCommand()); 
-    }
-
-    public Command complexIntakeCommand() { 
-         return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
-        .andThen(new InstantCommand(()-> System.out.println("Running complex intake command")))
-        .andThen(new ElevatorToPosition(elevator, elevatorPositions.STOW))
-        .andThen(new InstantCommand(()-> System.out.println("Running elevator stow command")))
-        .andThen(new WaitUntilCommand(elevator::atSetpoint))
-        .andThen(new InstantCommand(()-> System.out.println("Running wrist intake command")))
-        .andThen(wrist.IntakePositionCommand())
-        .andThen(new InstantCommand(()-> System.out.println("Running intake coral command")))
-        .andThen(endEffector.intakeCoralCommand())
-        .andThen(new InstantCommand(()-> System.out.println("Running stow command")))
-        .andThen(wrist.StowPositionCommand())
-        .andThen(new InstantCommand(()-> System.out.println("Running elevator L2 command")))
-        .andThen(new ElevatorToPosition(elevator, elevatorPositions.L2))
-        .andThen(new WaitUntilCommand(elevator::atSetpoint)); 
+        public Command complexElevatorScoreCommand(elevatorPositions position) {
+            System.out.println("Running complex score command"); 
+            return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
+            .andThen((new ElevatorToPosition(elevator,position)))
+            .andThen(new WaitUntilCommand(elevator::atSetpoint))
+            .andThen(wrist.HoverPositionCommand());
+        }
+    
+        public Command complexElevatorStowCommand(elevatorPositions position) {
+            return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
+            .andThen((new ElevatorToPosition(elevator,position)));
+        }
+    
+        public Command complexProcessorCommand(elevatorPositions position) {
+            return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
+            .andThen(new ElevatorToPosition(elevator, position))
+            .andThen(new WaitUntilCommand(elevator::atSetpoint))
+            .andThen(wrist.ProcessorPositionCommand()); 
+        }
+    
+        public Command complexIntakeCommand() { 
+             return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
+            .andThen(new InstantCommand(()-> System.out.println("Running complex intake command")))
+            .andThen(new ElevatorToPosition(elevator, elevatorPositions.STOW))
+            .andThen(new InstantCommand(()-> System.out.println("Running elevator stow command")))
+            .andThen(new WaitUntilCommand(elevator::atSetpoint))
+            .andThen(new InstantCommand(()-> System.out.println("Running wrist intake command")))
+            .andThen(wrist.IntakePositionCommand())
+            .andThen(new InstantCommand(()-> System.out.println("Running intake coral command")))
+            .andThen(endEffector.intakeCoralCommand())
+            .andThen(new InstantCommand(()-> System.out.println("Running stow command")))
+            .andThen(wrist.StowPositionCommand())
+            .andThen(new InstantCommand(()-> System.out.println("Running elevator L2 command")))
+            .andThen(new ElevatorToPosition(elevator, elevatorPositions.L2))
+            .andThen(new WaitUntilCommand(elevator::atSetpoint)); 
+        }
+    
+        public void AutoScoreAlign()
+        {
+            // if(state.getDesiredElevatorLevel() == Level.L1)
+            // {
+            //     return;
+            // }
+            SwerveRequest.FieldCentric teleopDrive = drive.withVelocityX(xLimiter.calculate(-driverController.getLeftY()*MaxSpeed, DriveConstants.INITIAL_LIMIT*Math.pow(DriveConstants.LIMIT_SCALE_PER_INCH, elevator.getPositionInches()), DriveConstants.TIME_TO_STOP)) // Drive forward with negative Y (forward)
+                        .withVelocityY(yLimiter.calculate(-driverController.getLeftX()*MaxSpeed, DriveConstants.INITIAL_LIMIT*Math.pow(DriveConstants.LIMIT_SCALE_PER_INCH, elevator.getPositionInches()), DriveConstants.TIME_TO_STOP)) // Drive left with negative X (left)
+                        .withRotationalRate(-driverController.getRightX() * MaxAngularRate);
+                  boolean isTeleopActive = (Math.abs(teleopDrive.VelocityX) > teleopDrive.Deadband ||
+                                      Math.abs(teleopDrive.VelocityY) > teleopDrive.Deadband);
+            // Get the current robot pose.
+            Pose2d currentPose = drivetrain.getState().Pose;
+            double desiredHeading = 0;
+            double commandedX = 0;
+            double commandedY = 0;
+            double rotationCmd = 0;
+            Pose2d nearestFace = FieldConstants.getNearestReefFace(currentPose);
+            double distanceToReef = currentPose.getTranslation().getDistance(nearestFace.getTranslation());
+            SmartDashboard.putNumber("Distance to Reef", distanceToReef);
+            if (isTeleopActive) {
+                // While driving, use teleop translation.
+                commandedX = teleopDrive.VelocityX;
+                commandedY = teleopDrive.VelocityY;
+                // "Look at the reef": use the nearest reef face as reference.
+                // Option 1: Use the rotation defined for the reef face.
+                // Alternatively, you could compute the direction vector:
+                // desiredHeading = nearestFace.getTranslation().minus(currentPose.getTranslation()).getAngle().getDegrees();
+                double currentYaw = currentPose.getRotation().getDegrees();
+                if(distanceToReef < 2)
+                {
+                desiredHeading = nearestFace.getRotation().plus(Rotation2d.k180deg).getDegrees();
+                }
+                else
+                {
+                    desiredHeading = currentYaw;
+                }
+                rotationCmd = headingController.calculate(currentYaw, desiredHeading);
+                // Command teleop translation plus the rotation correction.
+                drivetrain.setControl(
+                    teleopDrive.withVelocityX(commandedX)
+                            .withVelocityY(commandedY)
+                            .withRotationalRate(rotationCmd * 0.5)
+                );
+            }
+            else {
+                if(!aligning && distanceToReef < 1) {
+                    new AlignToReefCommand(drivetrain, () ->
+                        drive.withVelocityX(xLimiter.calculate(-driverController.getLeftY()*MaxSpeed, DriveConstants.INITIAL_LIMIT*Math.pow(DriveConstants.LIMIT_SCALE_PER_INCH, elevator.getPositionInches()), DriveConstants.TIME_TO_STOP)) // Drive forward with negative Y (forward)
+                                .withVelocityY(yLimiter.calculate(-driverController.getLeftX()*MaxSpeed, DriveConstants.INITIAL_LIMIT*Math.pow(DriveConstants.LIMIT_SCALE_PER_INCH, elevator.getPositionInches()), DriveConstants.TIME_TO_STOP)) // Drive left with negative X (left)
+                                .withRotationalRate(-driverController.getRightX() * MaxAngularRate),
+                                reefAlign, true, 0).schedule();
+                    aligning = true;
+                }
+	    }
     }
     
     // 2.3976 is the y postion of StartLineToF
