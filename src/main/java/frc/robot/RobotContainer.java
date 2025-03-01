@@ -13,6 +13,9 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -24,6 +27,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.robotInitConstants;
 import frc.robot.Constants.EndEffectorConstants;
 import frc.robot.Constants.WristConstants;
+import frc.robot.commands.AlignToReefCommand;
 import frc.robot.commands.ElevatorToPosition;
 import frc.robot.generated.TunerConstants;
 import frc.robot.generated.TunerConstants.*;
@@ -31,6 +35,7 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.EndEffector;
 import frc.robot.subsystems.Wrist;
+import frc.robot.utilities.FieldConstants;
 import frc.robot.subsystems.ElevatorSubsystem.elevatorPositions;
 
 public class RobotContainer {
@@ -68,146 +73,208 @@ public class RobotContainer {
     private final CommandXboxController operatorController = new CommandXboxController(1);
         
     private final SendableChooser<Command> autoChooser;
-    
-    public RobotContainer() {
-        registerNamedCommands();
-        autoChooser = AutoBuilder.buildAutoChooser(); // A default auto can be passed in as parameter.
-        SmartDashboard.putData("Auto Mode", autoChooser);
-        
-        configureBindings();
-        
-    }
-    
-    private void configureBindings() {
-        // Note that X is defined as forward according to WPILib convention,
-        // and Y is defined as to the left according to WPILib convention.
-        drivetrain.setDefaultCommand(
-                // Drivetrain will execute this command periodically
-                drivetrain.applyRequest(() ->
-                        // drive.withVelocityX(-MathUtil.applyDeadband(driverController.getLeftY(), 0, MAX_SPEED_PERCENT) * MaxSpeed) // Drive forward with negative Y (forward)
-                        //             .withVelocityY(-MathUtil.applyDeadband(driverController.getLeftX(), 0, MAX_SPEED_PERCENT) * MaxSpeed) // Drive left with negative X (left)
-                        //             .withRotationalRate(-MathUtil.applyDeadband(driverController.getRightX(), 0, MAX_ANGULAR_RATE_PERCENT) * MaxAngularRate) // Drive counterclockwise with negative X (left)
-                        drive.withVelocityX(-drivetrain.apply2dDynamicDeadband(driverController.getLeftY(), driverController.getLeftX(), STATIC_DEADBAND, KINETIC_DEADBAND, false) * MaxSpeed * MAX_SPEED_PERCENT) // Drive forward with negative Y (forward)
-                                    .withVelocityY(-drivetrain.apply2dDynamicDeadband(driverController.getLeftX(), driverController.getLeftY(), STATIC_DEADBAND, KINETIC_DEADBAND, false) * MaxSpeed * MAX_SPEED_PERCENT) // Drive left with negative X (left)
-                                    .withRotationalRate(-MathUtil.applyDeadband(driverController.getRightX(), STATIC_DEADBAND) * MaxAngularRate * MAX_ANGULAR_RATE_PERCENT) // Drive counterclockwise with negative X (left)
-                )
-        );
-        
-        // reset the field-centric heading on left bumper press
-        driverController.back().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
-        driverController.start().onTrue(new InstantCommand(()-> slowMode(true)))
-            .onFalse(new InstantCommand(()-> slowMode(false)));
-        
-        
-        // Subsystems
-        // All Poseidon-specific commands MUST be within if-statement, or a NullPointerException will be thrown.
-        if (robotInitConstants.isCompBot) {    
-            // =====================================  Driver Controls  =====================================
-            // Elevator
+    private boolean aligning = false;
+    private final PIDController headingController = new PIDController(0.1, 0, 0);
+    private final SwerveRequest.RobotCentric reefAlign = new SwerveRequest.RobotCentric()
+        .withDeadband(MaxSpeed * 0.05).withRotationalDeadband(MaxAngularRate * 0.05) // Add a 5% deadband
+        .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
 
+        public RobotContainer() {
+            registerNamedCommands();
+            autoChooser = AutoBuilder.buildAutoChooser(); // A default auto can be passed in as parameter.
+            SmartDashboard.putData("Auto Mode", autoChooser);
             
-            // End Effector
-            // driverController.a().whileTrue(endEffector.intakeCoralCommand())
-            //     .onFalse(new InstantCommand(()-> endEffector.setCoralSpeed(0)));
-            driverController.a().whileTrue(complexIntakeCommand())
-                .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(0)));
-            driverController.rightBumper().whileTrue(endEffector.intakeAlgaeCommand())
-                .onFalse(new InstantCommand(()-> wrist.setWristMotor(0)));
+            configureBindings();
             
+        }
+        
+        private void configureBindings() {
+            // Note that X is defined as forward according to WPILib convention,
+            // and Y is defined as to the left according to WPILib convention.
+            drivetrain.setDefaultCommand(
+                    // Drivetrain will execute this command periodically
+                    drivetrain.applyRequest(() ->
+                            // drive.withVelocityX(-MathUtil.applyDeadband(driverController.getLeftY(), 0, MAX_SPEED_PERCENT) * MaxSpeed) // Drive forward with negative Y (forward)
+                            //             .withVelocityY(-MathUtil.applyDeadband(driverController.getLeftX(), 0, MAX_SPEED_PERCENT) * MaxSpeed) // Drive left with negative X (left)
+                            //             .withRotationalRate(-MathUtil.applyDeadband(driverController.getRightX(), 0, MAX_ANGULAR_RATE_PERCENT) * MaxAngularRate) // Drive counterclockwise with negative X (left)
+                            drive.withVelocityX(-drivetrain.apply2dDynamicDeadband(driverController.getLeftY(), driverController.getLeftX(), STATIC_DEADBAND, KINETIC_DEADBAND, false) * MaxSpeed * MAX_SPEED_PERCENT) // Drive forward with negative Y (forward)
+                                        .withVelocityY(-drivetrain.apply2dDynamicDeadband(driverController.getLeftX(), driverController.getLeftY(), STATIC_DEADBAND, KINETIC_DEADBAND, false) * MaxSpeed * MAX_SPEED_PERCENT) // Drive left with negative X (left)
+                                        .withRotationalRate(-MathUtil.applyDeadband(driverController.getRightX(), STATIC_DEADBAND) * MaxAngularRate * MAX_ANGULAR_RATE_PERCENT) // Drive counterclockwise with negative X (left)
+                    )
+            );
+            
+            // reset the field-centric heading on left bumper press
+            driverController.back().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+            driverController.start().onTrue(new InstantCommand(()-> slowMode(true)))
+                .onFalse(new InstantCommand(()-> slowMode(false)));
+            
+            
+            // Subsystems
+            // All Poseidon-specific commands MUST be within if-statement, or a NullPointerException will be thrown.
+            if (robotInitConstants.isCompBot) {    
+                // =====================================  Driver Controls  =====================================
+                // Elevator
+    
                 
-            driverController.leftBumper().whileTrue(endEffector.ejectAlgaeCommand())
-                .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(0)));
-            driverController.x().onTrue(endEffector.ejectCoralCommand());                
-            // Wrist
-            driverController.rightTrigger().whileTrue(wrist.manualWristMovement(-driverController.getRightTriggerAxis()*-0.20))
-                .onFalse(new InstantCommand(()-> wrist.setWristMotor(0)));
-            driverController.leftTrigger().whileTrue(wrist.manualWristMovement(-driverController.getLeftTriggerAxis()*0.20))
-                .onFalse(new InstantCommand(()-> wrist.setWristMotor(0)));
+                // End Effector
+                // driverController.a().whileTrue(endEffector.intakeCoralCommand())
+                //     .onFalse(new InstantCommand(()-> endEffector.setCoralSpeed(0)));
+                driverController.a().whileTrue(complexIntakeCommand())
+                    .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(0)));
+                driverController.rightBumper().whileTrue(endEffector.intakeAlgaeCommand())
+                    .onFalse(new InstantCommand(()-> wrist.setWristMotor(0)));
                 
-            // ===================================== Operator Controls =====================================
-            // Elevator
-            operatorController.povDown().onTrue(complexElevatorScoreCommand(elevatorPositions.L1)); 
-            operatorController.povLeft().onTrue(complexElevatorScoreCommand(elevatorPositions.L2)); 
-            operatorController.povRight().onTrue(complexElevatorScoreCommand(elevatorPositions.L4)); 
-            operatorController.povUp().onTrue(complexElevatorScoreCommand(elevatorPositions.L3));
-            operatorController.leftBumper().onTrue(complexElevatorStowCommand(elevatorPositions.STOW));
-            operatorController.back().onTrue(new InstantCommand(() -> elevator.zeroElevatorCommand()));
-
-            // Wrist
-            operatorController.a().onTrue(new InstantCommand(()-> wrist.setAngle(WristConstants.WRIST_STOW)));
-            operatorController.b().onTrue(new InstantCommand(()-> wrist.setAngle(WristConstants.WRIST_PROCESSOR)));
-            operatorController.x().onTrue(new InstantCommand(()-> wrist.setAngle(WristConstants.GROUND_INTAKE)));
-            operatorController.y().onTrue(new InstantCommand(()-> wrist.setAngle(WristConstants.REEF_ACQUIRE_ANGLE)));
-
-            // Default Commands
-            // wrist.setDefaultCommand(new RunCommand(()-> wrist.setWristMotor(operatorController.getRightY()*0.20), wrist));
-            // elevator.setDefaultCommand(new RunCommand(() -> elevator.setMotorSpeed(operatorController.getRightY()*0.50), elevator));
+                    
+                driverController.leftBumper().whileTrue(endEffector.ejectAlgaeCommand())
+                    .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(0)));
+                driverController.x().onTrue(endEffector.ejectCoralCommand());                
+                // Wrist
+                driverController.rightTrigger().whileTrue(wrist.manualWristMovement(-driverController.getRightTriggerAxis()*-0.20))
+                    .onFalse(new InstantCommand(()-> wrist.setWristMotor(0)));
+                driverController.leftTrigger().whileTrue(wrist.manualWristMovement(-driverController.getLeftTriggerAxis()*0.20))
+                    .onFalse(new InstantCommand(()-> wrist.setWristMotor(0)));
+                    
+                // ===================================== Operator Controls =====================================
+                // Elevator
+                operatorController.povDown().onTrue(complexElevatorScoreCommand(elevatorPositions.L1)); 
+                operatorController.povLeft().onTrue(complexElevatorScoreCommand(elevatorPositions.L2)); 
+                operatorController.povRight().onTrue(complexElevatorScoreCommand(elevatorPositions.L4)); 
+                operatorController.povUp().onTrue(complexElevatorScoreCommand(elevatorPositions.L3));
+                operatorController.leftBumper().onTrue(complexElevatorStowCommand(elevatorPositions.STOW));
+                operatorController.back().onTrue(new InstantCommand(() -> elevator.zeroElevatorCommand()));
+    
+                // Wrist
+                operatorController.a().onTrue(new InstantCommand(()-> wrist.setAngle(WristConstants.WRIST_STOW)));
+                operatorController.b().onTrue(new InstantCommand(()-> wrist.setAngle(WristConstants.WRIST_PROCESSOR)));
+                operatorController.x().onTrue(new InstantCommand(()-> wrist.setAngle(WristConstants.GROUND_INTAKE)));
+                operatorController.y().onTrue(new InstantCommand(()-> wrist.setAngle(WristConstants.REEF_ACQUIRE_ANGLE)));
+    
+                // Default Commands
+                // wrist.setDefaultCommand(new RunCommand(()-> wrist.setWristMotor(operatorController.getRightY()*0.20), wrist));
+                // elevator.setDefaultCommand(new RunCommand(() -> elevator.setMotorSpeed(operatorController.getRightY()*0.50), elevator));
+            }
+    
+            // Drivetrain tunning commands
+            // joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
+            // joystick.b().whileTrue(drivetrain.applyRequest(() ->
+            //         point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
+            // ));
+            // // Run SysId routines when holding back/start and X/Y.
+            // // Note that each routine should be run exactly once in a single log.
+            // joystick.back().and(joystick.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
+            // joystick.back().and(joystick.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
+            // joystick.start().and(joystick.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
+            // joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+            // joystick.leftTrigger().onTrue(Commands.runOnce(SignalLogger::start));
+            // joystick.rightTrigger().onTrue(Commands.runOnce(SignalLogger::stop));
+    
+    
+            drivetrain.registerTelemetry(logger::telemeterize);
         }
-
-        // Drivetrain tunning commands
-        // joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
-        // joystick.b().whileTrue(drivetrain.applyRequest(() ->
-        //         point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
-        // ));
-        // // Run SysId routines when holding back/start and X/Y.
-        // // Note that each routine should be run exactly once in a single log.
-        // joystick.back().and(joystick.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
-        // joystick.back().and(joystick.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
-        // joystick.start().and(joystick.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
-        // joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
-        // joystick.leftTrigger().onTrue(Commands.runOnce(SignalLogger::start));
-        // joystick.rightTrigger().onTrue(Commands.runOnce(SignalLogger::stop));
-
-
-        drivetrain.registerTelemetry(logger::telemeterize);
-    }
-
-    public void slowMode(boolean isSlow){
-        if(isSlow){
-            MAX_ANGULAR_RATE_PERCENT = 0.1; 
-            MAX_SPEED_PERCENT = 0.2; 
+    
+        public void slowMode(boolean isSlow){
+            if(isSlow){
+                MAX_ANGULAR_RATE_PERCENT = 0.1; 
+                MAX_SPEED_PERCENT = 0.2; 
+            }
+            else {
+               MAX_ANGULAR_RATE_PERCENT = 1.0; 
+               MAX_SPEED_PERCENT = 1.0;  
+            }
         }
-        else {
-           MAX_ANGULAR_RATE_PERCENT = 1.0; 
-           MAX_SPEED_PERCENT = 1.0;  
+    
+        public Command complexElevatorScoreCommand(elevatorPositions position) {
+            System.out.println("Running complex score command"); 
+            return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
+            .andThen((new ElevatorToPosition(elevator,position)))
+            .andThen(new WaitUntilCommand(elevator::atSetpoint))
+            .andThen(wrist.HoverPositionCommand());
         }
-    }
-
-    public Command complexElevatorScoreCommand(elevatorPositions position) {
-        System.out.println("Running complex score command"); 
-        return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
-        .andThen((new ElevatorToPosition(elevator,position)))
-        .andThen(new WaitUntilCommand(elevator::atSetpoint))
-        .andThen(wrist.HoverPositionCommand());
-    }
-
-    public Command complexElevatorStowCommand(elevatorPositions position) {
-        return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
-        .andThen((new ElevatorToPosition(elevator,position)));
-    }
-
-    public Command complexProcessorCommand(elevatorPositions position) {
-        return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
-        .andThen(new ElevatorToPosition(elevator, position))
-        .andThen(new WaitUntilCommand(elevator::atSetpoint))
-        .andThen(wrist.ProcessorPositionCommand()); 
-    }
-
-    public Command complexIntakeCommand() { 
-         return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
-        .andThen(new InstantCommand(()-> System.out.println("Running complex intake command")))
-        .andThen(new ElevatorToPosition(elevator, elevatorPositions.STOW))
-        .andThen(new InstantCommand(()-> System.out.println("Running elevator stow command")))
-        .andThen(new WaitUntilCommand(elevator::atSetpoint))
-        .andThen(new InstantCommand(()-> System.out.println("Running wrist intake command")))
-        .andThen(wrist.IntakePositionCommand())
-        .andThen(new InstantCommand(()-> System.out.println("Running intake coral command")))
-        .andThen(endEffector.intakeCoralCommand())
-        .andThen(new InstantCommand(()-> System.out.println("Running stow command")))
-        .andThen(wrist.StowPositionCommand())
-        .andThen(new InstantCommand(()-> System.out.println("Running elevator L2 command")))
-        .andThen(new ElevatorToPosition(elevator, elevatorPositions.L2))
-        .andThen(new WaitUntilCommand(elevator::atSetpoint)); 
+    
+        public Command complexElevatorStowCommand(elevatorPositions position) {
+            return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
+            .andThen((new ElevatorToPosition(elevator,position)));
+        }
+    
+        public Command complexProcessorCommand(elevatorPositions position) {
+            return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
+            .andThen(new ElevatorToPosition(elevator, position))
+            .andThen(new WaitUntilCommand(elevator::atSetpoint))
+            .andThen(wrist.ProcessorPositionCommand()); 
+        }
+    
+        public Command complexIntakeCommand() { 
+             return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
+            .andThen(new InstantCommand(()-> System.out.println("Running complex intake command")))
+            .andThen(new ElevatorToPosition(elevator, elevatorPositions.STOW))
+            .andThen(new InstantCommand(()-> System.out.println("Running elevator stow command")))
+            .andThen(new WaitUntilCommand(elevator::atSetpoint))
+            .andThen(new InstantCommand(()-> System.out.println("Running wrist intake command")))
+            .andThen(wrist.IntakePositionCommand())
+            .andThen(new InstantCommand(()-> System.out.println("Running intake coral command")))
+            .andThen(endEffector.intakeCoralCommand())
+            .andThen(new InstantCommand(()-> System.out.println("Running stow command")))
+            .andThen(wrist.StowPositionCommand())
+            .andThen(new InstantCommand(()-> System.out.println("Running elevator L2 command")))
+            .andThen(new ElevatorToPosition(elevator, elevatorPositions.L2))
+            .andThen(new WaitUntilCommand(elevator::atSetpoint)); 
+        }
+    
+        public void AutoScoreAlign()
+        {
+            if(state.getDesiredElevatorLevel() == Level.L1)
+            {
+                return;
+            }
+            SwerveRequest.FieldCentric teleopDrive = drive.withVelocityX(xLimiter.calculate(-driver.getLeftY()*MaxSpeed, DriveConstants.INITIAL_LIMIT*Math.pow(DriveConstants.LIMIT_SCALE_PER_INCH, elevator.getPositionInches()), DriveConstants.TIME_TO_STOP)) // Drive forward with negative Y (forward)
+                        .withVelocityY(yLimiter.calculate(-driver.getLeftX()*MaxSpeed, DriveConstants.INITIAL_LIMIT*Math.pow(DriveConstants.LIMIT_SCALE_PER_INCH, elevator.getPositionInches()), DriveConstants.TIME_TO_STOP)) // Drive left with negative X (left)
+                        .withRotationalRate(-driver.getRightX() * MaxAngularRate);
+                  boolean isTeleopActive = (Math.abs(teleopDrive.VelocityX) > teleopDrive.Deadband ||
+                                      Math.abs(teleopDrive.VelocityY) > teleopDrive.Deadband);
+            // Get the current robot pose.
+            Pose2d currentPose = drivetrain.getState().Pose;
+            double desiredHeading = 0;
+            double commandedX = 0;
+            double commandedY = 0;
+            double rotationCmd = 0;
+            Pose2d nearestFace = FieldConstants.getNearestReefFace(currentPose);
+            double distanceToReef = currentPose.getTranslation().getDistance(nearestFace.getTranslation());
+            SmartDashboard.putNumber("Distance to Reef", distanceToReef);
+            if (isTeleopActive) {
+                // While driving, use teleop translation.
+                commandedX = teleopDrive.VelocityX;
+                commandedY = teleopDrive.VelocityY;
+                // "Look at the reef": use the nearest reef face as reference.
+                // Option 1: Use the rotation defined for the reef face.
+                // Alternatively, you could compute the direction vector:
+                // desiredHeading = nearestFace.getTranslation().minus(currentPose.getTranslation()).getAngle().getDegrees();
+                double currentYaw = currentPose.getRotation().getDegrees();
+                if(distanceToReef < 2)
+                {
+                desiredHeading = nearestFace.getRotation().plus(Rotation2d.k180deg).getDegrees();
+                }
+                else
+                {
+                    desiredHeading = currentYaw;
+                }
+                rotationCmd = headingController.calculate(currentYaw, desiredHeading);
+                // Command teleop translation plus the rotation correction.
+                drivetrain.setControl(
+                    teleopDrive.withVelocityX(commandedX)
+                            .withVelocityY(commandedY)
+                            .withRotationalRate(rotationCmd * 0.5)
+                );
+            }
+            else {
+                if(!aligning && distanceToReef < 1) {
+                    // new AlignToReefCommand(drivetrain, () ->
+                        drive.withVelocityX(xLimiter.calculate(-driver.getLeftY()*MaxSpeed, DriveConstants.INITIAL_LIMIT*Math.pow(DriveConstants.LIMIT_SCALE_PER_INCH, elevator.getPositionInches()), DriveConstants.TIME_TO_STOP)) // Drive forward with negative Y (forward)
+                                .withVelocityY(yLimiter.calculate(-driver.getLeftX()*MaxSpeed, DriveConstants.INITIAL_LIMIT*Math.pow(DriveConstants.LIMIT_SCALE_PER_INCH, elevator.getPositionInches()), DriveConstants.TIME_TO_STOP)) // Drive left with negative X (left)
+                                .withRotationalRate(-driver.getRightX() * MaxAngularRate),
+                                reefAlign, true, 0).schedule();
+                    aligning = true;
+                }
+	    }
     }
     
     // 2.3976 is the y postion of StartLineToF
