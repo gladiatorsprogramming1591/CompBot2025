@@ -39,8 +39,8 @@ public class Constants {
         public static final double D_UP = 0; 
         public static final double FF_UP = .623; 
 
-        public static final double MAX_VEL_UP = 2000; 
-        public static final double MAX_ACCEL_UP = 4000; 
+        public static final double MAX_VEL_UP = 100; 
+        public static final double MAX_ACCEL_UP = 200; 
         public static final double ALLOWERD_ERR_UP = 0.08; 
 
         //Constants for going down
@@ -48,8 +48,8 @@ public class Constants {
         public static final double I_DOWN = 0; 
         public static final double D_DOWN = 0; 
 
-        public static final double MAX_VEL_DOWN = 3200; 
-        public static final double MAX_ACCEL_DOWN = 6000;
+        public static final double MAX_VEL_DOWN = 2400; 
+        public static final double MAX_ACCEL_DOWN = 4800;
         public static final double ALLOWERD_ERR_DOWN = 1.0; 
 
         public static final SparkFlexConfig MOTOR_CONFIG = new SparkFlexConfig() {{
@@ -91,13 +91,14 @@ public class Constants {
 
     public class EndEffectorConstants {
         public static final int EE_MOTOR_ID = 3;
-        public static final int INTAKE_CURRENT_LIMIT = 40; 
+        public static final int INTAKE_CURRENT_LIMIT = 60; 
         public static final double INTAKE_RAMP_RATE = 0.1; 
-        public static final boolean INTAKE_INVERTED = false;
+        public static final boolean INTAKE_INVERTED = true;
 
 
         //Coral Constants
         public static final double CORAL_INTAKE_SPEED = 0.2; 
+        public static final double CORAL_REVERSE_SPEED = -0.15; 
         public static final double CORAL_EJECT_SPEED = 0.5;
         public static final double ARM_CORAL_SPEED = 0;
         
@@ -119,14 +120,14 @@ public class Constants {
     }
     
     public class WristConstants {
-        // Wrist Positions
-        public static final double WRIST_STOW = 172.0;
-        public static final double WRIST_INTAKE = 163.0;  
-        public static final double REEF_ACQUIRE_ANGLE = 185.0;
-        public static final double GROUND_INTAKE = 228.0; 
-        public static final double WRIST_PROCESSOR = 188; //placeholder 
-        public static final double WRIST_HOVER = 195.0; //191 forever <3
-        public static final double WRIST_HOVER_L4 = 172; //placeholder 
+        // Wrist Position
+        public static final double WRIST_INTAKE = 102.0;
+        public static final double WRIST_STOW = WRIST_INTAKE+9.0;
+        public static final double REEF_ACQUIRE_ANGLE = WRIST_INTAKE+22.0;
+        public static final double GROUND_INTAKE = WRIST_INTAKE+65.0; 
+        public static final double WRIST_PROCESSOR = WRIST_INTAKE+25.0;
+        public static final double WRIST_HOVER = WRIST_INTAKE+32.0;
+        public static final double WRIST_HOVER_L4 = WRIST_INTAKE+9.0; 
         public static final double WRIST_TOLERANCE = 5; 
 
         public static final int WRIST_CAN_ID = 4; 
@@ -151,7 +152,7 @@ public class Constants {
             // closedLoop.maxMotion.maxVelocity(120000);
             closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
             absoluteEncoder.positionConversionFactor(360);
-            absoluteEncoder.zeroOffset(210/360);
+            absoluteEncoder.zeroOffset(50/360);
         }};         
 
     }

@@ -161,7 +161,7 @@ public class ElevatorSubsystem extends SubsystemBase{
 
         if((lastPos == kSTOW) && (getPositionInches() < kSTOW+0.32)){
             leader.stopMotor();
-            System.out.println("Zeroing Elevator");
+            // System.out.println("Zeroing Elevator");
             zeroElevator();
         }
     }

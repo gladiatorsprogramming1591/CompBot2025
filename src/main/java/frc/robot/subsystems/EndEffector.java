@@ -96,9 +96,9 @@ public class EndEffector extends SubsystemBase {
      * @return the command
      */
      public Command intakeCoralCommand() {
-        return new SequentialCommandGroup(new RunCommand(() -> setCoralSpeed(0.1))
+        return new SequentialCommandGroup(new RunCommand(() -> setCoralSpeed(EndEffectorConstants.CORAL_INTAKE_SPEED))
             .until(this::hasCoral),
-            new RunCommand(() -> setCoralSpeed(-0.1))
+            new RunCommand(() -> setCoralSpeed(EndEffectorConstants.CORAL_REVERSE_SPEED))
             .until(this::coralArmed),
             new RunCommand(() ->setCoralSpeed(0)));
     }
@@ -122,6 +122,7 @@ public class EndEffector extends SubsystemBase {
     public void periodic() {
         SmartDashboard.putBoolean("Has Algae?", hasAlgae()); 
         SmartDashboard.putNumber("ee Current", intakeMotor.getOutputCurrent());
+        SmartDashboard.putNumber("ee Motor Controller Voltage", intakeMotor.getBusVoltage());
         SmartDashboard.putBoolean("Rear Beam Broken?", isCoralRearBeamBroken()); 
         SmartDashboard.putBoolean("Front Beam Broken?", isCoralFrontBeamBroken()); 
     }
