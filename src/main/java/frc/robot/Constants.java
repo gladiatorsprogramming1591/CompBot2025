@@ -10,8 +10,8 @@ import edu.wpi.first.wpilibj.DigitalInput;
 public class Constants {
 
     public static final class DriveConstants {
-        public static final double STATIC_DEADBAND = 0.10; // 10% Deadband before robot moves
-        public static final double KINETIC_DEADBAND = 0.00; // 0% Deadband to perpendicular axis while robot is in motion
+        public static final double STATIC_DEADBAND = 0.07; // 7% Deadband before robot moves
+        public static final double KINETIC_DEADBAND = 0.02; // 2% Deadband to perpendicular axis while robot is in motion
 
         public static final double TIME_TO_STOP = 0.75;
         public static final double INITIAL_LIMIT = 10.0;

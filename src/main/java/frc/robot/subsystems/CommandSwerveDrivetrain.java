@@ -471,15 +471,22 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     {
         SmartDashboard.putNumber("axis apply2dDynamicDeadband", axis);
 
-        // if (squaredInputs) {axis = Math.pow(axis, 2) * (axis / Math.abs(axis));}
-        double sign = axis / Math.abs(axis);
+        if (squaredInputs) {
+            double axisSign = axis / Math.abs(axis);
+            double perpendicularAxisSign = perpendicularAxis / Math.abs(perpendicularAxis);
+            axis *= axis * axisSign;
+            perpendicularAxis *= perpendicularAxis * perpendicularAxisSign;
+            staticDeadband *= staticDeadband;
+            kineticDeadband *= kineticDeadband;
+        }
+
         double deadband = Math.abs(perpendicularAxis) > staticDeadband ? kineticDeadband : staticDeadband;
         double result = MathUtil.applyDeadband(axis, deadband);
 
         SmartDashboard.putNumber("axis squared apply2dDynamicDeadband", axis);
         SmartDashboard.putNumber("deadband apply2dDynamicDeadband", deadband);
         SmartDashboard.putNumber("result apply2dDynamicDeadband", result);
-        return squaredInputs ? Math.pow(result, 2) * sign : result;
+        return result;
     }
 
     public double squaredInputs(double axis)
