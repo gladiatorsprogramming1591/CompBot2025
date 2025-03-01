@@ -23,7 +23,6 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.robotInitConstants;
-import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.WristConstants;
 import frc.robot.commands.AlignToReefCommand;
 import frc.robot.commands.ElevatorToPosition;
@@ -74,7 +73,7 @@ public class RobotContainer {
     private boolean aligning = false;
     private final PIDController headingController = new PIDController(0.1, 0, 0);
     private final SwerveRequest.RobotCentric reefAlign = new SwerveRequest.RobotCentric()
-        .withDeadband(MaxSpeed * 0.05).withRotationalDeadband(MaxAngularRate * 0.05) // Add a 5% deadband
+        // .withDeadband(MaxSpeed * 0.05).withRotationalDeadband(MaxAngularRate * 0.05) // Add a 5% deadband
         .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
     
     public RobotContainer() {
@@ -150,10 +149,12 @@ public class RobotContainer {
         drivetrain.setDefaultCommand(
                 // Drivetrain will execute this command periodically
                 drivetrain.applyRequest(() ->
-                        drive.withVelocityX(-drivetrain.apply2dDynamicDeadband(driverController.getLeftY(), driverController.getLeftX(), STATIC_DEADBAND, KINETIC_DEADBAND, false) * MaxSpeed * maxSpeedPercent) // Drive forward with negative Y (forward)
-                                    .withVelocityY(-drivetrain.apply2dDynamicDeadband(driverController.getLeftX(), driverController.getLeftY(), STATIC_DEADBAND, KINETIC_DEADBAND, false) * MaxSpeed * maxSpeedPercent) // Drive left with negative X (left)
-                                    .withRotationalRate(-MathUtil.applyDeadband(driverController.getRightX(), STATIC_DEADBAND) * MaxAngularRate * maxAngularRatePercent) // Drive counterclockwise with negative X (left)
-                )
+                        drive.withVelocityX(xLimiter.calculate(-drivetrain.apply2dDynamicDeadband(driverController.getLeftY(), driverController.getLeftX(), STATIC_DEADBAND, KINETIC_DEADBAND, false) * MaxSpeed * maxSpeedPercent,
+                                            INITIAL_LIMIT * Math.pow(LIMIT_SCALE_PER_INCH, elevator.getPositionInches()), TIME_TO_STOP)) // Drive forward with negative Y (forward)
+                                    .withVelocityY(yLimiter.calculate(-drivetrain.apply2dDynamicDeadband(driverController.getLeftX(), driverController.getLeftY(), STATIC_DEADBAND, KINETIC_DEADBAND, false) * MaxSpeed * maxSpeedPercent,
+                                            INITIAL_LIMIT * Math.pow(LIMIT_SCALE_PER_INCH, elevator.getPositionInches()), TIME_TO_STOP)) // Drive left with negative X (left)
+                                    .withRotationalRate(-MathUtil.applyDeadband(driverController.getRightX(), STATIC_DEADBAND, maxAngularRatePercent) * MaxAngularRate) // Drive counterclockwise with negative X (left)
+)
         );
         
         // reset the field-centric heading on left bumper press
@@ -233,10 +234,14 @@ public class RobotContainer {
             // {
             //     return;
             // }
-            SwerveRequest.FieldCentric teleopDrive = drive.withVelocityX(xLimiter.calculate(-driverController.getLeftY()*MaxSpeed, DriveConstants.INITIAL_LIMIT*Math.pow(DriveConstants.LIMIT_SCALE_PER_INCH, elevator.getPositionInches()), DriveConstants.TIME_TO_STOP)) // Drive forward with negative Y (forward)
-                        .withVelocityY(yLimiter.calculate(-driverController.getLeftX()*MaxSpeed, DriveConstants.INITIAL_LIMIT*Math.pow(DriveConstants.LIMIT_SCALE_PER_INCH, elevator.getPositionInches()), DriveConstants.TIME_TO_STOP)) // Drive left with negative X (left)
-                        .withRotationalRate(-driverController.getRightX() * MaxAngularRate);
-                  boolean isTeleopActive = (Math.abs(teleopDrive.VelocityX) > teleopDrive.Deadband ||
+            SwerveRequest.FieldCentric teleopDrive =                         
+                drive.withVelocityX(xLimiter.calculate(-drivetrain.apply2dDynamicDeadband(driverController.getLeftY(), driverController.getLeftX(), STATIC_DEADBAND, KINETIC_DEADBAND, false) * MaxSpeed * maxSpeedPercent,
+                                    INITIAL_LIMIT * Math.pow(LIMIT_SCALE_PER_INCH, elevator.getPositionInches()), TIME_TO_STOP)) // Drive forward with negative Y (forward)
+                            .withVelocityY(yLimiter.calculate(-drivetrain.apply2dDynamicDeadband(driverController.getLeftX(), driverController.getLeftY(), STATIC_DEADBAND, KINETIC_DEADBAND, false) * MaxSpeed * maxSpeedPercent,
+                                    INITIAL_LIMIT * Math.pow(LIMIT_SCALE_PER_INCH, elevator.getPositionInches()), TIME_TO_STOP)) // Drive left with negative X (left)
+                            .withRotationalRate(-MathUtil.applyDeadband(driverController.getRightX(), STATIC_DEADBAND, maxAngularRatePercent) * MaxAngularRate); // Drive counterclockwise with negative X (left)
+
+            boolean isTeleopActive = (Math.abs(teleopDrive.VelocityX) > teleopDrive.Deadband ||
                                       Math.abs(teleopDrive.VelocityY) > teleopDrive.Deadband);
             // Get the current robot pose.
             Pose2d currentPose = drivetrain.getState().Pose;
@@ -275,10 +280,12 @@ public class RobotContainer {
             else {
                 if(!aligning && distanceToReef < 1) {
                     new AlignToReefCommand(drivetrain, () ->
-                        drive.withVelocityX(xLimiter.calculate(-driverController.getLeftY()*MaxSpeed, DriveConstants.INITIAL_LIMIT*Math.pow(DriveConstants.LIMIT_SCALE_PER_INCH, elevator.getPositionInches()), DriveConstants.TIME_TO_STOP)) // Drive forward with negative Y (forward)
-                                .withVelocityY(yLimiter.calculate(-driverController.getLeftX()*MaxSpeed, DriveConstants.INITIAL_LIMIT*Math.pow(DriveConstants.LIMIT_SCALE_PER_INCH, elevator.getPositionInches()), DriveConstants.TIME_TO_STOP)) // Drive left with negative X (left)
-                                .withRotationalRate(-driverController.getRightX() * MaxAngularRate),
-                                reefAlign, true, 0).schedule();
+                            drive.withVelocityX(xLimiter.calculate(-drivetrain.apply2dDynamicDeadband(driverController.getLeftY(), driverController.getLeftX(), STATIC_DEADBAND, KINETIC_DEADBAND, false) * MaxSpeed * maxSpeedPercent,
+                                                INITIAL_LIMIT * Math.pow(LIMIT_SCALE_PER_INCH, elevator.getPositionInches()), TIME_TO_STOP)) // Drive forward with negative Y (forward)
+                                        .withVelocityY(yLimiter.calculate(-drivetrain.apply2dDynamicDeadband(driverController.getLeftX(), driverController.getLeftY(), STATIC_DEADBAND, KINETIC_DEADBAND, false) * MaxSpeed * maxSpeedPercent,
+                                                INITIAL_LIMIT * Math.pow(LIMIT_SCALE_PER_INCH, elevator.getPositionInches()), TIME_TO_STOP)) // Drive left with negative X (left)
+                                        .withRotationalRate(-MathUtil.applyDeadband(driverController.getRightX(), STATIC_DEADBAND, maxAngularRatePercent) * MaxAngularRate), // Drive counterclockwise with negative X (left)
+                            reefAlign, true, 0).schedule();
                     aligning = true;
                 }
 	    }
