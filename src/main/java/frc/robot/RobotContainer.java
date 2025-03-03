@@ -104,14 +104,19 @@ public class RobotContainer {
                                     .withRotationalRate(-MathUtil.applyDeadband(driverController.getRightX(), STATIC_DEADBAND, maxAngularRatePercent) * MaxAngularRate) // Drive counterclockwise with negative X (left)
                 )
         );
+
+        wrist.setDefaultCommand(
+            wrist.manualWristMovement(operatorController.getRightTriggerAxis() - operatorController.getLeftTriggerAxis()*0.20)
+        );
+
         // reset the field-centric heading on back button press
         driverController.back().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
         driverController.start().onTrue(new InstantCommand(()-> slowMode(true)))
             .onFalse(new InstantCommand(()-> slowMode(false)));
         
-        driverController.rightTrigger()
-            .whileTrue(new RunCommand(()->AutoScoreAlign()))
-			.onFalse(new InstantCommand(()->{aligning=false;})); // this needs to be cleaned up ASAP
+        // driverController.rightTrigger()
+        //     .whileTrue(new RunCommand(()->AutoScoreAlign()))
+		// 	.onFalse(new InstantCommand(()->{aligning=false;})); // this needs to be cleaned up ASAP
 
         // End Effector
         driverController.a().whileTrue(complexIntakeCommand())
@@ -124,16 +129,16 @@ public class RobotContainer {
         driverController.x().onTrue(endEffector.ejectCoralCommand());   
 
         // Wrist
-        // driverController.rightTrigger().whileTrue(wrist.manualWristMovement(-driverController.getRightTriggerAxis()*-0.20))
-        //     .onFalse(new InstantCommand(()-> wrist.setWristMotor(0)));
-        // driverController.leftTrigger().whileTrue(wrist.manualWristMovement(-driverController.getLeftTriggerAxis()*0.20))
-        //     .onFalse(new InstantCommand(()-> wrist.setWristMotor(0)));
+        driverController.rightTrigger().whileTrue(wrist.manualWristMovement(-driverController.getRightTriggerAxis()*-0.20))
+            .onFalse(new InstantCommand(()-> wrist.setWristMotor(0)));
+        driverController.leftTrigger().whileTrue(wrist.manualWristMovement(-driverController.getLeftTriggerAxis()*0.20))
+            .onFalse(new InstantCommand(()-> wrist.setWristMotor(0)));
             
         // ===================================== Operator Controls =====================================
         // Elevator
         operatorController.povDown().onTrue(complexElevatorScoreCommand(elevatorPositions.L1)); 
         operatorController.povLeft().onTrue(complexElevatorScoreCommand(elevatorPositions.L2)); 
-        operatorController.povRight().onTrue(complexElevatorScoreCommand(elevatorPositions.L4)); 
+        operatorController.povRight().onTrue(complexElevatorScoreCommandL4(elevatorPositions.L4)); 
         operatorController.povUp().onTrue(complexElevatorScoreCommand(elevatorPositions.L3));
         operatorController.leftBumper().onTrue(complexElevatorStowCommand(elevatorPositions.STOW));
         operatorController.back().onTrue(new InstantCommand(() -> elevator.zeroElevatorCommand()));
@@ -143,6 +148,11 @@ public class RobotContainer {
         operatorController.b().onTrue(new InstantCommand(()-> wrist.setAngle(WristConstants.WRIST_PROCESSOR)));
         operatorController.x().onTrue(new InstantCommand(()-> wrist.setAngle(WristConstants.GROUND_INTAKE)));
         operatorController.y().onTrue(new InstantCommand(()-> wrist.setAngle(WristConstants.REEF_ACQUIRE_ANGLE)));
+
+        // operatorController.rightTrigger().whileTrue(wrist.manualWristMovement(operatorController.getRightTriggerAxis()*0.20))
+        //     .onFalse(new InstantCommand(()-> wrist.setWristMotor(0)));
+        // operatorController.leftTrigger().whileTrue(wrist.manualWristMovement(-operatorController.getLeftTriggerAxis()*0.20))
+        //     .onFalse(new InstantCommand(()-> wrist.setWristMotor(0)));
 
         // Default Commands
         // wrist.setDefaultCommand(new RunCommand(()-> wrist.setWristMotor(operatorController.getRightY()*0.20), wrist));
@@ -207,6 +217,14 @@ public class RobotContainer {
             .andThen(wrist.HoverPositionCommand());
         }
     
+        public Command complexElevatorScoreCommandL4(elevatorPositions position) {
+            System.out.println("Running complex score command"); 
+            return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
+            .andThen((new ElevatorToPosition(elevator,position)))
+            .andThen(new WaitUntilCommand(elevator::atSetpoint))
+            .andThen(wrist.L4HoverPositionCommand());
+        }
+    
         public Command complexElevatorStowCommand(elevatorPositions position) {
             return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
             .andThen((new ElevatorToPosition(elevator,position)));
@@ -221,17 +239,11 @@ public class RobotContainer {
     
         public Command complexIntakeCommand() { 
              return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
-            .andThen(new InstantCommand(()-> System.out.println("Running complex intake command")))
             .andThen(new ElevatorToPosition(elevator, elevatorPositions.STOW))
-            .andThen(new InstantCommand(()-> System.out.println("Running elevator stow command")))
             .andThen(new WaitUntilCommand(elevator::atSetpoint))
-            .andThen(new InstantCommand(()-> System.out.println("Running wrist intake command")))
             .andThen(wrist.IntakePositionCommand())
-            .andThen(new InstantCommand(()-> System.out.println("Running intake coral command")))
             .andThen(endEffector.intakeCoralCommand())
-            .andThen(new InstantCommand(()-> System.out.println("Running stow command")))
             .andThen(wrist.StowPositionCommand())
-            .andThen(new InstantCommand(()-> System.out.println("Running elevator L2 command")))
             .andThen(new ElevatorToPosition(elevator, elevatorPositions.L2))
             .andThen(new WaitUntilCommand(elevator::atSetpoint)); 
         }

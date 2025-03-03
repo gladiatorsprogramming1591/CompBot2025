@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 public class Constants {
 
     public static final class DriveConstants {
-        public static final double STATIC_DEADBAND = 0.07; // 7% Deadband before robot moves
+        public static final double STATIC_DEADBAND = 0.09; // 7% Deadband before robot moves
         public static final double KINETIC_DEADBAND = 0.02; // 2% Deadband to perpendicular axis while robot is in motion
 
         public static final double TIME_TO_STOP = 0.75;
@@ -97,8 +97,8 @@ public class Constants {
 
 
         //Coral Constants
-        public static final double CORAL_INTAKE_SPEED = 0.2; 
-        public static final double CORAL_REVERSE_SPEED = -0.15; 
+        public static final double CORAL_INTAKE_SPEED = 0.15; 
+        public static final double CORAL_REVERSE_SPEED = -0.12; 
         public static final double CORAL_EJECT_SPEED = 0.5;
         public static final double ARM_CORAL_SPEED = 0;
         
@@ -126,8 +126,8 @@ public class Constants {
         public static final double REEF_ACQUIRE_ANGLE = WRIST_INTAKE+22.0;
         public static final double GROUND_INTAKE = WRIST_INTAKE+65.0; 
         public static final double WRIST_PROCESSOR = WRIST_INTAKE+25.0;
-        public static final double WRIST_HOVER = WRIST_INTAKE+32.0;
-        public static final double WRIST_HOVER_L4 = WRIST_INTAKE+9.0; 
+        public static final double WRIST_HOVER = WRIST_INTAKE+34.0;
+        public static final double WRIST_HOVER_L4 = WRIST_HOVER; 
         public static final double WRIST_TOLERANCE = 5; 
 
         public static final int WRIST_CAN_ID = 4; 

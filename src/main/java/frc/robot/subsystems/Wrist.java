@@ -105,12 +105,17 @@ public class Wrist extends SubsystemBase {
     public Command HoverPositionCommand(){
           return new InstantCommand(()->setAngle(WristConstants.WRIST_HOVER)); 
      }
+
+     public Command L4HoverPositionCommand(){
+          return new InstantCommand(()->setAngle(WristConstants.WRIST_HOVER_L4)); 
+     }
+
     public Command HoldPositionCommand()
     {
          return new RunCommand(()->setHoldAngle(),this);
     }
 
     public Command manualWristMovement(double speed){
-        return new RunCommand(()-> setWristMotor(speed)); 
+        return new RunCommand(()-> setWristMotor(speed), this); 
     }
 }
