@@ -310,5 +310,6 @@ public class RobotContainer {
         NamedCommands.registerCommand("ComplexScoreCommand", complexElevatorScoreCommand(elevatorPositions.L4).andThen(()-> System.out.println("Complex Score Command")));
         NamedCommands.registerCommand("ScoreCoral", endEffector.ejectCoralCommand()); 
         NamedCommands.registerCommand("ComplexStow", complexElevatorStowCommand(elevatorPositions.STOW));
+        NamedCommands.registerCommand("ComplexProcessor", complexProcessorCommand(elevatorPositions.STOW));
     }
 }

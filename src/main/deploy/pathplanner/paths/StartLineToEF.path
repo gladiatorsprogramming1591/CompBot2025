@@ -16,16 +16,16 @@
     },
     {
       "anchor": {
-        "x": 5.3235,
-        "y": 2.972
+        "x": 5.085416666666667,
+        "y": 2.998421717171717
       },
       "prevControl": {
-        "x": 5.6195674877800545,
-        "y": 2.8969268028472137
+        "x": 5.381484154446722,
+        "y": 2.923348520018931
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "I4"
+      "linkedName": null
     }
   ],
   "rotationTargets": [],
@@ -45,7 +45,7 @@
     "rotation": 119.99999999999999
   },
   "reversed": false,
-  "folder": null,
+  "folder": "Processor+Reef",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 180.0

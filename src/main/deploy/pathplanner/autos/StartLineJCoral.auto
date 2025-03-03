@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "StartLineToF"
+            "pathName": "StartLineToJ"
           }
         },
         {
@@ -31,7 +31,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "FToCoralStationR"
+            "pathName": "JToCoralStationL"
           }
         },
         {
@@ -43,7 +43,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "CoralStationRToD"
+            "pathName": "CoralStationLToL"
           }
         },
         {
@@ -67,7 +67,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "DToCoralStationR"
+            "pathName": "LToCoralStationL"
           }
         },
         {
@@ -79,7 +79,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "CoralStationRToB"
+            "pathName": "CoralStationLToB"
           }
         },
         {

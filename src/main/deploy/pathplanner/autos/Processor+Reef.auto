@@ -7,13 +7,37 @@
         {
           "type": "path",
           "data": {
-            "pathName": "StartLineToEF"
+            "pathName": "StartLineToF"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ComplexScoreCommand"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ScoreCoral"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ComplexStow"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "EFToProcessor"
+            "pathName": "FToProcessor"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ComplexProcessor"
           }
         },
         {
@@ -23,9 +47,33 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "IntakeCoral"
+          }
+        },
+        {
           "type": "path",
           "data": {
-            "pathName": "CoralStationRightToCD"
+            "pathName": "CoralStationRightToD"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ComplexScoreCommand"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ScoreCoral"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ComplexStow"
           }
         }
       ]

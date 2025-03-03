@@ -1,0 +1,37 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "StartLineToF"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "FToProcessor"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ProcessorToCoralStationRight"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "CoralStationRightToD"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": false,
+  "folder": null,
+  "choreoAuto": false
+}

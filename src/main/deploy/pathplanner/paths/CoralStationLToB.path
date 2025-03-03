@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.3235,
-        "y": 2.972
+        "x": 1.2027146464646465,
+        "y": 7.196212121212121
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.352614092147027,
-        "y": 2.7237010478506716
+        "x": 2.686679292936396,
+        "y": 6.423737373738888
       },
       "isLocked": false,
-      "linkedName": "I4"
+      "linkedName": "CoralStationL"
     },
     {
       "anchor": {
-        "x": 5.979861111111112,
-        "y": 0.45738636363636376
+        "x": 3.2965277777777784,
+        "y": 3.831881313131313
       },
       "prevControl": {
-        "x": 5.6576061557618695,
-        "y": 1.5311186936239574
+        "x": 1.7617424242495272,
+        "y": 3.628598484849999
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Processor"
+      "linkedName": "B"
     }
   ],
   "rotationTargets": [],
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -90.0
+    "rotation": 0.0
   },
   "reversed": false,
-  "folder": null,
+  "folder": "StartLineICoral",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 119.99999999999999
+    "rotation": -54.0
   },
   "useDefaultConstraints": true
 }
