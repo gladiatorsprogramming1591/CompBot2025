@@ -2,38 +2,38 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.ElevatorConstants;
-import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.subsystems.Elevator;
 
 public class ElevatorToPosition extends Command {
-    private ElevatorSubsystem m_elevator; 
-    private ElevatorSubsystem.elevatorPositions m_targetPos; 
+    private Elevator m_elevator; 
+    private Elevator.elevatorPositions m_targetPos; 
     private double m_elevatorSetpoint; 
     private boolean m_keepRunning; 
     private boolean m_customSetpoint = false; 
     private int m_currentLimit = ElevatorConstants.CURRENT_LIMIT; 
 
-    public ElevatorToPosition(ElevatorSubsystem elevator, ElevatorSubsystem.elevatorPositions pos){
+    public ElevatorToPosition(Elevator elevator, Elevator.elevatorPositions pos){
         m_elevator = elevator;
         m_targetPos = pos;
         m_keepRunning = false;
         addRequirements(m_elevator);
     }
 
-    public ElevatorToPosition(ElevatorSubsystem elevator, ElevatorSubsystem.elevatorPositions pos, boolean keepRunning){
+    public ElevatorToPosition(Elevator elevator, Elevator.elevatorPositions pos, boolean keepRunning){
         m_elevator = elevator;
         m_targetPos = pos;
         m_keepRunning = keepRunning;
         addRequirements(m_elevator);
     }
 
-    public ElevatorToPosition(ElevatorSubsystem elevator, double elevatorSetpoint){
+    public ElevatorToPosition(Elevator elevator, double elevatorSetpoint){
         m_elevator = elevator;
         m_elevatorSetpoint = elevatorSetpoint;
         m_customSetpoint = true;
         addRequirements(m_elevator);
     }
 
-    public ElevatorToPosition(ElevatorSubsystem elevator, ElevatorSubsystem.elevatorPositions pos, int currentLimit) {
+    public ElevatorToPosition(Elevator elevator, Elevator.elevatorPositions pos, int currentLimit) {
         m_elevator = elevator;
         m_targetPos = pos;
         m_keepRunning = false;

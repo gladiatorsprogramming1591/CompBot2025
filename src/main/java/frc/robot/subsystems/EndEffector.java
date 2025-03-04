@@ -68,6 +68,10 @@ public class EndEffector extends SubsystemBase {
         intakeMotor.set(EndEffectorConstants.ALGAE_EJECT_SPEED); 
     }
 
+    public void holdAlgae(){
+        intakeMotor.set(EndEffectorConstants.ALGAE_HOLD_SPEED);
+    }
+
     /**
      *spins intake backwards to arm the coral
      */
@@ -91,10 +95,6 @@ public class EndEffector extends SubsystemBase {
         return new RunCommand(() -> setCoralSpeed(EndEffectorConstants.ALGAE_INTAKE_SPEED));
     }
 
-    /**
-     * Runs the intake until the robot has coral, slowing down as coral progresses through the system
-     * @return the command
-     */
      public Command intakeCoralCommand() {
         return new SequentialCommandGroup(new RunCommand(() -> setCoralSpeed(EndEffectorConstants.CORAL_INTAKE_SPEED))
             .until(this::hasCoral),
@@ -113,11 +113,9 @@ public class EndEffector extends SubsystemBase {
         return new InstantCommand(()-> ejectAlgae()); 
     }
     
-
-
-
-
-
+    public Command stopMotor(){
+        return new InstantCommand(()-> intakeMotor.stopMotor());
+    }
     @Override
     public void periodic() {
         SmartDashboard.putBoolean("Has Algae?", hasAlgae()); 

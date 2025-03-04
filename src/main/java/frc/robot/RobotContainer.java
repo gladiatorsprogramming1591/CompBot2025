@@ -32,12 +32,12 @@ import frc.robot.commands.ElevatorToPosition;
 import frc.robot.generated.TunerConstants;
 import frc.robot.generated.TunerConstants.*;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
-import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.EndEffector;
 import frc.robot.subsystems.Wrist;
 import frc.robot.utilities.DynamicRateLimiter;
 import frc.robot.utilities.FieldConstants;
-import frc.robot.subsystems.ElevatorSubsystem.elevatorPositions;
+import frc.robot.subsystems.Elevator.elevatorPositions;
 
 public class RobotContainer {
 
@@ -45,7 +45,7 @@ public class RobotContainer {
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 	public final EndEffector endEffector = robotInitConstants.isCompBot ? new EndEffector() : null;
 	private final Wrist wrist = robotInitConstants.isCompBot ? new Wrist() : null;
-	public final ElevatorSubsystem elevator = robotInitConstants.isCompBot ? new ElevatorSubsystem() : null;
+	public final Elevator elevator = robotInitConstants.isCompBot ? new Elevator() : null;
 
 
     private double MaxSpeed = robotInitConstants.isCompBot ? PoseidonTunerConstants.kSpeedAt12Volts.in(MetersPerSecond)

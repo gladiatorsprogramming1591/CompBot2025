@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import java.util.EnumMap;
+
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -20,7 +22,24 @@ public class Wrist extends SubsystemBase {
     AbsoluteEncoder wristEncoder; 
     SparkClosedLoopController wristController; 
     double holdAngle;
-    
+    private WristPosition desiredPosition; 
+
+    EnumMap<WristPosition, Double> wristMap = new EnumMap<>(WristPosition.class);
+
+    public enum WristPosition{
+     STOW, 
+     L1,
+     CORAL_INTAKE,
+     REEF_ACQUIRE, 
+     GROUND_INTAKE, 
+     PROCESSOR, 
+     HOVER,
+     HOVER_L4, 
+     ALGAE_LOW,
+     ALGAE_HIGH, 
+     DUNK
+    }
+
     public Wrist() {
         wristMotor = new SparkMax(WristConstants.WRIST_CAN_ID, MotorType.kBrushless); 
           wristMotor.configure(WristConstants.MOTOR_CONFIG,
@@ -29,8 +48,19 @@ public class Wrist extends SubsystemBase {
           );   
           wristEncoder = wristMotor.getAbsoluteEncoder(); 
           wristController = wristMotor.getClosedLoopController(); 
-          holdAngle = ElevatorConstants.STOW_ANGLE; 
-        
+          holdAngle = ElevatorConstants.kSTOW; 
+          
+     
+        wristMap.put(WristPosition.STOW, WristConstants.WRIST_STOW);
+        wristMap.put(WristPosition.L1, WristConstants.L1);
+        wristMap.put(WristPosition.CORAL_INTAKE, WristConstants.WRIST_STOW);
+        wristMap.put(WristPosition.REEF_ACQUIRE, WristConstants.REEF_ACQUIRE_ANGLE);
+        wristMap.put(WristPosition.GROUND_INTAKE, WristConstants.GROUND_INTAKE);
+        wristMap.put(WristPosition.PROCESSOR, WristConstants.WRIST_PROCESSOR);
+        wristMap.put(WristPosition.HOVER, WristConstants.WRIST_HOVER);
+        wristMap.put(WristPosition.HOVER_L4, WristConstants.WRIST_HOVER_L4);
+        wristMap.put(WristPosition.ALGAE_HIGH, WristConstants.WRIST_ALGAE_HIGH);
+        wristMap.put(WristPosition.ALGAE_LOW, WristConstants.WRIST_ALGAE_LOW);
     }
 
     public double getPosition() {

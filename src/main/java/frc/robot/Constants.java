@@ -52,6 +52,15 @@ public class Constants {
         public static final double MAX_ACCEL_DOWN = 4800;
         public static final double ALLOWERD_ERR_DOWN = 1.0; 
 
+        //Elevator Positions
+        public static final double kSTOW = 0.2; 
+        public static final double kL1 = 0.3; 
+        public static final double kL2 = 7.25; 
+        public static final double kL3 = 15.5; 
+        public static final double kL4 = 26.0; 
+        public static final double kPROCESSOR = 0; 
+        public static final double kNET = kL4;
+
         public static final SparkFlexConfig MOTOR_CONFIG = new SparkFlexConfig() {{
             idleMode(IdleMode.kBrake);
             smartCurrentLimit(ElevatorConstants.CURRENT_LIMIT);
@@ -75,18 +84,6 @@ public class Constants {
                 .maxAcceleration(MAX_ACCEL_DOWN, ClosedLoopSlot.kSlot1)
                 .allowedClosedLoopError(ALLOWERD_ERR_DOWN, ClosedLoopSlot.kSlot1);
         }};
-
-
-        //Elevator Positions
-        public static final double kSTOW = 0.2; 
-        public static final double kL1 = 0.3; 
-        public static final double kL2 = 7.25; 
-        public static final double kL3 = 15.5; 
-        public static final double kL4 = 26.0; 
-        public static final double kPROCESSOR = 0; 
-        public static final double kNET = kL4;
-        public static final double STOW_ANGLE = 0;
-
     }
 
     public class EndEffectorConstants {
@@ -95,19 +92,17 @@ public class Constants {
         public static final double INTAKE_RAMP_RATE = 0.1; 
         public static final boolean INTAKE_INVERTED = true;
 
-
         //Coral Constants
         public static final double CORAL_INTAKE_SPEED = 0.2; 
         public static final double CORAL_REVERSE_SPEED = -0.15; 
         public static final double CORAL_EJECT_SPEED = 0.5;
         public static final double ARM_CORAL_SPEED = 0;
         
-
         //Algae Constants
         public static final double ALGAE_INTAKE_SPEED = -1; 
         public static final double HAS_ALGAE_CURRENT = 30;
         public static final double ALGAE_EJECT_SPEED = 1.0; 
-         
+        public static final double ALGAE_HOLD_SPEED = 0;
 
         public static final SparkFlexConfig MOTOR_CONFIG = new SparkFlexConfig() {{
             idleMode(IdleMode.kBrake);
@@ -128,6 +123,9 @@ public class Constants {
         public static final double WRIST_PROCESSOR = WRIST_INTAKE+25.0;
         public static final double WRIST_HOVER = WRIST_INTAKE+32.0;
         public static final double WRIST_HOVER_L4 = WRIST_INTAKE+9.0; 
+        public static final Double WRIST_ALGAE_LOW = WRIST_INTAKE;
+        public static final Double WRIST_ALGAE_HIGH = WRIST_INTAKE;
+        public static final Double L1 = WRIST_INTAKE; 
         public static final double WRIST_TOLERANCE = 5; 
 
         public static final int WRIST_CAN_ID = 4; 
@@ -153,8 +151,8 @@ public class Constants {
             closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
             absoluteEncoder.positionConversionFactor(360);
             absoluteEncoder.zeroOffset(50/360);
-        }};         
-
+        }};
+        
     }
 
     public class robotInitConstants {

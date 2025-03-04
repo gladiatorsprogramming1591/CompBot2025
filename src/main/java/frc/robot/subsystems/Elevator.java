@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.ElevatorConstants;
 
 import java.util.EnumMap;
 
@@ -22,7 +23,7 @@ import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode; 
 
-public class ElevatorSubsystem extends SubsystemBase{
+public class Elevator extends SubsystemBase{
     DigitalInput lowerLimit; 
     Trigger zeroTrigger; 
 
@@ -45,10 +46,12 @@ public class ElevatorSubsystem extends SubsystemBase{
         L3, 
         L4, 
         PROCESSOR, //same as stow height? 
-        NETSHOOT //same as l4 height?
+        NETSHOOT, //same as l4 height?
+        ALGAE_LOW, 
+        ALGAE_HIGH
     }  
 
-    public ElevatorSubsystem() {
+    public Elevator() {
         leader = new SparkFlex(ELEVATOR_LEADER_CAN_ID, MotorType.kBrushless); 
         follower = new SparkFlex(ELEVATOR_FOLLOWER_CAN_ID, MotorType.kBrushless);
         leader.configure(MOTOR_CONFIG,
@@ -99,6 +102,14 @@ public class ElevatorSubsystem extends SubsystemBase{
         return leadEncoder.getPosition(); 
     }
 
+    public void setPositionInches(double inches) {
+        
+        tolerance = inches;
+        SmartDashboard.putNumber("positioninches setpoint", tolerance);
+        setPositionRotations(inchesToRotations(inches));
+    }
+
+
      /**
      * Returns the current height
      * @return the height, in inches
@@ -107,6 +118,41 @@ public class ElevatorSubsystem extends SubsystemBase{
         return getPositionRotations()*INCHES_PER_ROTATION+INITIAL_HEIGHT_INCHES;
     }
 
+    public void setLevel(elevatorPositions position) {
+        desiredLevel = position;
+        SmartDashboard.putString("desiredLevel", desiredLevel.toString());
+        switch (position) {
+            case STOW: 
+                setPositionInches(ElevatorConstants.kSTOW);
+                break;
+            case L1:
+                setPositionInches(ElevatorConstants.kL1);
+                break;
+            case L2:
+                setPositionInches(ElevatorConstants.kL2);
+                break;
+            case L3:
+                setPositionInches(ElevatorConstants.kL3);
+                break;
+            case L4:
+                setPositionInches(ElevatorConstants.kL4);
+                break;
+            case ALGAE_HIGH:
+                setPositionInches(ElevatorConstants.ALGAE_HIGH);
+                break;
+            case ALGAE_LOW:
+                setPositionInches(ElevatorConstants.ALGAE_LOW);
+                break;
+            default:
+                invalidStateRequested.set(true);
+                setPositionInches(ElevatorConstants.STOW_INCHES);
+                break;
+        }
+    }
+
+    public Command stowCommand(){
+        return new InstantCommand(()-> setLevel(elevatorPositions.STOW));
+    }
    /**
      * Calculates the number of rotations to be at the specified number of inches.
      * @return the number of rotations
