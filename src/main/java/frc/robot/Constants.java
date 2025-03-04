@@ -60,6 +60,8 @@ public class Constants {
         public static final double kL4 = 26.0; 
         public static final double kPROCESSOR = 0; 
         public static final double kNET = kL4;
+        public static final double ALGAE_HIGH = 0;
+        public static final double ALGAE_LOW = 0;
 
         public static final SparkFlexConfig MOTOR_CONFIG = new SparkFlexConfig() {{
             idleMode(IdleMode.kBrake);
@@ -97,6 +99,7 @@ public class Constants {
         public static final double CORAL_REVERSE_SPEED = -0.15; 
         public static final double CORAL_EJECT_SPEED = 0.5;
         public static final double ARM_CORAL_SPEED = 0;
+        public static final double L1_CORAL_EJECT_SPEED = 0.75;
         
         //Algae Constants
         public static final double ALGAE_INTAKE_SPEED = -1; 
@@ -123,9 +126,10 @@ public class Constants {
         public static final double WRIST_PROCESSOR = WRIST_INTAKE+25.0;
         public static final double WRIST_HOVER = WRIST_INTAKE+32.0;
         public static final double WRIST_HOVER_L4 = WRIST_INTAKE+9.0; 
-        public static final Double WRIST_ALGAE_LOW = WRIST_INTAKE;
-        public static final Double WRIST_ALGAE_HIGH = WRIST_INTAKE;
-        public static final Double L1 = WRIST_INTAKE; 
+        public static final double WRIST_ALGAE_LOW = WRIST_INTAKE;
+        public static final double WRIST_ALGAE_HIGH = WRIST_INTAKE;
+        public static final double WRIST_DUNK_CORAL = WRIST_INTAKE; 
+        public static final double WRIST_L1 = WRIST_INTAKE; 
         public static final double WRIST_TOLERANCE = 5; 
 
         public static final int WRIST_CAN_ID = 4; 

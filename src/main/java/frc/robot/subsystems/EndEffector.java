@@ -9,10 +9,12 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.EndEffectorConstants;
+import frc.robot.subsystems.Elevator.elevatorPositions;
 
 public class EndEffector extends SubsystemBase {
     SparkFlex intakeMotor;
@@ -91,6 +93,9 @@ public class EndEffector extends SubsystemBase {
         if(intakeMotor.getOutputCurrent() < EndEffectorConstants.HAS_ALGAE_CURRENT){intakeMotor.stopMotor();}//Multiple loop check routine
     }
 
+    public InstantCommand depositL1Coral(){
+        return new InstantCommand(()-> intakeMotor.set(EndEffectorConstants.L1_CORAL_EJECT_SPEED));
+    }
     public Command intakeAlgaeCommand() {
         return new RunCommand(() -> setCoralSpeed(EndEffectorConstants.ALGAE_INTAKE_SPEED));
     }

@@ -51,7 +51,7 @@ public class RobotState {
     public Command scoreConfirmCommand(EndEffector EndEffector, Wrist wrist, Elevator elevator) {
         return new ConditionalCommand(
             EndEffector.ejectCoralCommand(),
-            EndEffector.depositL1CoralCommand(),
+            EndEffector.depositL1Coral(),
             ()->{return getDesiredElevatorLevel() != elevatorPositions.L1;});
     }
 
@@ -62,15 +62,7 @@ public class RobotState {
 				.andThen(elevator.stowCommand()
                 .andThen(new WaitUntilCommand(elevator::atSetpoint))),
 
-                ()->{return !(getDesiredElevatorLevel() != Level.L1 || force)});
-    }
-
-    public Command decreaseDeployedCoralLevelCommand() {
-        return new InstantCommand(()->desiredElevatorState.deployedCoralLevel=desiredElevatorState.deployedCoralLevel.nextCoralLevelDown());
-    }
-
-    public Command increaseDeployedCoralLevelCommand() {
-        return new InstantCommand(()->desiredElevatorState.deployedCoralLevel=desiredElevatorState.deployedCoralLevel.nextCoralLevelUp());
+                ()->{return !(getDesiredElevatorLevel() != elevatorPositions.L1 || force);});
     }
 
     public Command setDeployedCoralLevelCommand(elevatorPositions level) {
@@ -187,8 +179,8 @@ public class RobotState {
         currentElevatorState.height = currentInches;
     }
 
-    public void setElevatorDesiredState(elevatorPositions desiredLevel) {
-        desiredElevatorState.elevatorPositions = desiredLevel;
+    public Command setElevatorDesiredState(elevatorPositions desiredLevel) {
+        return new InstantCommand(()-> desiredElevatorState.elevatorPositions = desiredLevel); 
     }
 
     public void setCurrentWristPosition(double angle) {
@@ -283,16 +275,7 @@ public class RobotState {
 
     public elevatorPositions getAlgaeLevel(CommandSwerveDrivetrain drive)
     {
-        return FieldConstants.isAlgaeHigh(drive.getState().Pose) ? Level.ALGAE_HIGH : Level.ALGAE_LOW;
-    }
-
-    /**
-     * Turns the initial position into center if we're in algae mode
-     * @param initialPosition what to return if we are not in algae mode
-     * @return the reef side we should go to
-     */
-    public ReefSide getReefPos(ReefSide initialPosition) {
-        return mode==GamePiece.ALGAE ? ReefSide.CENTER : initialPosition;
+        return FieldConstants.isAlgaeHigh(drive.getState().Pose) ? elevatorPositions.ALGAE_HIGH : elevatorPositions.ALGAE_LOW;
     }
 
 }
