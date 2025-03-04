@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.robotInitConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.WristConstants;
@@ -46,6 +47,7 @@ public class RobotContainer {
 	public final EndEffector endEffector = robotInitConstants.isCompBot ? new EndEffector() : null;
 	private final Wrist wrist = robotInitConstants.isCompBot ? new Wrist() : null;
 	public final Elevator elevator = robotInitConstants.isCompBot ? new Elevator() : null;
+    public final RobotState robotState = new RobotState(); 
 
 
     private double MaxSpeed = robotInitConstants.isCompBot ? PoseidonTunerConstants.kSpeedAt12Volts.in(MetersPerSecond)
@@ -90,6 +92,9 @@ public class RobotContainer {
     }
     
     private void configureBindingsComp() {
+        Trigger toggleMode = driverController.leftBumper();
+        Trigger zero = driverController.back();
+        Trigger alignReef = driverController.rightTrigger(); 
         // =====================================  Driver Controls  =====================================
         // Drivetrain
         // Note that X is defined as forward according to WPILib convention,
@@ -104,12 +109,13 @@ public class RobotContainer {
                                     .withRotationalRate(-MathUtil.applyDeadband(driverController.getRightX(), STATIC_DEADBAND, maxAngularRatePercent) * MaxAngularRate) // Drive counterclockwise with negative X (left)
                 )
         );
+        toggleMode.onTrue(new InstantCommand(()-> robotState.toggleMode()));
         // reset the field-centric heading on back button press
         driverController.back().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
         driverController.start().onTrue(new InstantCommand(()-> slowMode(true)))
             .onFalse(new InstantCommand(()-> slowMode(false)));
         
-        driverController.rightTrigger()
+        alignReef
             .whileTrue(new RunCommand(()->AutoScoreAlign()))
 			.onFalse(new InstantCommand(()->{aligning=false;})); // this needs to be cleaned up ASAP
 
@@ -131,10 +137,11 @@ public class RobotContainer {
             
         // ===================================== Operator Controls =====================================
         // Elevator
-        operatorController.povDown().onTrue(complexElevatorScoreCommand(elevatorPositions.L1)); 
-        operatorController.povLeft().onTrue(complexElevatorScoreCommand(elevatorPositions.L2)); 
-        operatorController.povRight().onTrue(complexElevatorScoreCommand(elevatorPositions.L4)); 
-        operatorController.povUp().onTrue(complexElevatorScoreCommand(elevatorPositions.L3));
+        operatorController.povDown().onTrue(robotState.setElevatorDesiredState(elevatorPositions.L1));
+        operatorController.povLeft().onTrue(robotState.setElevatorDesiredState(elevatorPositions.L2));
+        operatorController.povUp().onTrue(robotState.setElevatorDesiredState(elevatorPositions.L3));
+        operatorController.povRight().onTrue(robotState.setElevatorDesiredState(elevatorPositions.L4));
+         
         operatorController.leftBumper().onTrue(complexElevatorStowCommand(elevatorPositions.STOW));
         operatorController.back().onTrue(new InstantCommand(() -> elevator.zeroElevatorCommand()));
 

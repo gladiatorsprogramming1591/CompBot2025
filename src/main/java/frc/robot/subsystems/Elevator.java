@@ -35,6 +35,8 @@ public class Elevator extends SubsystemBase{
     SparkClosedLoopController controller; 
     SparkLimitSwitch bottomLimitSwitch;
 
+    double tolerance = 0; 
+    elevatorPositions desiredLevel; 
     private double lastPos;
 
     EnumMap<elevatorPositions, Double> mapEnc = new EnumMap<>(elevatorPositions.class);
@@ -144,14 +146,9 @@ public class Elevator extends SubsystemBase{
                 setPositionInches(ElevatorConstants.ALGAE_LOW);
                 break;
             default:
-                invalidStateRequested.set(true);
-                setPositionInches(ElevatorConstants.STOW_INCHES);
+                setPositionInches(ElevatorConstants.kSTOW);
                 break;
         }
-    }
-
-    public Command stowCommand(){
-        return new InstantCommand(()-> setLevel(elevatorPositions.STOW));
     }
    /**
      * Calculates the number of rotations to be at the specified number of inches.
@@ -186,6 +183,10 @@ public class Elevator extends SubsystemBase{
         setPositionRotations(inchesToRotations(lastPos)); 
     }
 
+    public Command stowCommand() {
+        return new InstantCommand(()->setLevel(elevatorPositions.STOW));
+    }
+
     public Command zeroElevatorCommand() {
         return new InstantCommand(() -> {System.out.println("ZeroCommand");leadEncoder.setPosition(0);});
     }
@@ -211,5 +212,7 @@ public class Elevator extends SubsystemBase{
             zeroElevator();
         }
     }
+
+    
 
 }

@@ -37,7 +37,9 @@ public class Wrist extends SubsystemBase {
      HOVER_L4, 
      ALGAE_LOW,
      ALGAE_HIGH, 
-     DUNK
+     DUNK, 
+     REEF_ALGAE_LOW, 
+     REEF_ALGAE_HIGH
     }
 
     public Wrist() {
@@ -52,7 +54,7 @@ public class Wrist extends SubsystemBase {
           
      
         wristMap.put(WristPosition.STOW, WristConstants.WRIST_STOW);
-        wristMap.put(WristPosition.L1, WristConstants.L1);
+        wristMap.put(WristPosition.L1, WristConstants.WRIST_L1);
         wristMap.put(WristPosition.CORAL_INTAKE, WristConstants.WRIST_STOW);
         wristMap.put(WristPosition.REEF_ACQUIRE, WristConstants.REEF_ACQUIRE_ANGLE);
         wristMap.put(WristPosition.GROUND_INTAKE, WristConstants.GROUND_INTAKE);
@@ -115,7 +117,21 @@ public class Wrist extends SubsystemBase {
      double tolerance = 5;
           return Math.abs(getAngle() - holdAngle) < tolerance; 
     }
-
+    
+    public void setPosition(WristPosition position) {
+        desiredPosition = position;
+        switch (position) {
+             case HOVER -> setAngle(WristConstants.WRIST_HOVER);
+             case GROUND_INTAKE -> setAngle(WristConstants.GROUND_INTAKE);
+             case REEF_ALGAE_LOW -> setAngle(WristConstants.WRIST_ALGAE_LOW);
+             case REEF_ALGAE_HIGH -> setAngle(WristConstants.WRIST_ALGAE_HIGH);
+             case DUNK -> setAngle(WristConstants.WRIST_DUNK_CORAL);
+             case PROCESSOR -> setAngle(WristConstants.WRIST_PROCESSOR);
+             case L1 -> setAngle(WristConstants.WRIST_L1);
+             default -> setAngle(WristConstants.WRIST_STOW);
+        }
+    }
+    
     public Command AquirePositionCommand()
     {
         return new InstantCommand(()->setAngle(WristConstants.REEF_ACQUIRE_ANGLE));
