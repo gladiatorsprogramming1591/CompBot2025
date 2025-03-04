@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import java.util.function.DoubleSupplier;
+
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -70,6 +72,18 @@ public class Wrist extends SubsystemBase {
         wristMotor.set(speed);
     }
 
+    public void setWristForwardSpeed(DoubleSupplier speedSupplier)
+    {
+        SmartDashboard.putNumber("Wrist Motor Speed", speedSupplier.getAsDouble());
+        wristMotor.set(speedSupplier.getAsDouble()*0.2);
+    }
+
+    public void setWristReverseSpeed(DoubleSupplier speedSupplier)
+    {
+        SmartDashboard.putNumber("Wrist Motor Speed", speedSupplier.getAsDouble());
+        wristMotor.set(speedSupplier.getAsDouble()*-0.2);
+    }
+
     public void setAngle(double angle)
     {
          holdAngle = angle;
@@ -115,7 +129,11 @@ public class Wrist extends SubsystemBase {
          return new RunCommand(()->setHoldAngle(),this);
     }
 
-    public Command manualWristMovement(double speed){
-        return new RunCommand(()-> setWristMotor(speed), this); 
+    public Command manualWristForwardMovement(DoubleSupplier speedSupplier){
+        return new RunCommand(()-> setWristForwardSpeed(speedSupplier), this); 
     }
+
+    public Command manualWristReverseMovement(DoubleSupplier speedSupplier){
+     return new RunCommand(()-> setWristReverseSpeed(speedSupplier), this); 
+ }
 }

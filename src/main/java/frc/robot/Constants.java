@@ -122,11 +122,11 @@ public class Constants {
     public class WristConstants {
         // Wrist Position
         public static final double WRIST_INTAKE = 102.0;
-        public static final double WRIST_STOW = WRIST_INTAKE+9.0;
+        public static final double WRIST_STOW = WRIST_INTAKE+11.0;
         public static final double REEF_ACQUIRE_ANGLE = WRIST_INTAKE+22.0;
         public static final double GROUND_INTAKE = WRIST_INTAKE+65.0; 
         public static final double WRIST_PROCESSOR = WRIST_INTAKE+25.0;
-        public static final double WRIST_HOVER = WRIST_INTAKE+34.0;
+        public static final double WRIST_HOVER = WRIST_INTAKE+36.0;
         public static final double WRIST_HOVER_L4 = WRIST_HOVER; 
         public static final double WRIST_TOLERANCE = 5; 
 
@@ -136,7 +136,7 @@ public class Constants {
         public static final double RAMP_RATE = 0.1; 
         public static final double WRIST_P = 0.03; 
         public static final double WRIST_I = 0; 
-        public static final double WRIST_D = 0.01; 
+        public static final double WRIST_D = 0.02; 
 
         public static final SparkMaxConfig MOTOR_CONFIG = new SparkMaxConfig() {{
             idleMode(IdleMode.kBrake
