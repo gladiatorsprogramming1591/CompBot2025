@@ -100,7 +100,7 @@ public class EndEffector extends SubsystemBase {
             .until(this::hasCoral),
             new RunCommand(() -> setCoralSpeed(EndEffectorConstants.CORAL_REVERSE_SPEED))
             .until(this::coralArmed),
-            new RunCommand(() ->setCoralSpeed(0)));
+            new RunCommand(() ->setCoralSpeed(0.1)).until(()->{return !coralArmed();}), new InstantCommand(()->setCoralSpeed(0)));
     }
 
     public Command ejectCoralCommand() {

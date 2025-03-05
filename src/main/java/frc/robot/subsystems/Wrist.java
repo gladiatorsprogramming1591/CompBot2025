@@ -31,7 +31,7 @@ public class Wrist extends SubsystemBase {
           );   
           wristEncoder = wristMotor.getAbsoluteEncoder(); 
           wristController = wristMotor.getClosedLoopController(); 
-          holdAngle = ElevatorConstants.STOW_ANGLE; 
+          holdAngle = WristConstants.WRIST_STOW; 
         
     }
 
@@ -96,7 +96,7 @@ public class Wrist extends SubsystemBase {
     }
 
     public boolean atSetpoint(){
-     double tolerance = 5;
+     double tolerance = 2;
           return Math.abs(getAngle() - holdAngle) < tolerance; 
     }
 

@@ -119,20 +119,21 @@ public class RobotContainer {
 		// 	.onFalse(new InstantCommand(()->{aligning=false;})); // this needs to be cleaned up ASAP
 
         // End Effector
-        driverController.a().whileTrue(complexIntakeCommand())
+        driverController.leftTrigger().whileTrue(complexIntakeCommand())
             .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(0),endEffector));
         driverController.rightBumper().whileTrue(endEffector.intakeAlgaeCommand())
             .onFalse(new InstantCommand(()-> wrist.setWristMotor(0)));
         
         driverController.leftBumper().whileTrue(endEffector.ejectAlgaeCommand())
             .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(0),endEffector));
-        driverController.x().onTrue(endEffector.ejectCoralCommand());   
+        driverController.rightTrigger().onTrue(endEffector.ejectCoralCommand())  
+            .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(0),endEffector));
 
         // Wrist
-        driverController.rightTrigger().whileTrue(wrist.manualWristForwardMovement(driverController::getRightTriggerAxis))
-            .onFalse(new InstantCommand(()-> wrist.setWristMotor(0),wrist));
-        driverController.leftTrigger().whileTrue(wrist.manualWristReverseMovement(driverController::getLeftTriggerAxis))
-            .onFalse(new InstantCommand(()-> wrist.setWristMotor(0),wrist));
+                // driverController.rightTrigger().whileTrue(wrist.manualWristForwardMovement(driverController::getRightTriggerAxis))
+        //     .onFalse(new InstantCommand(()-> wrist.setWristMotor(0),wrist));
+        // driverController.leftTrigger().whileTrue(wrist.manualWristReverseMovement(driverController::getLeftTriggerAxis))
+        //     .onFalse(new InstantCommand(()-> wrist.setWristMotor(0),wrist));
             
         // ===================================== Operator Controls =====================================
         // Elevator

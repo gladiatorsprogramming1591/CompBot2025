@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 public class Constants {
 
     public static final class DriveConstants {
-        public static final double STATIC_DEADBAND = 0.09; // 7% Deadband before robot moves
+        public static final double STATIC_DEADBAND = 0.07; // 7% Deadband before robot moves
         public static final double KINETIC_DEADBAND = 0.02; // 2% Deadband to perpendicular axis while robot is in motion
 
         public static final double TIME_TO_STOP = 0.75;
@@ -52,6 +52,17 @@ public class Constants {
         public static final double MAX_ACCEL_DOWN = 4800;
         public static final double ALLOWERD_ERR_DOWN = 1.0; 
 
+        //Elevator Positions
+        public static final double kSTOW = 0.2; 
+        public static final double kL1 = 0.3; 
+        public static final double kL2 = 7.25; 
+        public static final double kL3 = 14.0; 
+        public static final double kL4 = 26.5; 
+        public static final double kPROCESSOR = 0.2; 
+        public static final double kNET = kL4;
+        public static final double ALGAE_HIGH = 15.75;
+        public static final double ALGAE_LOW = 6.25;
+
         public static final SparkFlexConfig MOTOR_CONFIG = new SparkFlexConfig() {{
             idleMode(IdleMode.kBrake);
             smartCurrentLimit(ElevatorConstants.CURRENT_LIMIT);
@@ -75,18 +86,6 @@ public class Constants {
                 .maxAcceleration(MAX_ACCEL_DOWN, ClosedLoopSlot.kSlot1)
                 .allowedClosedLoopError(ALLOWERD_ERR_DOWN, ClosedLoopSlot.kSlot1);
         }};
-
-
-        //Elevator Positions
-        public static final double kSTOW = 0.2; 
-        public static final double kL1 = 0.3; 
-        public static final double kL2 = 7.25; 
-        public static final double kL3 = 15.5; 
-        public static final double kL4 = 26.0; 
-        public static final double kPROCESSOR = 0; 
-        public static final double kNET = kL4;
-        public static final double STOW_ANGLE = 0;
-
     }
 
     public class EndEffectorConstants {
@@ -95,19 +94,18 @@ public class Constants {
         public static final double INTAKE_RAMP_RATE = 0.1; 
         public static final boolean INTAKE_INVERTED = true;
 
-
         //Coral Constants
-        public static final double CORAL_INTAKE_SPEED = 0.15; 
-        public static final double CORAL_REVERSE_SPEED = -0.12; 
+        public static final double CORAL_INTAKE_SPEED = 0.2; 
+        public static final double CORAL_REVERSE_SPEED = -0.15; 
         public static final double CORAL_EJECT_SPEED = 0.5;
         public static final double ARM_CORAL_SPEED = 0;
+        public static final double L1_CORAL_EJECT_SPEED = 0.75;
         
-
         //Algae Constants
         public static final double ALGAE_INTAKE_SPEED = -1; 
         public static final double HAS_ALGAE_CURRENT = 30;
         public static final double ALGAE_EJECT_SPEED = 1.0; 
-         
+        public static final double ALGAE_HOLD_SPEED = -0.5;
 
         public static final SparkFlexConfig MOTOR_CONFIG = new SparkFlexConfig() {{
             idleMode(IdleMode.kBrake);
@@ -121,13 +119,18 @@ public class Constants {
     
     public class WristConstants {
         // Wrist Position
-        public static final double WRIST_INTAKE = 102.0;
-        public static final double WRIST_STOW = WRIST_INTAKE+11.0;
+        public static final double WRIST_INTAKE = 252.0;
+        public static final double WRIST_STOW = WRIST_INTAKE+13.5;
         public static final double REEF_ACQUIRE_ANGLE = WRIST_INTAKE+22.0;
         public static final double GROUND_INTAKE = WRIST_INTAKE+65.0; 
         public static final double WRIST_PROCESSOR = WRIST_INTAKE+25.0;
-        public static final double WRIST_HOVER = WRIST_INTAKE+36.0;
-        public static final double WRIST_HOVER_L4 = WRIST_HOVER; 
+        public static final double WRIST_HOVER = WRIST_INTAKE+12.0;
+        public static final double WRIST_HOVER_L4 = WRIST_INTAKE+30.0; 
+        public static final double WRIST_ALGAE_LOW = WRIST_INTAKE;
+        public static final double WRIST_ALGAE_HIGH = WRIST_INTAKE;
+        public static final double WRIST_DUNK_CORAL = WRIST_INTAKE; 
+        public static final double WRIST_L1 = WRIST_INTAKE; 
+
         public static final double WRIST_TOLERANCE = 5; 
 
         public static final int WRIST_CAN_ID = 4; 
@@ -136,7 +139,7 @@ public class Constants {
         public static final double RAMP_RATE = 0.1; 
         public static final double WRIST_P = 0.03; 
         public static final double WRIST_I = 0; 
-        public static final double WRIST_D = 0.02; 
+        public static final double WRIST_D = 0.01; 
 
         public static final SparkMaxConfig MOTOR_CONFIG = new SparkMaxConfig() {{
             idleMode(IdleMode.kBrake
@@ -152,9 +155,9 @@ public class Constants {
             // closedLoop.maxMotion.maxVelocity(120000);
             closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
             absoluteEncoder.positionConversionFactor(360);
-            absoluteEncoder.zeroOffset(50/360);
-        }};         
-
+            absoluteEncoder.zeroOffset(252/360);
+        }};
+        
     }
 
     public class robotInitConstants {
