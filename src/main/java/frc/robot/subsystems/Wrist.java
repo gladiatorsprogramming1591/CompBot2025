@@ -96,14 +96,10 @@ public class Wrist extends SubsystemBase {
     }
 
     public boolean atSetpoint(){
-     double tolerance = 2;
+     double tolerance = 6;
           return Math.abs(getAngle() - holdAngle) < tolerance; 
     }
 
-    public Command AquirePositionCommand()
-    {
-        return new InstantCommand(()->setAngle(WristConstants.REEF_ACQUIRE_ANGLE));
-    }     
     public Command StowPositionCommand(){
          return new InstantCommand(()->setAngle(WristConstants.WRIST_STOW)); 
     }
@@ -122,6 +118,12 @@ public class Wrist extends SubsystemBase {
 
      public Command L4HoverPositionCommand(){
           return new InstantCommand(()->setAngle(WristConstants.WRIST_HOVER_L4)); 
+     }
+     public Command LowAlgaePositionCommand(){
+          return new InstantCommand(()->setAngle(WristConstants.WRIST_ALGAE_LOW)); 
+     }
+     public Command HighAlgaePositionCommand(){
+          return new InstantCommand(()->setAngle(WristConstants.WRIST_ALGAE_HIGH)); 
      }
 
     public Command HoldPositionCommand()

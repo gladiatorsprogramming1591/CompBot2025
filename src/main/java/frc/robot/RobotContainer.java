@@ -6,6 +6,7 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 import static frc.robot.Constants.DriveConstants.*;
+import static frc.robot.Constants.ElevatorConstants.ALGAE_HIGH;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -46,6 +47,7 @@ public class RobotContainer {
 	public final EndEffector endEffector = robotInitConstants.isCompBot ? new EndEffector() : null;
 	private final Wrist wrist = robotInitConstants.isCompBot ? new Wrist() : null;
 	public final ElevatorSubsystem elevator = robotInitConstants.isCompBot ? new ElevatorSubsystem() : null;
+    
 
 
     private double MaxSpeed = robotInitConstants.isCompBot ? PoseidonTunerConstants.kSpeedAt12Volts.in(MetersPerSecond)
@@ -84,6 +86,7 @@ public class RobotContainer {
         registerNamedCommands();
         autoChooser = AutoBuilder.buildAutoChooser(); // A default auto can be passed in as parameter.
         SmartDashboard.putData("Auto Mode", autoChooser);
+        SmartDashboard.putData(drivetrain.getCurrentCommand());
         
         if (robotInitConstants.isCompBot) configureBindingsComp(); else configureBindingsChassis();
         
@@ -150,13 +153,17 @@ public class RobotContainer {
         operatorController.x().onTrue(new InstantCommand(()-> wrist.setAngle(WristConstants.GROUND_INTAKE)));
         operatorController.y().onTrue(new InstantCommand(()-> wrist.setAngle(WristConstants.REEF_ACQUIRE_ANGLE)));
 
+        operatorController.rightTrigger().onTrue(complexHighAlgaeIntakeCommand(elevatorPositions.ALGAE_HIGH));
+        operatorController.leftTrigger().onTrue(complexLowAlgaeIntakeCommand(elevatorPositions.ALGAE_LOW));
+
         // operatorController.rightTrigger().whileTrue(wrist.manualWristMovement(operatorController.getRightTriggerAxis()*0.20))
         //     .onFalse(new InstantCommand(()-> wrist.setWristMotor(0)));
         // operatorController.leftTrigger().whileTrue(wrist.manualWristMovement(-operatorController.getLeftTriggerAxis()*0.20))
         //     .onFalse(new InstantCommand(()-> wrist.setWristMotor(0)));
 
         // Default Commands
-        // wrist.setDefaultCommand(new RunCommand(()-> wrist.setWristMotor(operatorController.getRightY()*0.20), wrist));
+        // wrist.setDefaultComman
+        // (new RunCommand(()-> wrist.setWristMotor(operatorController.getRightY()*0.20), wrist));
         // elevator.setDefaultCommand(new RunCommand(() -> elevator.setMotorSpeed(operatorController.getRightY()*0.50), elevator));
     
         drivetrain.registerTelemetry(logger::telemeterize);
@@ -224,7 +231,7 @@ public class RobotContainer {
             .andThen((new ElevatorToPosition(elevator,position)))
             .andThen(new WaitUntilCommand(elevator::atSetpoint))
             .andThen(wrist.L4HoverPositionCommand())
-            .andThen(new RunCommand(() -> endEffector.setCoralSpeed(-0.15),endEffector).withTimeout(0.1))
+            .andThen(new RunCommand(() -> endEffector.setCoralSpeed(-0.15),endEffector).withTimeout(0.2))
             .andThen(new InstantCommand(() -> endEffector.setCoralSpeed(0.0),endEffector));
         }
     
@@ -240,6 +247,21 @@ public class RobotContainer {
             .andThen(wrist.ProcessorPositionCommand()); 
         }
     
+        public Command complexLowAlgaeIntakeCommand(elevatorPositions position){
+            return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
+            .andThen((new ElevatorToPosition(elevator,position)))
+            .andThen(new WaitUntilCommand(elevator::atSetpoint))
+            .andThen(wrist.LowAlgaePositionCommand())
+            .andThen(new WaitUntilCommand(wrist::atSetpoint));
+        }
+        public Command complexHighAlgaeIntakeCommand(elevatorPositions position){
+            return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
+            .andThen((new ElevatorToPosition(elevator,position)))
+            .andThen(new WaitUntilCommand(elevator::atSetpoint))
+            .andThen(wrist.HighAlgaePositionCommand())
+            .andThen(new WaitUntilCommand(wrist::atSetpoint));
+        }
+
         public Command complexIntakeCommand() { 
              return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
             .andThen(new ElevatorToPosition(elevator, elevatorPositions.STOW))

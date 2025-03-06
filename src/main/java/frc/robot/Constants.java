@@ -55,13 +55,13 @@ public class Constants {
         //Elevator Positions
         public static final double kSTOW = 0.2; 
         public static final double kL1 = 0.3; 
-        public static final double kL2 = 7.25; 
-        public static final double kL3 = 14.0; 
+        public static final double kL2 = 7.50; 
+        public static final double kL3 = 15.50; 
         public static final double kL4 = 26.5; 
         public static final double kPROCESSOR = 0.2; 
         public static final double kNET = kL4;
         public static final double ALGAE_HIGH = 15.75;
-        public static final double ALGAE_LOW = 6.25;
+        public static final double ALGAE_LOW = 9.8;
 
         public static final SparkFlexConfig MOTOR_CONFIG = new SparkFlexConfig() {{
             idleMode(IdleMode.kBrake);
@@ -119,27 +119,25 @@ public class Constants {
     
     public class WristConstants {
         // Wrist Position
-        public static final double WRIST_INTAKE = 252.0;
-        public static final double WRIST_STOW = WRIST_INTAKE+13.5;
+        public static final double WRIST_INTAKE = 254.0;
+        public static final double WRIST_STOW = WRIST_INTAKE+16.5;
         public static final double REEF_ACQUIRE_ANGLE = WRIST_INTAKE+22.0;
         public static final double GROUND_INTAKE = WRIST_INTAKE+65.0; 
         public static final double WRIST_PROCESSOR = WRIST_INTAKE+25.0;
-        public static final double WRIST_HOVER = WRIST_INTAKE+12.0;
-        public static final double WRIST_HOVER_L4 = WRIST_INTAKE+30.0; 
-        public static final double WRIST_ALGAE_LOW = WRIST_INTAKE;
+        public static final double WRIST_HOVER = 288.0;
+        public static final double WRIST_HOVER_L4 = 300.0; //293
+        public static final double WRIST_ALGAE_LOW = 295.0;
         public static final double WRIST_ALGAE_HIGH = WRIST_INTAKE;
         public static final double WRIST_DUNK_CORAL = WRIST_INTAKE; 
         public static final double WRIST_L1 = WRIST_INTAKE; 
-
-        public static final double WRIST_TOLERANCE = 5; 
 
         public static final int WRIST_CAN_ID = 4; 
         public static final int WRIST_CURRENT_LIMIT = 30; 
         public static final boolean MOTOR_INVERTED = true; 
         public static final double RAMP_RATE = 0.1; 
-        public static final double WRIST_P = 0.03; 
+        public static final double WRIST_P = 0.025; 
         public static final double WRIST_I = 0; 
-        public static final double WRIST_D = 0.01; 
+        public static final double WRIST_D = 0.04; 
 
         public static final SparkMaxConfig MOTOR_CONFIG = new SparkMaxConfig() {{
             idleMode(IdleMode.kBrake

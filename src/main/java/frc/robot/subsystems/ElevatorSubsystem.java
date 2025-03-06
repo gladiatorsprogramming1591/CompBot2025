@@ -45,7 +45,9 @@ public class ElevatorSubsystem extends SubsystemBase{
         L3, 
         L4, 
         PROCESSOR, //same as stow height? 
-        NETSHOOT //same as l4 height?
+        NETSHOOT, //same as l4 height
+        ALGAE_HIGH, 
+        ALGAE_LOW
     }  
 
     public ElevatorSubsystem() {
@@ -76,7 +78,9 @@ public class ElevatorSubsystem extends SubsystemBase{
         mapEnc.put(elevatorPositions.L3, kL3);
         mapEnc.put(elevatorPositions.L4, kL4);
         mapEnc.put(elevatorPositions.PROCESSOR, kPROCESSOR);
-        mapEnc.put(elevatorPositions.NETSHOOT, kNET);        
+        mapEnc.put(elevatorPositions.NETSHOOT, kNET);  
+        mapEnc.put(elevatorPositions.ALGAE_HIGH, ALGAE_HIGH);   
+        mapEnc.put(elevatorPositions.ALGAE_LOW, ALGAE_LOW);   
     }
 
     private boolean isElevatorNotAtBottom() {
@@ -143,7 +147,6 @@ public class ElevatorSubsystem extends SubsystemBase{
     public Command zeroElevatorCommand() {
         return new InstantCommand(() -> {System.out.println("ZeroCommand");leadEncoder.setPosition(0);});
     }
-
     public void zeroElevator() {
         leadEncoder.setPosition(0);
     }
