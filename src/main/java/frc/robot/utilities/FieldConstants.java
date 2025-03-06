@@ -212,6 +212,12 @@ public class FieldConstants {
         return (nearestReefRotation.equals(new Rotation2d(0)) || nearestReefRotation.equals(new Rotation2d(Math.toRadians(120))) || nearestReefRotation.equals(new Rotation2d(Math.toRadians(-120))));
     }
 
+    public static Pose2d toRobotRelative(Pose2d robotPose, Pose2d goalPose)
+    {
+        Transform2d goalTransform = goalPose.minus(robotPose);
+        return new Pose2d(goalTransform.getTranslation(), goalTransform.getRotation());
+    }
+
     public static Pose2d getNearestReefFace(Pose2d currentPose)
     {
         return currentPose.nearest(List.of(FieldConstants.Reef.centerFaces));
@@ -219,15 +225,28 @@ public class FieldConstants {
 
     public enum ReefSide {
         LEFT,
+        CENTER,
         RIGHT
     }
 
+    /**
+     * Returns the nearest reef location of the specified type
+     * @param currentPose the current post of the robot
+     * @param side left (coral), center (algae), or right (coral)
+     * @return the pose
+     */
     public static Pose2d getNearestReefBranch(Pose2d currentPose, ReefSide side)
     {
+        if(side==ReefSide.CENTER) return getNearestReefFace(currentPose);
+
         return FieldConstants.Reef.branchPositions
             .get(List.of(FieldConstants.Reef.centerFaces).indexOf(getNearestReefFace(currentPose))
                 * 2 + (side == ReefSide.LEFT ? 1 : 0))
             .get(FieldConstants.ReefHeight.L1).toPose2d();
+    }
+
+    public static ReefSide getNearestReefSide(Pose2d robotPose) {
+        return robotPose.minus(getNearestReefFace(robotPose)).getX()<0 ? ReefSide.LEFT : ReefSide.RIGHT;
     }
 
     public static Pose2d getNearestCoralStation(Pose2d currentPose)

@@ -29,6 +29,7 @@ import frc.robot.Constants.robotInitConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.WristConstants;
 import frc.robot.commands.AlignToReefCommand;
+import frc.robot.commands.AutoReefPoseCommand;
 import frc.robot.commands.ElevatorToPosition;
 import frc.robot.generated.TunerConstants;
 import frc.robot.generated.TunerConstants.*;
@@ -38,6 +39,7 @@ import frc.robot.subsystems.EndEffector;
 import frc.robot.subsystems.Wrist;
 import frc.robot.utilities.DynamicRateLimiter;
 import frc.robot.utilities.FieldConstants;
+import frc.robot.utilities.FieldConstants.ReefSide;
 import frc.robot.subsystems.ElevatorSubsystem.elevatorPositions;
 
 public class RobotContainer {
@@ -131,6 +133,10 @@ public class RobotContainer {
             .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(0),endEffector));
         driverController.rightTrigger().onTrue(endEffector.ejectCoralCommand())  
             .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(0),endEffector));
+
+		driverController.x().whileTrue(new AutoReefPoseCommand(drivetrain, reefAlign, this::driveX, this::driveY, this::driveT, ()->ReefSide.LEFT));
+		driverController.y().whileTrue(new AutoReefPoseCommand(drivetrain, reefAlign, this::driveX, this::driveY, this::driveT, ()->ReefSide.RIGHT));
+		driverController.a().whileTrue(new AutoReefPoseCommand(drivetrain, reefAlign, this::driveX, this::driveY, this::driveT, ()->FieldConstants.getNearestReefSide(drivetrain.getState().Pose)));
 
         // Wrist
                 // driverController.rightTrigger().whileTrue(wrist.manualWristForwardMovement(driverController::getRightTriggerAxis))
@@ -336,6 +342,26 @@ public class RobotContainer {
                 }
 	    }
     }
+
+    	/**
+	 * Limits the acceleration of the drivetrain so the robot can't tip over
+	 * @return the X joystick value, limited
+	 */
+	public double driveX() {
+		return xLimiter.calculate(-driverController.getLeftY()*MaxSpeed, DriveConstants.INITIAL_LIMIT*Math.pow(DriveConstants.LIMIT_SCALE_PER_INCH, elevator.getPositionInches()), DriveConstants.TIME_TO_STOP);
+	}
+
+	/**
+	 * Limits the acceleration of the drivetrain so the robot can't tip over
+	 * @return the Y joystick value, limited
+	 */
+	public double driveY() {
+		return yLimiter.calculate(-driverController.getLeftX()*MaxSpeed, DriveConstants.INITIAL_LIMIT*Math.pow(DriveConstants.LIMIT_SCALE_PER_INCH, elevator.getPositionInches()), DriveConstants.TIME_TO_STOP);
+	}
+
+	public double driveT() {
+		return -driverController.getRightX() * MaxAngularRate;
+	}
     
     // 2.3976 is the y postion of StartLineToF
     public Command getAutonomousCommand() {
