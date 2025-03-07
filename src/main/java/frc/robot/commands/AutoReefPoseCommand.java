@@ -13,6 +13,7 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 
 public class AutoReefPoseCommand extends Command {
@@ -82,11 +83,21 @@ public class AutoReefPoseCommand extends Command {
             rotationVal = 0;
 
         /* Drive */
+        double velocityX = (controllerX.getAsDouble()-strafeVal) * 0.5;
+        double velocityY = (controllerY.getAsDouble()-distanceVal) * 0.5;
+        double rotationalRate = (controllerT.getAsDouble()-rotationVal) * 0.25;
         drivetrain.setControl(
-            reefAlign.withVelocityX((controllerX.getAsDouble()-strafeVal) * 0.5) // Drive forward with negative Y (forward) strafeController
-                .withVelocityY((controllerY.getAsDouble()-distanceVal) * 0.5) // Drive left with negative X (left)
-                .withRotationalRate((controllerT.getAsDouble()-rotationVal) * 0.25) // Drive counterclockwise with negative X (left)
+            reefAlign.withVelocityX(velocityX) // Drive forward with negative Y (forward) strafeController
+                .withVelocityY(velocityY) // Drive left with negative X (left)
+                .withRotationalRate(rotationalRate) // Drive counterclockwise with negative X (left)
         );
+
+        SmartDashboard.putNumber("strafeVal", strafeVal);
+        SmartDashboard.putNumber("distanceVal", distanceVal);
+        SmartDashboard.putNumber("rotationVal", rotationVal);
+        SmartDashboard.putNumber("Auto align velocity X", velocityX);
+        SmartDashboard.putNumber("Auto align velocity Y", velocityY);
+        SmartDashboard.putNumber("Auto align rot rate", rotationalRate);
         
     }
       // Make this return true when this Command no longer needs to run execute()

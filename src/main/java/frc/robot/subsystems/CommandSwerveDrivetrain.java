@@ -32,8 +32,10 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Notifier;
+import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
@@ -56,7 +58,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private static final double kSimLoopPeriod = 0.005; // 5 ms
     private Notifier m_simNotifier = null;
     private double m_lastSimTime;
-    
+    PowerDistribution m_pdh = new PowerDistribution(21,ModuleType.kRev);
+
     /* Blue alliance sees forward as 0 degrees (toward red alliance wall) */
     private static final Rotation2d kBlueAlliancePerspectiveRotation = Rotation2d.kZero;
     /* Red alliance sees forward as 180 degrees (toward blue alliance wall) */
@@ -144,11 +147,14 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     AprilTagFieldLayout fieldLayout;
         private PhotonTrackedTarget lastTarget;
     
-        // TODO: Determine actual camera location and angle, init values from 2024 Halo
-        private static final Transform3d kFrontCameraLocation = new Transform3d(
-            new Translation3d(Units.inchesToMeters(4.5), Units.inchesToMeters(10.9),
-                Units.inchesToMeters(9.25)),
-            new Rotation3d(0.0, 0.0, Math.toRadians(-25.0)));
+        public static final Transform3d kFrontCameraLocation = robotInitConstants.isCompBot ? new Transform3d(
+                new Translation3d(Units.inchesToMeters(4.5), Units.inchesToMeters(10.9),
+                    Units.inchesToMeters(9.25)),
+                new Rotation3d(0.0, 0.0, Math.toRadians(-25.0)))
+                : new Transform3d(
+                    new Translation3d(Units.inchesToMeters(11.007), Units.inchesToMeters(0.1875),
+                    Units.inchesToMeters(5.789)),
+                new Rotation3d(0.0, Math.toRadians(-20.0), Math.toRadians(0.0)));
     
         public static final double VISION_FIELD_MARGIN = 0.5;
         public static final double VISION_Z_MARGIN = 0.75;
@@ -419,9 +425,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         SmartDashboard.putNumber("BL Drive OCurrent",  getModule(2).getDriveMotor().getStatorCurrent().getValueAsDouble());
         SmartDashboard.putNumber("BR Drive OCurrent",  getModule(3).getDriveMotor().getStatorCurrent().getValueAsDouble());
         SmartDashboard.putNumber("Heading", getState().RawHeading.getDegrees());
-
         SmartDashboard.putNumber("Swerve States", getState().ModuleStates.length);
-
+        SmartDashboard.putNumber("Vision Current", m_pdh.getCurrent(15));
         SmartDashboard.putBoolean("DIO channel 0", robotInitConstants.dIO_port.get());
     }
 

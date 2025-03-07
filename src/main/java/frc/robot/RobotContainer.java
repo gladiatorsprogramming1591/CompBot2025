@@ -6,7 +6,6 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 import static frc.robot.Constants.DriveConstants.*;
-import static frc.robot.Constants.ElevatorConstants.ALGAE_HIGH;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -181,10 +180,10 @@ public class RobotContainer {
         drivetrain.setDefaultCommand(
                 // Drivetrain will execute this command periodically
                 drivetrain.applyRequest(() ->
-                        drive.withVelocityX(xLimiter.calculate(-drivetrain.apply2dDynamicDeadband(driverController.getLeftY(), driverController.getLeftX(), STATIC_DEADBAND, KINETIC_DEADBAND, false) * MaxSpeed * maxSpeedPercent,
-                                            INITIAL_LIMIT * Math.pow(LIMIT_SCALE_PER_INCH, elevator.getPositionInches()), TIME_TO_STOP)) // Drive forward with negative Y (forward)
-                                    .withVelocityY(yLimiter.calculate(-drivetrain.apply2dDynamicDeadband(driverController.getLeftX(), driverController.getLeftY(), STATIC_DEADBAND, KINETIC_DEADBAND, false) * MaxSpeed * maxSpeedPercent,
-                                            INITIAL_LIMIT * Math.pow(LIMIT_SCALE_PER_INCH, elevator.getPositionInches()), TIME_TO_STOP)) // Drive left with negative X (left)
+                        drive.withVelocityX(xLimiter.calculate(-drivetrain.apply2dDynamicDeadband(driverController.getLeftY(), driverController.getLeftX(), STATIC_DEADBAND, KINETIC_DEADBAND, true) * MaxSpeed * maxSpeedPercent,
+                                            INITIAL_LIMIT, TIME_TO_STOP)) // Drive forward with negative Y (forward)
+                                    .withVelocityY(yLimiter.calculate(-drivetrain.apply2dDynamicDeadband(driverController.getLeftX(), driverController.getLeftY(), STATIC_DEADBAND, KINETIC_DEADBAND, true) * MaxSpeed * maxSpeedPercent,
+                                            INITIAL_LIMIT, TIME_TO_STOP)) // Drive left with negative X (left)
                                     .withRotationalRate(-MathUtil.applyDeadband(driverController.getRightX(), STATIC_DEADBAND, maxAngularRatePercent) * MaxAngularRate) // Drive counterclockwise with negative X (left)
 )
         );
@@ -193,6 +192,10 @@ public class RobotContainer {
         driverController.back().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
         driverController.start().onTrue(new InstantCommand(()-> slowMode(true)))
             .onFalse(new InstantCommand(()-> slowMode(false)));
+
+        driverController.x().whileTrue(new AutoReefPoseCommand(drivetrain, reefAlign, this::driveXChassis, this::driveYChassis, this::driveT, ()->ReefSide.LEFT));
+        driverController.y().whileTrue(new AutoReefPoseCommand(drivetrain, reefAlign, this::driveXChassis, this::driveYChassis, this::driveT, ()->ReefSide.RIGHT));
+        driverController.a().whileTrue(new AutoReefPoseCommand(drivetrain, reefAlign, this::driveXChassis, this::driveYChassis, this::driveT, ()->FieldConstants.getNearestReefSide(drivetrain.getState().Pose)));    
 
         // Drivetrain tunning commands
         // joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
@@ -350,6 +353,9 @@ public class RobotContainer {
 	public double driveX() {
 		return xLimiter.calculate(-driverController.getLeftY()*MaxSpeed, DriveConstants.INITIAL_LIMIT*Math.pow(DriveConstants.LIMIT_SCALE_PER_INCH, elevator.getPositionInches()), DriveConstants.TIME_TO_STOP);
 	}
+	public double driveXChassis() {
+		return xLimiter.calculate(-driverController.getLeftY()*MaxSpeed, DriveConstants.INITIAL_LIMIT, DriveConstants.TIME_TO_STOP);
+	}
 
 	/**
 	 * Limits the acceleration of the drivetrain so the robot can't tip over
@@ -357,6 +363,9 @@ public class RobotContainer {
 	 */
 	public double driveY() {
 		return yLimiter.calculate(-driverController.getLeftX()*MaxSpeed, DriveConstants.INITIAL_LIMIT*Math.pow(DriveConstants.LIMIT_SCALE_PER_INCH, elevator.getPositionInches()), DriveConstants.TIME_TO_STOP);
+	}
+	public double driveYChassis() {
+		return yLimiter.calculate(-driverController.getLeftX()*MaxSpeed, DriveConstants.INITIAL_LIMIT, DriveConstants.TIME_TO_STOP);
 	}
 
 	public double driveT() {
@@ -370,10 +379,12 @@ public class RobotContainer {
     }
     
     public void registerNamedCommands(){
-        NamedCommands.registerCommand("IntakeCoral", complexIntakeCommand());
-        NamedCommands.registerCommand("ComplexScoreCommand", complexElevatorScoreCommand(elevatorPositions.L4).andThen(()-> System.out.println("Complex Score Command")));
-        NamedCommands.registerCommand("ScoreCoral", endEffector.ejectCoralCommand()); 
-        NamedCommands.registerCommand("ComplexStow", complexElevatorStowCommand(elevatorPositions.STOW));
-        NamedCommands.registerCommand("ComplexProcessor", complexProcessorCommand(elevatorPositions.STOW));
+        if (robotInitConstants.isCompBot) {
+            NamedCommands.registerCommand("IntakeCoral", complexIntakeCommand());
+            NamedCommands.registerCommand("ComplexScoreCommand", complexElevatorScoreCommand(elevatorPositions.L4).andThen(()-> System.out.println("Complex Score Command")));
+            NamedCommands.registerCommand("ScoreCoral", endEffector.ejectCoralCommand()); 
+            NamedCommands.registerCommand("ComplexStow", complexElevatorStowCommand(elevatorPositions.STOW));
+            NamedCommands.registerCommand("ComplexProcessor", complexProcessorCommand(elevatorPositions.STOW));
+        }
     }
 }

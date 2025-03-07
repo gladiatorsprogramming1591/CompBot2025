@@ -157,6 +157,8 @@ public class Constants {
         }};
         
     }
+    public class VisionConstants {
+    }
 
     public class robotInitConstants {
         public static final DigitalInput dIO_port = new DigitalInput(0);
