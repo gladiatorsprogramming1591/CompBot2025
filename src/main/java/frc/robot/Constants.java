@@ -159,7 +159,7 @@ public class Constants {
 
     }
     public class ClimberConstants {
-        public static final int CLIMB_ROLLER_CAN_ID = 4; 
+        public static final int CLIMB_ROLLER_CAN_ID = 50; 
         public static final int CLIMB_ROLLER_CURRENT_LIMIT = 30; 
         public static final boolean CLIMB_ROLLER_MOTOR_INVERTED = true; 
         public static final double CLIMB_ROLLER_RAMP_RATE = 0.1; 
@@ -182,7 +182,7 @@ public class Constants {
             absoluteEncoder.positionConversionFactor(360);
         }};
 
-        public static final int WINCH_CAN_ID = 4; 
+        public static final int WINCH_CAN_ID = 60; 
         public static final int WINCH_CURRENT_LIMIT = 30; 
         public static final boolean WINCH_MOTOR_INVERTED = true; 
         public static final double WINCH_RAMP_RATE = 0.1; 

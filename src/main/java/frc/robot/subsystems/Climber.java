@@ -6,7 +6,7 @@ import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkFlex;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -22,13 +22,13 @@ public class Climber extends SubsystemBase {
     AbsoluteEncoder climberEncoder; 
     
     public Climber() {
-        climbRollerMotor = new SparkMax(frc.robot.Constants.ClimberConstants.CLIMB_ROLLER_CAN_ID, MotorType.kBrushless); 
+        climbRollerMotor = new SparkFlex(frc.robot.Constants.ClimberConstants.CLIMB_ROLLER_CAN_ID, MotorType.kBrushless); 
           climbRollerMotor.configure(ClimberConstants.CLIMB_ROLLER_MOTOR_CONFIG,
                SparkBase.ResetMode.kResetSafeParameters,
                SparkBase.PersistMode.kPersistParameters
           );      
             
-          winchMotor = new SparkMax(frc.robot.Constants.ClimberConstants.WINCH_CAN_ID, MotorType.kBrushless); 
+          winchMotor = new SparkFlex(frc.robot.Constants.ClimberConstants.WINCH_CAN_ID, MotorType.kBrushless); 
           winchMotor.configure(ClimberConstants.WINCH_MOTOR_CONFIG,
                SparkBase.ResetMode.kResetSafeParameters,
                SparkBase.PersistMode.kPersistParameters
@@ -55,19 +55,26 @@ public class Climber extends SubsystemBase {
     public void setclimbRollerMotor(double speed)
     {
         SmartDashboard.putNumber("Climb Roller Motor Speed", speed);
-        climbRollerMotor.set(speed*0.2);
+        climbRollerMotor.set(speed*-1.0);
     }
 
     public void setWinchSpeed(double speed)
     {
         SmartDashboard.putNumber("Winch Motor Speed", speed);
-        winchMotor.set(speed*0.2);
+        winchMotor.set(speed*0.75);
+    }
+
+    class DefaultCommand extends ParallelCommandGroup {
+        public DefaultCommand(Climber climber, DoubleSupplier rollerSupplier, DoubleSupplier winchSupplier) {
+            addRequirements(climber);
+            addCommands(
+                new RunCommand(()-> climber.setWinchSpeed(winchSupplier.getAsDouble())),
+                new RunCommand(()-> climber.setclimbRollerMotor(rollerSupplier.getAsDouble()))
+            );
+        }
     }
 
     public Command manualClimbMovement(DoubleSupplier rollerSupplier, DoubleSupplier winchSupplier){
-        return new ParallelCommandGroup(
-          new RunCommand(()-> setWinchSpeed(winchSupplier.getAsDouble())),
-          new RunCommand(()-> setclimbRollerMotor(rollerSupplier.getAsDouble()))
-          ); 
+        return new DefaultCommand(this, rollerSupplier, winchSupplier);
     }
 }
