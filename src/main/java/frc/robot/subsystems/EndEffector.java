@@ -91,6 +91,9 @@ public class EndEffector extends SubsystemBase {
         return new RunCommand(() -> setCoralSpeed(EndEffectorConstants.ALGAE_INTAKE_SPEED));
     }
 
+    public Command holdAlgaeCommand() {
+        return new RunCommand(() -> setCoralSpeed(EndEffectorConstants.ALGAE_HOLD_SPEED));
+    }
     /**
      * Runs the intake until the robot has coral, slowing down as coral progresses through the system
      * @return the command

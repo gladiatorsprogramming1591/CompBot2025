@@ -120,7 +120,7 @@ public class RobotContainer {
 		// 	.onFalse(new InstantCommand(()->{aligning=false;})); // this needs to be cleaned up ASAP
 
         // End Effector
-        driverController.leftTrigger().whileTrue(complexIntakeCommand())
+        driverController.leftTrigger().whileTrue(complexIntakeCoral())
             .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(0),endEffector));
         driverController.rightBumper().whileTrue(endEffector.ejectAlgaeCommand())
             .onFalse(new InstantCommand(()-> wrist.setWristMotor(0)));
@@ -142,10 +142,10 @@ public class RobotContainer {
             
         // ===================================== Operator Controls =====================================
         // Elevator
-        operatorController.povDown().onTrue(complexElevatorScoreCommand(elevatorPositions.L1)); 
-        operatorController.povLeft().onTrue(complexElevatorScoreCommand(elevatorPositions.L2)); 
-        operatorController.povRight().onTrue(complexElevatorScoreCommandL4(elevatorPositions.L4)); 
-        operatorController.povUp().onTrue(complexElevatorScoreCommand(elevatorPositions.L3));
+        operatorController.povDown().onTrue(prepElevatorScore(elevatorPositions.L1)); 
+        operatorController.povLeft().onTrue(prepElevatorScore(elevatorPositions.L2)); 
+        operatorController.povRight().onTrue(prepElevatorScoreL4(elevatorPositions.L4)); 
+        operatorController.povUp().onTrue(prepElevatorScore(elevatorPositions.L3));
         operatorController.leftBumper().onTrue(complexElevatorStowCommand(elevatorPositions.STOW));
         operatorController.back().onTrue(new InstantCommand(() -> elevator.zeroElevatorCommand()));
 
@@ -223,7 +223,7 @@ public class RobotContainer {
         }
     }
 
-        public Command complexElevatorScoreCommand(elevatorPositions position) {
+        public Command prepElevatorScore(elevatorPositions position) {
             System.out.println("Running complex score command"); 
             return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
             .andThen((new ElevatorToPosition(elevator,position)))
@@ -231,7 +231,7 @@ public class RobotContainer {
             .andThen(wrist.HoverPositionCommand());
         }
     
-        public Command complexElevatorScoreCommandL4(elevatorPositions position) {
+        public Command prepElevatorScoreL4(elevatorPositions position) {
             System.out.println("Running complex score command"); 
             return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
             .andThen((new ElevatorToPosition(elevator,position)))
@@ -268,7 +268,7 @@ public class RobotContainer {
             .andThen(new WaitUntilCommand(wrist::atSetpoint));
         }
 
-        public Command complexIntakeCommand() { 
+        public Command complexIntakeCoral() { 
              return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
             .andThen(new ElevatorToPosition(elevator, elevatorPositions.STOW))
             .andThen(new WaitUntilCommand(elevator::atSetpoint))
@@ -278,6 +278,11 @@ public class RobotContainer {
             .andThen(wrist.StowPositionCommand());
             // .andThen(new ElevatorToPosition(elevator, elevatorPositions.L2))
             // .andThen(new WaitUntilCommand(elevator::atSetpoint)); 
+        }
+
+        public Command complexIntakeAlgae() {
+            return endEffector.intakeAlgaeCommand().until(()-> endEffector.hasAlgae())
+            .andThen(endEffector.holdAlgaeCommand());//TODO: Verify if this can be interupted
         }
     
         public void AutoScoreAlign()
@@ -379,11 +384,17 @@ public class RobotContainer {
     
     public void registerNamedCommands(){
         if (robotInitConstants.isCompBot) {
-            NamedCommands.registerCommand("IntakeCoral", complexIntakeCommand());
-            NamedCommands.registerCommand("ComplexScoreCommand", complexElevatorScoreCommand(elevatorPositions.L4).andThen(()-> System.out.println("Complex Score Command")));
-            NamedCommands.registerCommand("ScoreCoral", endEffector.ejectCoralCommand()); 
-            NamedCommands.registerCommand("ComplexStow", complexElevatorStowCommand(elevatorPositions.STOW));
-            NamedCommands.registerCommand("ComplexProcessor", complexProcessorCommand(elevatorPositions.STOW));
+            NamedCommands.registerCommand("Intake Coral", complexIntakeCoral());
+            NamedCommands.registerCommand("Intake Algae", complexIntakeAlgae());
+            NamedCommands.registerCommand("Prep L4", prepElevatorScoreL4(elevatorPositions.L4).andThen(()-> System.out.println("Prep L4")));
+            NamedCommands.registerCommand("Prep L3", prepElevatorScore(elevatorPositions.L3).andThen(()-> System.out.println("Prep L3")));
+            NamedCommands.registerCommand("Prep L2", prepElevatorScore(elevatorPositions.L2).andThen(()-> System.out.println("Prep L2")));
+            NamedCommands.registerCommand("Prep Algae High", complexHighAlgaeIntakeCommand(elevatorPositions.ALGAE_HIGH));
+            NamedCommands.registerCommand("Prep Algae Low", complexHighAlgaeIntakeCommand(elevatorPositions.ALGAE_LOW));
+            NamedCommands.registerCommand("Score Coral", endEffector.ejectCoralCommand()); 
+            NamedCommands.registerCommand("Score Algae", endEffector.ejectAlgaeCommand()); //Untested
+            NamedCommands.registerCommand("Stow", complexElevatorStowCommand(elevatorPositions.STOW));
+            NamedCommands.registerCommand("Prep Processor", complexProcessorCommand(elevatorPositions.STOW));
         }
     }
 }

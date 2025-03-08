@@ -13,19 +13,19 @@
         {
           "type": "named",
           "data": {
-            "name": "ComplexScoreCommand"
+            "name": "Prep L4"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "ScoreCoral"
+            "name": "Score Coral"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "ComplexStow"
+            "name": "Stow"
           }
         },
         {
@@ -37,7 +37,7 @@
         {
           "type": "named",
           "data": {
-            "name": "IntakeCoral"
+            "name": "Intake Coral"
           }
         },
         {
@@ -49,19 +49,19 @@
         {
           "type": "named",
           "data": {
-            "name": "ComplexScoreCommand"
+            "name": "Prep L4"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "ScoreCoral"
+            "name": "Score Coral"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "ComplexStow"
+            "name": "Stow"
           }
         },
         {
@@ -73,7 +73,7 @@
         {
           "type": "named",
           "data": {
-            "name": "IntakeCoral"
+            "name": "Intake Coral"
           }
         },
         {
@@ -85,19 +85,19 @@
         {
           "type": "named",
           "data": {
-            "name": "ComplexScoreCommand"
+            "name": "Prep L4"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "ScoreCoral"
+            "name": "Score Coral"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "ComplexStow"
+            "name": "Stow"
           }
         }
       ]

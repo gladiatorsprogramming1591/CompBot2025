@@ -13,13 +13,13 @@
         {
           "type": "named",
           "data": {
-            "name": "ComplexScoreCommand"
+            "name": "Prep L4"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "ScoreCoral"
+            "name": "Score Coral"
           }
         }
       ]
