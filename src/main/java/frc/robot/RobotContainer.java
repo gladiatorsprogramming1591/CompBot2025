@@ -53,8 +53,8 @@ public class RobotContainer {
     private double MaxSpeed = robotInitConstants.isCompBot ? PoseidonTunerConstants.kSpeedAt12Volts.in(MetersPerSecond)
             : ChazTunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 1 1/2 of a rotation per second max angular velocity
-    private double maxSpeedPercent = 1.00;
-    private double maxAngularRatePercent = 1.00;
+    private double maxSpeedPercent = 0.50;
+    private double maxAngularRatePercent = 0.25;
 
     /* Setting up bindings for necessary control of the swerve drive platform */
     // TODO: Issue: Deadband is not applied while bot is in motion (e.g. strafing while driving).
@@ -108,10 +108,6 @@ public class RobotContainer {
                 )
         );
 
-        // wrist.setDefaultCommand(
-        //     wrist.manualWristMovement(operatorController.getRightTriggerAxis() - operatorController.getLeftTriggerAxis()*0.20)
-        // );
-
         // reset the field-centric heading on back button press
         driverController.back().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
         driverController.start().onTrue(new InstantCommand(()-> slowMode(true)))
@@ -137,7 +133,7 @@ public class RobotContainer {
 		driverController.a().whileTrue(new AutoReefPoseCommand(drivetrain, reefAlign, this::driveX, this::driveY, this::driveT, ()->FieldConstants.getNearestReefSide(drivetrain.getState().Pose)));
 
         // Wrist
-                // driverController.rightTrigger().whileTrue(wrist.manualWristForwardMovement(driverController::getRightTriggerAxis))
+        // driverController.rightTrigger().whileTrue(wrist.manualWristForwardMovement(driverController::getRightTriggerAxis))
         //     .onFalse(new InstantCommand(()-> wrist.setWristMotor(0),wrist));
         // driverController.leftTrigger().whileTrue(wrist.manualWristReverseMovement(driverController::getLeftTriggerAxis))
         //     .onFalse(new InstantCommand(()-> wrist.setWristMotor(0),wrist));
@@ -166,9 +162,8 @@ public class RobotContainer {
         //     .onFalse(new InstantCommand(()-> wrist.setWristMotor(0)));
 
         // Default Commands
-        // wrist.setDefaultComman
-        // (new RunCommand(()-> wrist.setWristMotor(operatorController.getRightY()*0.20), wrist));
-        // elevator.setDefaultCommand(new RunCommand(() -> elevator.setMotorSpeed(operatorController.getRightY()*0.50), elevator));
+        // wrist.setDefaultCommand(wrist.manualWristMovement(operatorController.getRightTriggerAxis() - operatorController.getLeftTriggerAxis() * 0.20));
+        // elevator.setDefaultCommand(new RunCommand(() -> elevator.setMotorSpeed(operatorController.getRightY() * 0.50), elevator));
     
         drivetrain.registerTelemetry(logger::telemeterize);
     }

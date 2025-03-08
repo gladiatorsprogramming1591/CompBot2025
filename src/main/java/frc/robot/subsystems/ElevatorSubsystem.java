@@ -68,7 +68,7 @@ public class ElevatorSubsystem extends SubsystemBase{
 
         bottomLimitSwitch = leader.getReverseLimitSwitch();
         zeroTrigger = new Trigger(this::isElevatorNotAtBottom);
-        // zeroTrigger.onTrue(zeroElevatorCommand());
+        zeroTrigger.onTrue(zeroElevatorCommand());
 
         lastPos = 0.0;
         
@@ -165,7 +165,7 @@ public class ElevatorSubsystem extends SubsystemBase{
         if((lastPos == kSTOW) && (getPositionInches() < kSTOW+0.32)){
             leader.stopMotor();
             // System.out.println("Zeroing Elevator");
-            zeroElevator();
+            // zeroElevator();
         }
     }
 

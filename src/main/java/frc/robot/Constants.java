@@ -120,17 +120,17 @@ public class Constants {
     
     public class WristConstants {
         // Wrist Position
-        public static final double WRIST_INTAKE = 254.0;
-        public static final double WRIST_STOW = WRIST_INTAKE+16.5;
-        public static final double REEF_ACQUIRE_ANGLE = WRIST_INTAKE+22.0;
-        public static final double GROUND_INTAKE = WRIST_INTAKE+65.0; 
-        public static final double WRIST_PROCESSOR = WRIST_INTAKE+25.0;
-        public static final double WRIST_HOVER = 288.0;
-        public static final double WRIST_HOVER_L4 = 300.0; //293
-        public static final double WRIST_ALGAE_LOW = 295.0;
-        public static final double WRIST_ALGAE_HIGH = WRIST_INTAKE;
-        public static final double WRIST_DUNK_CORAL = WRIST_INTAKE; 
-        public static final double WRIST_L1 = WRIST_INTAKE; 
+        public static final double WRIST_INTAKE =       249.0;    // 254
+        public static final double WRIST_STOW =         WRIST_INTAKE + 16.5;
+        public static final double REEF_ACQUIRE_ANGLE = WRIST_INTAKE + 22.0;
+        public static final double GROUND_INTAKE =      WRIST_INTAKE + 65.0; 
+        public static final double WRIST_PROCESSOR =    WRIST_INTAKE + 25.0;
+        public static final double WRIST_HOVER =        WRIST_INTAKE + 34.0;
+        public static final double WRIST_HOVER_L4 =     WRIST_INTAKE + 46.0; // +39
+        public static final double WRIST_ALGAE_LOW =    WRIST_INTAKE + 41.0;
+        public static final double WRIST_ALGAE_HIGH =   WRIST_INTAKE;
+        public static final double WRIST_DUNK_CORAL =   WRIST_INTAKE; 
+        public static final double WRIST_L1 =           WRIST_INTAKE; 
 
         public static final int WRIST_CAN_ID = 4; 
         public static final int WRIST_CURRENT_LIMIT = 30; 
@@ -154,7 +154,7 @@ public class Constants {
             // closedLoop.maxMotion.maxVelocity(120000);
             closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
             absoluteEncoder.positionConversionFactor(360);
-            absoluteEncoder.zeroOffset(252/360);
+            // absoluteEncoder.zeroOffset(252/360);
         }};
         
     }

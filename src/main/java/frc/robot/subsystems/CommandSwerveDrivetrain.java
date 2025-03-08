@@ -42,6 +42,7 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.robotInitConstants;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
+import frc.robot.utilities.DynamicRateLimiter;
 
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
@@ -58,7 +59,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private static final double kSimLoopPeriod = 0.005; // 5 ms
     private Notifier m_simNotifier = null;
     private double m_lastSimTime;
-    PowerDistribution m_pdh = new PowerDistribution(21,ModuleType.kRev);
+    PowerDistribution m_pdh = robotInitConstants.isCompBot ? new PowerDistribution(1, ModuleType.kRev) : new PowerDistribution(21, ModuleType.kRev);
 
     /* Blue alliance sees forward as 0 degrees (toward red alliance wall) */
     private static final Rotation2d kBlueAlliancePerspectiveRotation = Rotation2d.kZero;
@@ -490,14 +491,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         }
     }
 
-    // After initial deadband is broken, the perpendicular axis' deadband scales down linearly as the other axis increases.
-    // minDeadband: Deadband to perpendicular axis while robot is at max speed. (Scaled in between)
-    public double apply2dScaledDynamicDeadband(double axis, double perpendicularAxis, double Deadband, double minDeadband)
-    {
-        return MathUtil.applyDeadband(axis, MathUtil.clamp(Math.abs(1 - perpendicularAxis) * Deadband, minDeadband, Deadband));
-    }   // A way to change scale from minDeadband to Deadband (reverse of above) may be more useful to maintain accurate directional
-        // control at slow speeds, but still counteract drift. (10% deadband too large at low speed)
-
     // Mimics CTRE's deadband function, but with properly scaled output between 0-1 after deadband.
     public double apply2dDynamicDeadband(double axis, double perpendicularAxis, double deadband)
     {
@@ -526,10 +519,16 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return result;
     }
 
-    public double squaredInputs(double axis)
+    public void teleopDrive(SwerveRequest.FieldCentric fieldCentric, double velocityXAxis, double velocityYAxis, double rotationalRateAxis, double staticDeadband, double kineticDeadband, double rotationDeadband,
+        double maxSpeed, double maxAngularRate, double maxSpeedPercent, double maxAngularRatePercent, boolean squaredInputs,
+        DynamicRateLimiter xLimiter, DynamicRateLimiter yLimiter, double initialLimit, double limitScalePerInch, double elevatorHeight, double timeToStop)
     {
-        double sign = axis / Math.abs(axis);
-        return Math.pow(axis, 2) * sign;
+        applyRequest(() ->
+                fieldCentric.withVelocityX(xLimiter.calculate(-apply2dDynamicDeadband(velocityXAxis, velocityYAxis, staticDeadband, kineticDeadband, true) * maxSpeed * maxSpeedPercent,
+                                    initialLimit * Math.pow(limitScalePerInch, elevatorHeight), timeToStop)) // Drive forward with negative Y (forward)
+                            .withVelocityY(yLimiter.calculate(-apply2dDynamicDeadband(velocityYAxis, velocityXAxis, staticDeadband, kineticDeadband, true) * maxSpeed * maxSpeedPercent,
+                                    initialLimit * Math.pow(limitScalePerInch, elevatorHeight), timeToStop)) // Drive left with negative X (left)
+                            .withRotationalRate(-MathUtil.applyDeadband(rotationalRateAxis, rotationDeadband, maxAngularRatePercent) * maxAngularRate) // Drive counterclockwise with negative X (left)
+        );
     }
-
 }
