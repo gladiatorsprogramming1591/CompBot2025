@@ -22,7 +22,7 @@ public class AutoReefPoseCommand extends Command {
     private Supplier<ReefSide> position;
     // private RobotState state;
 
-    private PIDController distanceController = new PIDController(1,0, 0.0);
+    private PIDController distanceController = new PIDController(5,0, 0.0);
     private PIDController strafeController = new PIDController(10, 0, 0.0);
     private PIDController angleController = new PIDController(0.5, 0, 0.02);
 
@@ -67,13 +67,17 @@ public class AutoReefPoseCommand extends Command {
         reefPose = reefPose.rotateAround(reefPose.getTranslation(), Rotation2d.k180deg);
         Pose2d goal = FieldConstants.toRobotRelative(currentPose, reefPose);
         
-        distanceController.setSetpoint(0.15); 
+        distanceController.setSetpoint(0.26); 
         strafeController.setSetpoint(0);
-        angleController.setSetpoint(1);   
+        angleController.setSetpoint(0);   
         
-        strafeVal = distanceController.calculate(goal.getX()); 
-        distanceVal = strafeController.calculate(goal.getY());
-        rotationVal = angleController.calculate(goal.getRotation().getDegrees());
+        double goalX = goal.getX();
+        double goalY = goal.getY();
+        double goalRotation = goal.getRotation().getDegrees();
+
+        strafeVal = distanceController.calculate(goalX); 
+        distanceVal = strafeController.calculate(goalY);
+        rotationVal = angleController.calculate(goalRotation);
 
         if (strafeController.atSetpoint())
             strafeVal = 0;
@@ -92,6 +96,9 @@ public class AutoReefPoseCommand extends Command {
                 .withRotationalRate(rotationalRate) // Drive counterclockwise with negative X (left)
         );
 
+        SmartDashboard.putNumber("goalX", goalX);
+        SmartDashboard.putNumber("goalY", goalY);
+        SmartDashboard.putNumber("goalRotation", goalRotation);
         SmartDashboard.putNumber("strafeVal", strafeVal);
         SmartDashboard.putNumber("distanceVal", distanceVal);
         SmartDashboard.putNumber("rotationVal", rotationVal);

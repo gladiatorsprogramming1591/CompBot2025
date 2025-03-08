@@ -16,7 +16,6 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -83,7 +82,7 @@ public class RobotContainer {
         .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
     
     public RobotContainer() {
-        DataLogManager.start();
+        // DataLogManager.start();
         registerNamedCommands();
         autoChooser = AutoBuilder.buildAutoChooser(); // A default auto can be passed in as parameter.
         SmartDashboard.putData("Auto Mode", autoChooser);
@@ -101,11 +100,11 @@ public class RobotContainer {
         drivetrain.setDefaultCommand(
                 // Drivetrain will execute this command periodically
                 drivetrain.applyRequest(() ->
-                        drive.withVelocityX(xLimiter.calculate(-drivetrain.apply2dDynamicDeadband(driverController.getLeftY(), driverController.getLeftX(), STATIC_DEADBAND, KINETIC_DEADBAND, false) * MaxSpeed * maxSpeedPercent,
+                        drive.withVelocityX(xLimiter.calculate(-drivetrain.apply2dDynamicDeadband(driverController.getLeftY(), driverController.getLeftX(), STATIC_DEADBAND, KINETIC_DEADBAND, true) * MaxSpeed * maxSpeedPercent,
                                             INITIAL_LIMIT * Math.pow(LIMIT_SCALE_PER_INCH, elevator.getPositionInches()), TIME_TO_STOP)) // Drive forward with negative Y (forward)
-                                    .withVelocityY(yLimiter.calculate(-drivetrain.apply2dDynamicDeadband(driverController.getLeftX(), driverController.getLeftY(), STATIC_DEADBAND, KINETIC_DEADBAND, false) * MaxSpeed * maxSpeedPercent,
+                                    .withVelocityY(yLimiter.calculate(-drivetrain.apply2dDynamicDeadband(driverController.getLeftX(), driverController.getLeftY(), STATIC_DEADBAND, KINETIC_DEADBAND, true) * MaxSpeed * maxSpeedPercent,
                                             INITIAL_LIMIT * Math.pow(LIMIT_SCALE_PER_INCH, elevator.getPositionInches()), TIME_TO_STOP)) // Drive left with negative X (left)
-                                    .withRotationalRate(-MathUtil.applyDeadband(driverController.getRightX(), STATIC_DEADBAND, maxAngularRatePercent) * MaxAngularRate) // Drive counterclockwise with negative X (left)
+                                    .withRotationalRate(-MathUtil.applyDeadband(driverController.getRightX(), ROTATION_DEADBAND, maxAngularRatePercent) * MaxAngularRate) // Drive counterclockwise with negative X (left)
                 )
         );
 
@@ -184,7 +183,7 @@ public class RobotContainer {
                                             INITIAL_LIMIT, TIME_TO_STOP)) // Drive forward with negative Y (forward)
                                     .withVelocityY(yLimiter.calculate(-drivetrain.apply2dDynamicDeadband(driverController.getLeftX(), driverController.getLeftY(), STATIC_DEADBAND, KINETIC_DEADBAND, true) * MaxSpeed * maxSpeedPercent,
                                             INITIAL_LIMIT, TIME_TO_STOP)) // Drive left with negative X (left)
-                                    .withRotationalRate(-MathUtil.applyDeadband(driverController.getRightX(), STATIC_DEADBAND, maxAngularRatePercent) * MaxAngularRate) // Drive counterclockwise with negative X (left)
+                                    .withRotationalRate(-MathUtil.applyDeadband(driverController.getRightX(), ROTATION_DEADBAND, maxAngularRatePercent) * MaxAngularRate) // Drive counterclockwise with negative X (left)
 )
         );
         
@@ -294,7 +293,7 @@ public class RobotContainer {
                                     INITIAL_LIMIT * Math.pow(LIMIT_SCALE_PER_INCH, elevator.getPositionInches()), TIME_TO_STOP)) // Drive forward with negative Y (forward)
                             .withVelocityY(yLimiter.calculate(-drivetrain.apply2dDynamicDeadband(driverController.getLeftX(), driverController.getLeftY(), STATIC_DEADBAND, KINETIC_DEADBAND, false) * MaxSpeed * maxSpeedPercent,
                                     INITIAL_LIMIT * Math.pow(LIMIT_SCALE_PER_INCH, elevator.getPositionInches()), TIME_TO_STOP)) // Drive left with negative X (left)
-                            .withRotationalRate(-MathUtil.applyDeadband(driverController.getRightX(), STATIC_DEADBAND, maxAngularRatePercent) * MaxAngularRate); // Drive counterclockwise with negative X (left)
+                            .withRotationalRate(-MathUtil.applyDeadband(driverController.getRightX(), ROTATION_DEADBAND, maxAngularRatePercent) * MaxAngularRate); // Drive counterclockwise with negative X (left)
 
             boolean isTeleopActive = (Math.abs(teleopDrive.VelocityX) > STATIC_DEADBAND ||
                                       Math.abs(teleopDrive.VelocityY) > STATIC_DEADBAND);
@@ -339,7 +338,7 @@ public class RobotContainer {
                                                 INITIAL_LIMIT * Math.pow(LIMIT_SCALE_PER_INCH, elevator.getPositionInches()), TIME_TO_STOP)) // Drive forward with negative Y (forward)
                                         .withVelocityY(yLimiter.calculate(-drivetrain.apply2dDynamicDeadband(driverController.getLeftX(), driverController.getLeftY(), STATIC_DEADBAND, KINETIC_DEADBAND, false) * MaxSpeed * maxSpeedPercent,
                                                 INITIAL_LIMIT * Math.pow(LIMIT_SCALE_PER_INCH, elevator.getPositionInches()), TIME_TO_STOP)) // Drive left with negative X (left)
-                                        .withRotationalRate(-MathUtil.applyDeadband(driverController.getRightX(), STATIC_DEADBAND, maxAngularRatePercent) * MaxAngularRate), // Drive counterclockwise with negative X (left)
+                                        .withRotationalRate(-MathUtil.applyDeadband(driverController.getRightX(), ROTATION_DEADBAND, maxAngularRatePercent) * MaxAngularRate), // Drive counterclockwise with negative X (left)
                             reefAlign, true, 0).schedule();
                     aligning = true;
                 }
@@ -354,7 +353,8 @@ public class RobotContainer {
 		return xLimiter.calculate(-driverController.getLeftY()*MaxSpeed, DriveConstants.INITIAL_LIMIT*Math.pow(DriveConstants.LIMIT_SCALE_PER_INCH, elevator.getPositionInches()), DriveConstants.TIME_TO_STOP);
 	}
 	public double driveXChassis() {
-		return xLimiter.calculate(-driverController.getLeftY()*MaxSpeed, DriveConstants.INITIAL_LIMIT, DriveConstants.TIME_TO_STOP);
+		return xLimiter.calculate(-drivetrain.apply2dDynamicDeadband(driverController.getLeftY(), driverController.getLeftX(), STATIC_DEADBAND, KINETIC_DEADBAND, true) * MaxSpeed * maxSpeedPercent,
+        INITIAL_LIMIT, TIME_TO_STOP);
 	}
 
 	/**
@@ -365,11 +365,12 @@ public class RobotContainer {
 		return yLimiter.calculate(-driverController.getLeftX()*MaxSpeed, DriveConstants.INITIAL_LIMIT*Math.pow(DriveConstants.LIMIT_SCALE_PER_INCH, elevator.getPositionInches()), DriveConstants.TIME_TO_STOP);
 	}
 	public double driveYChassis() {
-		return yLimiter.calculate(-driverController.getLeftX()*MaxSpeed, DriveConstants.INITIAL_LIMIT, DriveConstants.TIME_TO_STOP);
+		return yLimiter.calculate(-drivetrain.apply2dDynamicDeadband(driverController.getLeftX(), driverController.getLeftY(), STATIC_DEADBAND, KINETIC_DEADBAND, true) * MaxSpeed * maxSpeedPercent,
+        INITIAL_LIMIT, TIME_TO_STOP);
 	}
 
 	public double driveT() {
-		return -driverController.getRightX() * MaxAngularRate;
+		return MathUtil.applyDeadband(-driverController.getRightX(), STATIC_DEADBAND, maxAngularRatePercent) * MaxAngularRate;
 	}
     
     // 2.3976 is the y postion of StartLineToF

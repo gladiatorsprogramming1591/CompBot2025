@@ -143,6 +143,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private SysIdRoutine m_sysIdRoutineToApply = m_sysIdRoutineSteer;
 
     PhotonCamera m_frontCamera;
+    PhotonCamera m_frontLeftCamera;
     PhotonPoseEstimator[] m_photonPoseEstimators;
     AprilTagFieldLayout fieldLayout;
         private PhotonTrackedTarget lastTarget;
@@ -155,6 +156,12 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                     new Translation3d(Units.inchesToMeters(11.007), Units.inchesToMeters(0.1875),
                     Units.inchesToMeters(5.789)),
                 new Rotation3d(0.0, Math.toRadians(-20.0), Math.toRadians(0.0)));
+
+        private static final Transform3d kFrontLeftCameraLocation = new Transform3d(
+            new Translation3d(Units.inchesToMeters(10.854863), Units.inchesToMeters(8.433370),
+                Units.inchesToMeters(6.139140)),
+            new Rotation3d(0.0, Math.toRadians(-12.0 - 1.0), Math.toRadians(-29.0)));
+
     
         public static final double VISION_FIELD_MARGIN = 0.5;
         public static final double VISION_Z_MARGIN = 0.75;
@@ -182,6 +189,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 startSimThread();
             }
             configureAutoBuilder();
+            configureVision();
         }
         
         /**
@@ -207,6 +215,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 startSimThread();
             }
             configureAutoBuilder();
+            configureVision();
         }
         
         /**
@@ -240,6 +249,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 startSimThread();
             }
             configureAutoBuilder();
+            configureVision();
         }
         
         private void configureAutoBuilder() {
@@ -269,10 +279,13 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             } catch (Exception ex) {
                 DriverStation.reportError("Failed to load PathPlanner config and configure AutoBuilder", ex.getStackTrace());
             }
-    
+        }
+
+        private void configureVision() {
             fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
     
             m_frontCamera = new PhotonCamera("Front");
+            m_frontLeftCamera = new PhotonCamera("FrontLeft");
     
             m_photonPoseEstimators = new PhotonPoseEstimator[] {
                 new PhotonPoseEstimator(
@@ -280,8 +293,13 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                     PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
                     kFrontCameraLocation
                 )
+                // TODO: find out how to implent this to pose estimator
+                // ,
+                // new PhotonPoseEstimator(
+                //     fieldLayout,
+                //     PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
+                //     kFrontLeftCameraLocation)
             };
-    
         }
         
         /**
@@ -327,6 +345,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                     // Camera processed a new frame since last
                     // Get the last one in the list.
                     result = results.get(results.size() - 1);    
+                    if(!result.hasTargets()) continue;
                     lastTarget = result.getBestTarget();
                     double latency = result.metadata.getLatencyMillis();  
                     SmartDashboard.putNumber("Front Latency", latency); 
