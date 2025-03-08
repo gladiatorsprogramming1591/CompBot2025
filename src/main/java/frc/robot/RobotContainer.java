@@ -122,10 +122,10 @@ public class RobotContainer {
         // End Effector
         driverController.leftTrigger().whileTrue(complexIntakeCommand())
             .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(0),endEffector));
-        driverController.rightBumper().whileTrue(endEffector.intakeAlgaeCommand())
+        driverController.rightBumper().whileTrue(endEffector.ejectAlgaeCommand())
             .onFalse(new InstantCommand(()-> wrist.setWristMotor(0)));
         
-        driverController.leftBumper().whileTrue(endEffector.ejectAlgaeCommand())
+        driverController.leftBumper().whileTrue(endEffector.intakeAlgaeCommand())
             .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(0),endEffector));
         driverController.rightTrigger().onTrue(endEffector.ejectCoralCommand())  
             .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(0),endEffector));
