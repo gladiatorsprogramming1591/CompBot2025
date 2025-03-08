@@ -35,6 +35,7 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.EndEffector;
 import frc.robot.subsystems.Wrist;
+import frc.robot.subsystems.Climber;
 import frc.robot.utilities.DynamicRateLimiter;
 import frc.robot.utilities.FieldConstants;
 import frc.robot.utilities.FieldConstants.ReefSide;
@@ -47,7 +48,8 @@ public class RobotContainer {
 	public final EndEffector endEffector = robotInitConstants.isCompBot ? new EndEffector() : null;
 	private final Wrist wrist = robotInitConstants.isCompBot ? new Wrist() : null;
 	public final ElevatorSubsystem elevator = robotInitConstants.isCompBot ? new ElevatorSubsystem() : null;
-    
+    private final Climber climber = robotInitConstants.isCompBot ? new Climber() : null;
+
 
 
     private double MaxSpeed = robotInitConstants.isCompBot ? PoseidonTunerConstants.kSpeedAt12Volts.in(MetersPerSecond)
@@ -137,7 +139,7 @@ public class RobotContainer {
 		driverController.a().whileTrue(new AutoReefPoseCommand(drivetrain, reefAlign, this::driveX, this::driveY, this::driveT, ()->FieldConstants.getNearestReefSide(drivetrain.getState().Pose)));
 
         // Wrist
-                // driverController.rightTrigger().whileTrue(wrist.manualWristForwardMovement(driverController::getRightTriggerAxis))
+        // driverController.rightTrigger().whileTrue(wrist.manualWristForwardMovement(driverController::getRightTriggerAxis))
         //     .onFalse(new InstantCommand(()-> wrist.setWristMotor(0),wrist));
         // driverController.leftTrigger().whileTrue(wrist.manualWristReverseMovement(driverController::getLeftTriggerAxis))
         //     .onFalse(new InstantCommand(()-> wrist.setWristMotor(0),wrist));
@@ -166,10 +168,10 @@ public class RobotContainer {
         //     .onFalse(new InstantCommand(()-> wrist.setWristMotor(0)));
 
         // Default Commands
-        // wrist.setDefaultComman
-        // (new RunCommand(()-> wrist.setWristMotor(operatorController.getRightY()*0.20), wrist));
+        // wrist.setDefaultCommand(new RunCommand(()-> wrist.setWristMotor(operatorController.getRightY()*0.20), wrist));
         // elevator.setDefaultCommand(new RunCommand(() -> elevator.setMotorSpeed(operatorController.getRightY()*0.50), elevator));
     
+        climber.setDefaultCommand(climber.manualClimbMovement(()-> operatorController.getRightY(), ()-> operatorController.getLeftY()));
         drivetrain.registerTelemetry(logger::telemeterize);
     }
 
