@@ -56,7 +56,7 @@ public class Constants {
 
         //Elevator Positions
         public static final double kSTOW = 0.2; 
-        public static final double kL1 = 0.3; 
+        public static final double kL1 = 2.75; 
         public static final double kL2 = 7.50; 
         public static final double kL3 = 15.50; 
         public static final double kL4 = 25.6; 
