@@ -13,19 +13,19 @@
         {
           "type": "named",
           "data": {
-            "name": "ComplexScoreCommand"
+            "name": "Prep L4"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "ScoreCoral"
+            "name": "Score Coral"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "ComplexStow"
+            "name": "Stow"
           }
         }
       ]
