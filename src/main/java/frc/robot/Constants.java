@@ -33,6 +33,7 @@ public class Constants {
 
         public static final double INCHES_PER_ROTATION = 22.0/9.0/4.0;
         public static final double INITIAL_HEIGHT_INCHES = 0;
+        public static final double TOLERANCE_INCHES = 0.5;
 
         //Constants for going up 
         public static final double P_UP = 0.1; 
