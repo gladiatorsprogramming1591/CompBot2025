@@ -58,7 +58,7 @@ public class Constants {
         public static final double kL1 = 0.3; 
         public static final double kL2 = 7.50; 
         public static final double kL3 = 15.50; 
-        public static final double kL4 = 25.8; 
+        public static final double kL4 = 25.6; 
         public static final double kPROCESSOR = 0.2; 
         public static final double kNET = kL4;
         public static final double ALGAE_HIGH = 15.75;
