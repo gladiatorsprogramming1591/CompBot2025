@@ -22,7 +22,7 @@ public class AutoReefPoseCommand extends Command {
     private Supplier<ReefSide> position;
     // private RobotState state;
 
-    private PIDController distanceController = new PIDController(5,0, 0.0);
+    private PIDController distanceController = new PIDController(3.5,0, 0.0);
     private PIDController strafeController = new PIDController(10, 0, 0.0);
     private PIDController angleController = new PIDController(0.5, 0, 0.02);
 
@@ -37,7 +37,7 @@ public class AutoReefPoseCommand extends Command {
                                     DoubleSupplier controllerT,
                                     Supplier<ReefSide> position) {
                                         // Supplier<ReefSide> position,
-                                        // RobotState state) {
+                                    // RobotState state) {
         this.drivetrain = drivetrain;
         this.reefAlign = reefAlign;
         this.position = position;
@@ -61,13 +61,18 @@ public class AutoReefPoseCommand extends Command {
         double strafeVal = 0;
         double rotationVal = 0;
         Pose2d currentPose = drivetrain.getState().Pose;
+        if(position == null)
+        {
+            position = () -> FieldConstants.getNearestReefSide(drivetrain.getState().Pose);
+        }
+        // boolean isCoral = state.getCurrentMode() == GamePiece.CORAL;
         Pose2d reefPose = FieldConstants.getNearestReefBranch(currentPose, position.get());
         // Need to uncomment below when we add RobotState or want to test ALGAE
         // Pose2d reefPose = FieldConstants.getNearestReefBranch(currentPose, state.getReefPos(position.get()));
         reefPose = reefPose.rotateAround(reefPose.getTranslation(), Rotation2d.k180deg);
         Pose2d goal = FieldConstants.toRobotRelative(currentPose, reefPose);
         
-        distanceController.setSetpoint(0.26); 
+        distanceController.setSetpoint(0.3); 
         strafeController.setSetpoint(0);
         angleController.setSetpoint(0);   
         
@@ -78,6 +83,7 @@ public class AutoReefPoseCommand extends Command {
         strafeVal = distanceController.calculate(goalX); 
         distanceVal = strafeController.calculate(goalY);
         rotationVal = angleController.calculate(goalRotation);
+        strafeVal = 1/(Math.exp(Math.abs(distanceVal)*2));
 
         if (strafeController.atSetpoint())
             strafeVal = 0;
@@ -87,9 +93,9 @@ public class AutoReefPoseCommand extends Command {
             rotationVal = 0;
 
         /* Drive */
-        double velocityX = (controllerX.getAsDouble()-strafeVal) * 0.5;
-        double velocityY = (controllerY.getAsDouble()-distanceVal) * 0.5;
-        double rotationalRate = (controllerT.getAsDouble()-rotationVal) * 0.25;
+        double velocityX = (controllerX.getAsDouble()+strafeVal) * 0.75;
+        double velocityY = (controllerY.getAsDouble()-distanceVal) * 0.75;
+        double rotationalRate = (controllerT.getAsDouble()-rotationVal) * 0.20;
         drivetrain.setControl(
             reefAlign.withVelocityX(velocityX) // Drive forward with negative Y (forward) strafeController
                 .withVelocityY(velocityY) // Drive left with negative X (left)
