@@ -45,13 +45,13 @@ public class Constants {
         public static final double ALLOWERD_ERR_UP = 0.08; 
 
         //Constants for going down
-        public static final double P_DOWN = 0.05; 
+        public static final double P_DOWN = 0.08; 
         public static final double I_DOWN = 0; 
         public static final double D_DOWN = 0; 
         public static final double FF_DOWN = 0.623; 
 
-        public static final double MAX_VEL_DOWN = 3000; 
-        public static final double MAX_ACCEL_DOWN = 4800;
+        public static final double MAX_VEL_DOWN = 3500; 
+        public static final double MAX_ACCEL_DOWN = 5400;
         public static final double ALLOWERD_ERR_DOWN = 1.0; 
 
         //Elevator Positions
