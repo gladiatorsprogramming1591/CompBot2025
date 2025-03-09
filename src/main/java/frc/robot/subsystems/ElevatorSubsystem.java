@@ -122,7 +122,7 @@ public class ElevatorSubsystem extends SubsystemBase{
 
     public void setPositionRotations(double rotations) {
         if (rotations < getPositionRotations()) {
-            controller.setReference(rotations, ControlType.kMAXMotionPositionControl, ClosedLoopSlot.kSlot1); // Down case; use max motion and slot 1
+            controller.setReference(rotations, ControlType.kMAXMotionPositionControl, ClosedLoopSlot.kSlot1, FF_DOWN); // Down case; use max motion and slot 1
         } else {
             controller.setReference(rotations, ControlType.kPosition, ClosedLoopSlot.kSlot0, FF_UP); // Up case; use plain position control, slot 0
         }
