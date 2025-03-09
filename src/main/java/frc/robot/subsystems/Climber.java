@@ -19,9 +19,13 @@ import frc.robot.Constants.ClimberConstants;
 public class Climber extends SubsystemBase {
     private final SparkBase climbRollerMotor; 
     private final SparkBase winchMotor; 
+    private CommandSwerveDrivetrain drivetrain;
     AbsoluteEncoder climberEncoder; 
+    boolean winchAtPosition = false;
+    boolean robotAtDesiredPitch = false;
     
-    public Climber() {
+    public Climber(CommandSwerveDrivetrain drivetrain) {
+        this.drivetrain = drivetrain;
         climbRollerMotor = new SparkFlex(frc.robot.Constants.ClimberConstants.CLIMB_ROLLER_CAN_ID, MotorType.kBrushless); 
           climbRollerMotor.configure(ClimberConstants.CLIMB_ROLLER_MOTOR_CONFIG,
                SparkBase.ResetMode.kResetSafeParameters,
@@ -38,6 +42,24 @@ public class Climber extends SubsystemBase {
 
     @Override
     public void periodic() {
+        double TARGET_ANGLE = 126.5;
+        if (getAngle() < TARGET_ANGLE) {
+            winchAtPosition = true;
+        } else {
+            winchAtPosition = false;
+        }
+
+        double TARGET_PITCH_MAX = -3.0;
+        double TARGET_PITCH_MIN = -5.0;
+        double heading = drivetrain.getHeading();
+        if (heading > TARGET_PITCH_MIN && heading < TARGET_PITCH_MAX) {
+            robotAtDesiredPitch = true;
+        } else {
+            robotAtDesiredPitch = false;
+        }
+
+        SmartDashboard.putBoolean("Winch At Pos", winchAtPosition);
+        SmartDashboard.putBoolean("At Desired Pitch", robotAtDesiredPitch);
         SmartDashboard.putNumber("Climb Encoder Angle", getAngle());
         SmartDashboard.putNumber("Winch Current", winchMotor.getOutputCurrent()); 
         SmartDashboard.putNumber("Climb Roller Current", climbRollerMotor.getOutputCurrent()); 

@@ -48,7 +48,7 @@ public class RobotContainer {
 	public final EndEffector endEffector = robotInitConstants.isCompBot ? new EndEffector() : null;
 	private final Wrist wrist = robotInitConstants.isCompBot ? new Wrist() : null;
 	public final ElevatorSubsystem elevator = robotInitConstants.isCompBot ? new ElevatorSubsystem() : null;
-    private final Climber climber = robotInitConstants.isCompBot ? new Climber() : null;
+    private final Climber climber = robotInitConstants.isCompBot ? new Climber(drivetrain) : null;
 
 
 
@@ -279,6 +279,12 @@ public class RobotContainer {
             // .andThen(new ElevatorToPosition(elevator, elevatorPositions.L2))
             // .andThen(new WaitUntilCommand(elevator::atSetpoint)); 
         }
+
+        public Command ejectCoralAndStow() {
+            return endEffector.ejectCoralCommand()
+            .andThen(wrist.StowPositionCommand());
+        }
+
 
         public Command complexIntakeAlgae() {
             return endEffector.intakeAlgaeCommand().until(()-> endEffector.hasAlgae())
