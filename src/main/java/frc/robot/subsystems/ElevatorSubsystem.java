@@ -145,7 +145,8 @@ public class ElevatorSubsystem extends SubsystemBase{
     }
 
     public Command zeroElevatorCommand() {
-        return new InstantCommand(() -> {System.out.println("ZeroCommand");leadEncoder.setPosition(0);});
+        return new InstantCommand(() -> {System.out.println("ZeroCommand");
+        leadEncoder.setPosition(0);});
     }
     public void zeroElevator() {
         leadEncoder.setPosition(0);

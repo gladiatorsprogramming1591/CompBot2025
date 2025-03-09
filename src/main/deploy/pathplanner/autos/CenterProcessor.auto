@@ -9,6 +9,18 @@
           "data": {
             "pathName": "StartToGH"
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "HToGH"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "GHToProcessor"
+          }
         }
       ]
     }
