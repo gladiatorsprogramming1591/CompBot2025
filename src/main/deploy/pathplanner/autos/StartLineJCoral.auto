@@ -13,19 +13,7 @@
         {
           "type": "named",
           "data": {
-            "name": "Prep L4"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
             "name": "Score Coral"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Stow"
           }
         },
         {
@@ -35,45 +23,15 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "Intake Coral"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "CoralStationLToL"
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "Prep L4"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Score Coral"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Stow"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "LToCoralStationL"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Intake Coral"
           }
         },
         {
@@ -85,19 +43,7 @@
         {
           "type": "named",
           "data": {
-            "name": "Prep L4"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
             "name": "Score Coral"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Stow"
           }
         }
       ]
