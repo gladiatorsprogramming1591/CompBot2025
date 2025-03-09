@@ -7,8 +7,6 @@ import java.util.function.Supplier;
 
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.Utils;
-import com.ctre.phoenix6.controls.CoastOut;
-import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -143,22 +141,22 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     /* The SysId routine to test */
     private SysIdRoutine m_sysIdRoutineToApply = m_sysIdRoutineSteer;
 
-    PhotonCamera m_frontCamera;
-    PhotonCamera m_frontLeftCamera;
+    // PhotonCamera m_frontCamera;
+    PhotonCamera m_leftCamera;
     PhotonPoseEstimator[] m_photonPoseEstimators;
     AprilTagFieldLayout fieldLayout;
         private PhotonTrackedTarget lastTarget;
     
-        public static final Transform3d kFrontCameraLocation = robotInitConstants.isCompBot ? new Transform3d(
-                new Translation3d(Units.inchesToMeters(4.5), Units.inchesToMeters(10.9),
-                    Units.inchesToMeters(9.25)),
-                new Rotation3d(0.0, 0.0, Math.toRadians(-25.0)))
-                : new Transform3d(
-                    new Translation3d(Units.inchesToMeters(11.007), Units.inchesToMeters(0.1875),
-                    Units.inchesToMeters(5.789)),
-                new Rotation3d(0.0, Math.toRadians(-20.0), Math.toRadians(0.0)));
+        // public static final Transform3d kFrontCameraLocation = robotInitConstants.isCompBot ? new Transform3d(
+        //         new Translation3d(Units.inchesToMeters(4.5), Units.inchesToMeters(10.9),
+        //             Units.inchesToMeters(9.25)),
+        //         new Rotation3d(0.0, 0.0, Math.toRadians(-25.0)))
+        //         : new Transform3d(
+        //             new Translation3d(Units.inchesToMeters(11.007), Units.inchesToMeters(0.1875),
+        //             Units.inchesToMeters(5.789)),
+        //         new Rotation3d(0.0, Math.toRadians(-20.0), Math.toRadians(0.0)));
 
-        private static final Transform3d kFrontLeftCameraLocation = new Transform3d(
+        private static final Transform3d kleftCameraLocation = new Transform3d(
             new Translation3d(Units.inchesToMeters(10.854863), Units.inchesToMeters(8.433370),
                 Units.inchesToMeters(6.139140)),
             new Rotation3d(0.0, Math.toRadians(-12.0 - 1.0), Math.toRadians(-29.0)));
@@ -285,21 +283,22 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         private void configureVision() {
             fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
     
-            m_frontCamera = new PhotonCamera("Front");
-            m_frontLeftCamera = new PhotonCamera("FrontLeft");
+            // m_frontCamera = new PhotonCamera("Front");
+            // m_frontLeftCamera = new PhotonCamera("FrontLeft");
+            m_leftCamera = new PhotonCamera("Left");
     
             m_photonPoseEstimators = new PhotonPoseEstimator[] {
                 new PhotonPoseEstimator(
                     fieldLayout,
                     PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-                    kFrontCameraLocation
+                    kleftCameraLocation
                 )
                 // TODO: find out how to implent this to pose estimator
                 // ,
                 // new PhotonPoseEstimator(
                 //     fieldLayout,
                 //     PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-                //     kFrontLeftCameraLocation)
+                //     kFrontCameraLocation)
             };
         }
         
@@ -339,7 +338,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             Pose2d currentPose = getState().Pose;
             for (PhotonPoseEstimator poseEstimator : m_photonPoseEstimators) {
                 // TODO: need to find the camera associated with a pose estimator, hard coded to front
-                var results = m_frontCamera.getAllUnreadResults();
+                var results = m_leftCamera.getAllUnreadResults();
                 PhotonPipelineResult result;
                 Optional<EstimatedRobotPose> pose = null;
                 if (!results.isEmpty()) {
@@ -409,7 +408,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     public void periodic() {
         updatePoseEstimationWithFilter();
         
-        SmartDashboard.putBoolean("FrontConnected", m_frontCamera.isConnected());
+        // SmartDashboard.putBoolean("FrontConnected", m_frontCamera.isConnected());
+        SmartDashboard.putBoolean("FrontConnected", m_leftCamera.isConnected());
         // SmartDashboard.putBoolean("BackConnected", m_backCamera.isConnected());
         try {
             //TODO: Learn more on why getAllUnreadResults() returns a list of PhotonPipelineResults instead
@@ -475,21 +475,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     // TODO: Use getConfigurator to set different control loops and edit on smartDashBoard
 
     // TODO: Low Priority: Troubleshoot why setting idle mode to coast fights with the brake mode default
-    public void setCoastMode()
-    {
-        for (int i = 0; i < 4; i++) {
-            getModule(i).getSteerMotor().setControl(new CoastOut());
-            getModule(i).getDriveMotor().setControl(new CoastOut());
-        }
-    }
-
-    public void setBrakeMode()
-    {
-        for (int i = 0; i < 4; i++) {
-            getModule(i).getSteerMotor().setControl(new StaticBrake());
-            getModule(i).getDriveMotor().setControl(new StaticBrake());
-        }
-    }
 
     // Mimics CTRE's deadband function, but with properly scaled output between 0-1 after deadband.
     public double apply2dDynamicDeadband(double axis, double perpendicularAxis, double deadband)
