@@ -58,7 +58,7 @@ public class Constants {
         public static final double kL1 = 0.3; 
         public static final double kL2 = 7.50; 
         public static final double kL3 = 15.50; 
-        public static final double kL4 = 26.5; 
+        public static final double kL4 = 25.8; 
         public static final double kPROCESSOR = 0.2; 
         public static final double kNET = kL4;
         public static final double ALGAE_HIGH = 15.75;
@@ -120,15 +120,15 @@ public class Constants {
     
     public class WristConstants {
         // Wrist Position
-        public static final double WRIST_INTAKE =       249.0;    // 254
+        public static final double WRIST_INTAKE =       255.0;    // 254
         public static final double WRIST_STOW =         WRIST_INTAKE + 16.5;
         public static final double REEF_ACQUIRE_ANGLE = WRIST_INTAKE + 22.0;
-        public static final double GROUND_INTAKE =      WRIST_INTAKE + 65.0; 
+        public static final double GROUND_INTAKE =      WRIST_INTAKE + 70.0; 
         public static final double WRIST_PROCESSOR =    WRIST_INTAKE + 25.0;
         public static final double WRIST_HOVER =        WRIST_INTAKE + 34.0;
         public static final double WRIST_HOVER_L4 =     WRIST_INTAKE + 46.0; // +39
         public static final double WRIST_ALGAE_LOW =    WRIST_INTAKE + 41.0;
-        public static final double WRIST_ALGAE_HIGH =   WRIST_INTAKE;
+        public static final double WRIST_ALGAE_HIGH =   WRIST_INTAKE + 34.0;
         public static final double WRIST_DUNK_CORAL =   WRIST_INTAKE; 
         public static final double WRIST_L1 =           WRIST_INTAKE; 
 

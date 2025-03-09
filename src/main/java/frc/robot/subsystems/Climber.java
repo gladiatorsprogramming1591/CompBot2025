@@ -61,7 +61,7 @@ public class Climber extends SubsystemBase {
     public void setWinchSpeed(double speed)
     {
         SmartDashboard.putNumber("Winch Motor Speed", speed);
-        winchMotor.set(speed*0.75);
+        winchMotor.set(speed*1.0);
     }
 
     class DefaultCommand extends ParallelCommandGroup {
