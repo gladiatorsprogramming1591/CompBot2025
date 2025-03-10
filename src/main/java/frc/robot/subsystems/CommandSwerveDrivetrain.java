@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.*;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -143,7 +144,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     // PhotonCamera m_frontCamera;
     PhotonCamera m_leftCamera;
-    // PhotonCamera m_rightCamera;
+    PhotonCamera m_rightCamera;
     PhotonPoseEstimator[] m_photonPoseEstimators;
     AprilTagFieldLayout fieldLayout;
         private PhotonTrackedTarget lastTarget;
@@ -292,20 +293,20 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     
             // m_frontCamera = new PhotonCamera("Front");
             m_leftCamera = new PhotonCamera("Left");
-            // m_rightCamera = new PhotonCamera("Right");
+            m_rightCamera = new PhotonCamera("Right");
     
             m_photonPoseEstimators = new PhotonPoseEstimator[] {
                 new PhotonPoseEstimator(
                     fieldLayout,
                     PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
                     kleftCameraLocation
-                )
+                ),
                 // TODO: find out how to implent this to pose estimator
                 // ,
-                // new PhotonPoseEstimator(
-                //     fieldLayout,
-                //     PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-                //     kFrontCameraLocation)
+                new PhotonPoseEstimator(
+                    fieldLayout,
+                    PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
+                    krightCameraLocation)
             };
         }
         
@@ -346,8 +347,14 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             for (PhotonPoseEstimator poseEstimator : m_photonPoseEstimators) {
                 // TODO: need to find the camera associated with a pose estimator, hard coded to front
                 // var results = m_frontCamera.getAllUnreadResults();
-                var results = m_leftCamera.getAllUnreadResults();
-                // var results = m_rightCamera.getAllUnreadResults();
+                // if (m_photonPoseEstimators[0].equals(poseEstimator)) {
+                //     List<PhotonPipelineResult> results = m_leftCamera.getAllUnreadResults();
+                // } else if (m_photonPoseEstimators[1].equals(poseEstimator)) {
+                //     List<PhotonPipelineResult> results = m_rightCamera.getAllUnreadResults();
+                // } else {
+                //     continue;
+                // }
+                var results = m_photonPoseEstimators[0].equals(poseEstimator) ? m_leftCamera.getAllUnreadResults() : m_rightCamera.getAllUnreadResults();
                 PhotonPipelineResult result;
                 Optional<EstimatedRobotPose> pose = null;
                 if (!results.isEmpty()) {
@@ -419,7 +426,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         
         // SmartDashboard.putBoolean("FrontConnected", m_frontCamera.isConnected());
         SmartDashboard.putBoolean("LeftConnected", m_leftCamera.isConnected());
-        // SmartDashboard.putBoolean("RightConnected", m_rightCamera.isConnected());
+        SmartDashboard.putBoolean("RightConnected", m_rightCamera.isConnected());
         try {
             //TODO: Learn more on why getAllUnreadResults() returns a list of PhotonPipelineResults instead
             // SmartDashboard.putBoolean("Back Latency OK", m_backamera.getLatestResult().getLatencyMillis() > latencyThreshold);
