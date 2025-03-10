@@ -42,7 +42,7 @@ public class Constants {
         public static final double FF_UP = .623; 
 
         public static final double MAX_VEL_UP = 100; 
-        public static final double MAX_ACCEL_UP = 200; 
+        public static final double MAX_ACCEL_UP = 50; 
         public static final double ALLOWERD_ERR_UP = 0.08; 
 
         //Constants for going down

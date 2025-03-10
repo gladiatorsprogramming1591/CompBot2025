@@ -158,7 +158,7 @@ public class ElevatorSubsystem extends SubsystemBase{
         SmartDashboard.putNumber("Follower Velocity", followEncoder.getVelocity()); 
         SmartDashboard.putNumber("Elevator lastPos", lastPos);
 
-        if((lastPos == kSTOW) && (getPositionInches() <= kSTOW+TOLERANCE_INCHES)){
+        if((lastPos == kSTOW) && (getPositionInches() <= kSTOW + TOLERANCE_INCHES + .05)){
             if (printZero == true) {
                 System.out.println("Zeroing Elevator");
                 printZero = false;

@@ -72,9 +72,9 @@ public class AutoReefPoseCommand extends Command {
         reefPose = reefPose.rotateAround(reefPose.getTranslation(), Rotation2d.k180deg);
         Pose2d goal = FieldConstants.toRobotRelative(currentPose, reefPose);
         
-        distanceController.setSetpoint(0.3); 
+        distanceController.setSetpoint(0.095); 
         strafeController.setSetpoint(0);
-        angleController.setSetpoint(0);   
+        angleController.setSetpoint(position.get() == ReefSide.RIGHT ? 1.0 : -0.5);   
         
         double goalX = goal.getX();
         double goalY = goal.getY();
@@ -83,7 +83,7 @@ public class AutoReefPoseCommand extends Command {
         strafeVal = distanceController.calculate(goalX); 
         distanceVal = strafeController.calculate(goalY);
         rotationVal = angleController.calculate(goalRotation);
-        strafeVal = 1/(Math.exp(Math.abs(distanceVal)*2));
+        strafeVal = 1/(Math.exp(Math.abs(distanceVal)));
 
         if (strafeController.atSetpoint())
             strafeVal = 0;
@@ -94,8 +94,8 @@ public class AutoReefPoseCommand extends Command {
 
         /* Drive */
         double velocityX = (controllerX.getAsDouble()+strafeVal) * 0.75;
-        double velocityY = (controllerY.getAsDouble()-distanceVal) * 0.75;
-        double rotationalRate = (controllerT.getAsDouble()-rotationVal) * 0.20;
+        double velocityY = (controllerY.getAsDouble()-distanceVal) * 1.00;
+        double rotationalRate = (controllerT.getAsDouble()-rotationVal) * 0.35;
         drivetrain.setControl(
             reefAlign.withVelocityX(velocityX) // Drive forward with negative Y (forward) strafeController
                 .withVelocityY(velocityY) // Drive left with negative X (left)

@@ -57,6 +57,8 @@ public class RobotContainer {
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 1 1/2 of a rotation per second max angular velocity
     private double maxSpeedPercent = 0.50;
     private double maxAngularRatePercent = 0.25;
+    public static double kineticDeadband = KINETIC_DEADBAND;
+
 
     /* Setting up bindings for necessary control of the swerve drive platform */
     // TODO: Issue: Deadband is not applied while bot is in motion (e.g. strafing while driving).
@@ -114,6 +116,8 @@ public class RobotContainer {
         driverController.back().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
         driverController.start().onTrue(new InstantCommand(()-> slowMode(true)))
             .onFalse(new InstantCommand(()-> slowMode(false)));
+        // driverController.rightStick().toggleOnTrue(new InstantCommand(() -> cardinalDriveMode(true))
+        //     .handleInterrupt(() -> cardinalDriveMode(false)));
         
         // driverController.rightTrigger()
         //     .whileTrue(new RunCommand(()->AutoScoreAlign()))
@@ -223,12 +227,24 @@ public class RobotContainer {
         }
     }
 
+    public void cardinalDriveMode(boolean isCardinalDrive){
+        if(isCardinalDrive){
+            kineticDeadband = 0.75; 
+        }
+        else {
+           kineticDeadband = KINETIC_DEADBAND;  
+        }
+    }
+
+
         public Command prepElevatorScore(elevatorPositions position) {
             System.out.println("Running complex score command"); 
             return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
             .andThen((new ElevatorToPosition(elevator,position)))
             .andThen(new WaitUntilCommand(elevator::atSetpoint))
-            .andThen(wrist.HoverPositionCommand());
+            .andThen(wrist.HoverPositionCommand())
+            .andThen(new RunCommand(() -> endEffector.setCoralSpeed(-0.15),endEffector).withTimeout(0.10))
+            .andThen(new InstantCommand(() -> endEffector.setCoralSpeed(0.0),endEffector));
         }
     
         public Command prepElevatorScoreL4(elevatorPositions position) {
