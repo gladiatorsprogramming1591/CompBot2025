@@ -8,28 +8,42 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.313614092147027,
-        "y": 2.8602010478506714
+        "x": 5.512310606060606,
+        "y": 2.8967803030303028
       },
       "isLocked": false,
       "linkedName": "F"
     },
     {
       "anchor": {
-        "x": 5.979861111111112,
-        "y": 0.45738636363636376
+        "x": 5.0955808080808085,
+        "y": 2.9780934343434335
       },
       "prevControl": {
-        "x": 5.6576061557618695,
-        "y": 1.5311186936239574
+        "x": 5.24804292929293,
+        "y": 2.774810606060606
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Processor"
+      "linkedName": "EF"
     }
   ],
   "rotationTargets": [],
-  "constraintZones": [],
+  "constraintZones": [
+    {
+      "name": "Slow",
+      "minWaypointRelativePos": 0.0,
+      "maxWaypointRelativePos": 1.0,
+      "constraints": {
+        "maxVelocity": 1.25,
+        "maxAcceleration": 1.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
@@ -42,7 +56,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -90.0
+    "rotation": 119.99999999999999
   },
   "reversed": false,
   "folder": "Processor+Reef",

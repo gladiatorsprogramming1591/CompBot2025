@@ -31,13 +31,37 @@
         {
           "type": "path",
           "data": {
-            "pathName": "FToProcessor"
+            "pathName": "FToEF"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Prep Algae High"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Intake Algae"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "FEToProcessor"
           }
         },
         {
           "type": "named",
           "data": {
             "name": "Prep Processor"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Score Algae"
           }
         },
         {
