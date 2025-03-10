@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.*;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -142,14 +143,17 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private SysIdRoutine m_sysIdRoutineToApply = m_sysIdRoutineSteer;
 
     // PhotonCamera m_frontCamera;
-    PhotonCamera m_leftCamera;
+    private static final int MAX_CAMERAS = 2;
+    PhotonCamera[] cameras;
+    // PhotonCamera m_rightCamera;
     PhotonPoseEstimator[] m_photonPoseEstimators;
     AprilTagFieldLayout fieldLayout;
         private PhotonTrackedTarget lastTarget;
     
         // public static final Transform3d kFrontCameraLocation = robotInitConstants.isCompBot ? new Transform3d(
         //         new Translation3d(Units.inchesToMeters(4.5), Units.inchesToMeters(10.9),
-        //             Units.inchesToMeters(9.25)),
+        //             Units.inchesToMeters(9.25)),\[]
+
         //         new Rotation3d(0.0, 0.0, Math.toRadians(-25.0)))
         //         : new Transform3d(
         //             new Translation3d(Units.inchesToMeters(11.007), Units.inchesToMeters(0.1875),
@@ -157,9 +161,14 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         //         new Rotation3d(0.0, Math.toRadians(-20.0), Math.toRadians(0.0)));
 
         private static final Transform3d kleftCameraLocation = new Transform3d(
-            new Translation3d(Units.inchesToMeters(10.854863), Units.inchesToMeters(8.433370),
-                Units.inchesToMeters(6.139140)),
+            new Translation3d(Units.inchesToMeters(7.8), Units.inchesToMeters(12.45),
+                Units.inchesToMeters(7.9)),
             new Rotation3d(0.0, Math.toRadians(-12.0 - 1.0), Math.toRadians(-29.0)));
+
+        private static final Transform3d krightCameraLocation = new Transform3d(
+            new Translation3d(Units.inchesToMeters(7.8), Units.inchesToMeters(-12.45),
+                Units.inchesToMeters(7.9)),
+            new Rotation3d(0.0, Math.toRadians(-12.0 - 1.0), Math.toRadians(29.0)));
 
     
         public static final double VISION_FIELD_MARGIN = 0.5;
@@ -284,21 +293,23 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
     
             // m_frontCamera = new PhotonCamera("Front");
-            // m_frontLeftCamera = new PhotonCamera("FrontLeft");
-            m_leftCamera = new PhotonCamera("Left");
+            cameras = new PhotonCamera[] {
+                new PhotonCamera("Left"),
+                new PhotonCamera("Right")
+            };
     
             m_photonPoseEstimators = new PhotonPoseEstimator[] {
                 new PhotonPoseEstimator(
                     fieldLayout,
                     PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
                     kleftCameraLocation
-                )
+                ),
                 // TODO: find out how to implent this to pose estimator
                 // ,
-                // new PhotonPoseEstimator(
-                //     fieldLayout,
-                //     PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-                //     kFrontCameraLocation)
+                new PhotonPoseEstimator(
+                    fieldLayout,
+                    PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
+                    krightCameraLocation)
             };
         }
         
@@ -336,9 +347,17 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     
         public void updatePoseEstimationWithFilter() {
             Pose2d currentPose = getState().Pose;
-            for (PhotonPoseEstimator poseEstimator : m_photonPoseEstimators) {
+            for (int cameraIdx = 0; cameraIdx < MAX_CAMERAS; cameraIdx++) {
                 // TODO: need to find the camera associated with a pose estimator, hard coded to front
-                var results = m_leftCamera.getAllUnreadResults();
+                // var results = m_frontCamera.getAllUnreadResults();
+                // if (m_photonPoseEstimators[0].equals(poseEstimator)) {
+                //     List<PhotonPipelineResult> results = m_leftCamera.getAllUnreadResults();
+                // } else if (m_photonPoseEstimators[1].equals(poseEstimator)) {
+                //     List<PhotonPipelineResult> results = m_rightCamera.getAllUnreadResults();
+                // } else {
+                //     continue;
+                // }
+                var results = cameras[cameraIdx].getAllUnreadResults();
                 PhotonPipelineResult result;
                 Optional<EstimatedRobotPose> pose = null;
                 if (!results.isEmpty()) {
@@ -351,7 +370,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                     SmartDashboard.putNumber("Front Latency", latency); 
                     double latencyThreshold = 12.0;
                     SmartDashboard.putBoolean("Front Latency OK", latency > latencyThreshold);
-                    pose = poseEstimator.update(result);
+                    pose = m_photonPoseEstimators[cameraIdx].update(result);
                 }
                 if (pose != null && pose.isPresent()) {
                     Pose3d pose3d = pose.get().estimatedPose;
@@ -409,8 +428,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         updatePoseEstimationWithFilter();
         
         // SmartDashboard.putBoolean("FrontConnected", m_frontCamera.isConnected());
-        SmartDashboard.putBoolean("FrontConnected", m_leftCamera.isConnected());
-        // SmartDashboard.putBoolean("BackConnected", m_backCamera.isConnected());
+        SmartDashboard.putBoolean("LeftConnected", cameras[0].isConnected());
+        SmartDashboard.putBoolean("RightConnected", cameras[1].isConnected());
         try {
             //TODO: Learn more on why getAllUnreadResults() returns a list of PhotonPipelineResults instead
             // SmartDashboard.putBoolean("Back Latency OK", m_backamera.getLatestResult().getLatencyMillis() > latencyThreshold);
@@ -446,7 +465,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         SmartDashboard.putNumber("BR Drive OCurrent",  getModule(3).getDriveMotor().getStatorCurrent().getValueAsDouble());
         SmartDashboard.putNumber("Heading", getState().RawHeading.getDegrees());
         SmartDashboard.putNumber("Swerve States", getState().ModuleStates.length);
-        SmartDashboard.putNumber("Vision Current", m_pdh.getCurrent(15));
+        // SmartDashboard.putNumber("Vision Current", m_pdh.getCurrent(15));
         SmartDashboard.putBoolean("DIO channel 0", robotInitConstants.dIO_port.get());
     }
 

@@ -35,6 +35,7 @@ public class ElevatorSubsystem extends SubsystemBase{
     SparkLimitSwitch bottomLimitSwitch;
 
     private double lastPos;
+    private boolean printZero = true; // Flag to indicate whether to print when we are zeroing during stow position
 
     EnumMap<elevatorPositions, Double> mapEnc = new EnumMap<>(elevatorPositions.class);
 
@@ -68,7 +69,7 @@ public class ElevatorSubsystem extends SubsystemBase{
 
         bottomLimitSwitch = leader.getReverseLimitSwitch();
         zeroTrigger = new Trigger(this::isElevatorNotAtBottom);
-        zeroTrigger.onTrue(zeroElevatorCommand());
+        zeroTrigger.onFalse(zeroElevatorCommand());
 
         lastPos = 0.0;
         
@@ -129,17 +130,12 @@ public class ElevatorSubsystem extends SubsystemBase{
     }
 
     public boolean atSetpoint(){
-        double tolerance = 0.5;
-        boolean atTarget = Math.abs(getPositionInches() - lastPos) < tolerance; 
+        boolean atTarget = Math.abs(getPositionInches() - lastPos) < TOLERANCE_INCHES; 
         if (atTarget) System.out.println("Elevator at setpoint");
         return atTarget;
     }
 
     public void ElevatorToPosition(elevatorPositions positions){
-        if(lastPos == kSTOW) {
-            System.out.println("Zeroing Elevator in ETP");
-            zeroElevator(); // Zero the elevator if we are leaving the stow position
-        }
         lastPos = mapEnc.get(positions); 
         setPositionRotations(inchesToRotations(lastPos)); 
     }
@@ -163,10 +159,15 @@ public class ElevatorSubsystem extends SubsystemBase{
         SmartDashboard.putNumber("Follower Velocity", followEncoder.getVelocity()); 
         SmartDashboard.putNumber("Elevator lastPos", lastPos);
 
-        if((lastPos == kSTOW) && (getPositionInches() < kSTOW+0.32)){
+        if((lastPos == kSTOW) && (getPositionInches() <= kSTOW + TOLERANCE_INCHES + .05)){
+            if (printZero == true) {
+                System.out.println("Zeroing Elevator");
+                printZero = false;
+            }
             leader.stopMotor();
-            // System.out.println("Zeroing Elevator");
-            // zeroElevator();
+            zeroElevator();
+        } else {
+            printZero = true;
         }
     }
 
