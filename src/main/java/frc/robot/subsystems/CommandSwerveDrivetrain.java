@@ -166,9 +166,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             new Rotation3d(0.0, Math.toRadians(-12.0 - 1.0), Math.toRadians(-29.0)));
 
         private static final Transform3d krightCameraLocation = new Transform3d(
-            new Translation3d(Units.inchesToMeters(8.5), Units.inchesToMeters(-10.7),
+            new Translation3d(Units.inchesToMeters(7.8), Units.inchesToMeters(-12.45),
                 Units.inchesToMeters(7.9)),
-            new Rotation3d(0.0, Math.toRadians(-12.0 - 1.0), Math.toRadians(30.0)));
+            new Rotation3d(0.0, Math.toRadians(-12.0 - 1.0), Math.toRadians(29.0)));
 
     
         public static final double VISION_FIELD_MARGIN = 0.5;
