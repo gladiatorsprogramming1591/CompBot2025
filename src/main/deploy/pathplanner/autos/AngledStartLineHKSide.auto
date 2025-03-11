@@ -7,25 +7,31 @@
         {
           "type": "path",
           "data": {
-            "pathName": "StartLineToF"
+            "pathName": "AngledStartBlueToI"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "FEToProcessor"
+            "pathName": "IToCoralStationFar"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "ProcessorToCoralStationRight"
+            "pathName": "CoralStationFarToJ"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "CoralStationRightToD"
+            "pathName": "JToCoralStationFar"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "CoralStationFarToK"
           }
         }
       ]
