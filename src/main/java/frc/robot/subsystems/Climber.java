@@ -53,8 +53,8 @@ public class Climber extends SubsystemBase {
 
         double TARGET_PITCH_MAX = -3.0;
         double TARGET_PITCH_MIN = -5.0;
-        double heading = drivetrain.getHeading();
-        if (heading > TARGET_PITCH_MIN && heading < TARGET_PITCH_MAX) {
+        double pitch = drivetrain.getPitch();
+        if (pitch > TARGET_PITCH_MIN && pitch < TARGET_PITCH_MAX) {
             robotAtDesiredPitch = true;
         } else {
             robotAtDesiredPitch = false;
@@ -63,6 +63,7 @@ public class Climber extends SubsystemBase {
         SmartDashboard.putBoolean("Winch At Pos", winchAtPosition);
         SmartDashboard.putBoolean("At Desired Pitch", robotAtDesiredPitch);
         SmartDashboard.putNumber("Climb Encoder Angle", getAngle());
+        SmartDashboard.putNumber("Climb Pitch", pitch);
         SmartDashboard.putNumber("Winch Current", winchMotor.getOutputCurrent()); 
         SmartDashboard.putNumber("Climb Roller Current", climbRollerMotor.getOutputCurrent()); 
     }

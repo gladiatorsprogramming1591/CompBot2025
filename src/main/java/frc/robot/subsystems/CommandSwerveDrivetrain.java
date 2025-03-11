@@ -475,6 +475,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     public double getHeading() {
         return getState().RawHeading.getDegrees();
     }
+
+    public double getPitch() {
+        return getPigeon2().getPitch().getValueAsDouble();
+    }
     
     private void startSimThread() {
         m_lastSimTime = Utils.getCurrentTimeSeconds();
