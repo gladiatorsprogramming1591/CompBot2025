@@ -169,9 +169,10 @@ public class RobotContainer {
 
         // Default Commands
         // wrist.setDefaultCommand(wrist.manualWristMovement(operatorController.getRightTriggerAxis() - operatorController.getLeftTriggerAxis() * 0.20));
-        // elevator.setDefaultCommand(new RunCommand(() -> elevator.setMotorSpeed(operatorController.getRightY() * 0.50), elevator));
+        // operatorController.rightStick().toggleOnTrue(new RunCommand(() -> elevator.setMotorSpeed(operatorController.getRightY() * 0.50), elevator)
+            // .handleInterrupt(() -> elevator.setMotorSpeed(0)));
     
-        climber.setDefaultCommand(climber.manualClimbMovement(()-> MathUtil.applyDeadband(-operatorController.getRightY(), STATIC_DEADBAND), ()-> MathUtil.applyDeadband(operatorController.getLeftY(), STATIC_DEADBAND)));
+        climber.setDefaultCommand(climber.manualClimbMovement(()-> MathUtil.applyDeadband(operatorController.getRightY(), STATIC_DEADBAND), ()-> MathUtil.applyDeadband(operatorController.getLeftY(), STATIC_DEADBAND)));
         drivetrain.registerTelemetry(logger::telemeterize);
     }
 

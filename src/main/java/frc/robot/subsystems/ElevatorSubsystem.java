@@ -125,7 +125,7 @@ public class ElevatorSubsystem extends SubsystemBase{
         if (rotations < getPositionRotations()) {
             controller.setReference(rotations, ControlType.kMAXMotionPositionControl, ClosedLoopSlot.kSlot1, FF_DOWN); // Down case; use max motion and slot 1
         } else {
-            controller.setReference(rotations, ControlType.kPosition, ClosedLoopSlot.kSlot0, FF_UP); // Up case; use plain position control, slot 0
+            controller.setReference(rotations, ControlType.kMAXMotionPositionControl, ClosedLoopSlot.kSlot0, FF_UP); // Up case; use plain position control, slot 0
         }
     }
 
@@ -169,6 +169,11 @@ public class ElevatorSubsystem extends SubsystemBase{
         } else {
             printZero = true;
         }
+        if (bottomLimitSwitch.isPressed() && lastPos == kSTOW)
+        {
+            zeroElevator();
+        }
     }
+
 
 }

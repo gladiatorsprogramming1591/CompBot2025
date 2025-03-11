@@ -25,7 +25,7 @@ public class Constants {
         
         public static final boolean LEADER_INVERTED = false; 
         public static final boolean FOLLOWER_INVERTED_FROM_LEADER = true;
-        public static final double RAMP_RATE = 0.01; 
+        public static final double RAMP_RATE = 0.001; 
         public static final int CURRENT_LIMIT = 80; 
 
         public static final double OUTPUT_MAXIMUM = 1.0; 
@@ -41,8 +41,8 @@ public class Constants {
         public static final double D_UP = 0; 
         public static final double FF_UP = .623; 
 
-        public static final double MAX_VEL_UP = 100; 
-        public static final double MAX_ACCEL_UP = 50; 
+        public static final double MAX_VEL_UP = 4000; 
+        public static final double MAX_ACCEL_UP = 3500; 
         public static final double ALLOWERD_ERR_UP = 0.08; 
 
         //Constants for going down
@@ -56,11 +56,11 @@ public class Constants {
         public static final double ALLOWERD_ERR_DOWN = 1.0; 
 
         //Elevator Positions
-        public static final double kSTOW = 0.2; 
+        public static final double kSTOW = 0.4; 
         public static final double kL1 = 2.75; 
-        public static final double kL2 = 7.50; 
-        public static final double kL3 = 15.50; 
-        public static final double kL4 = 25.6; 
+        public static final double kL2 = 8.04; 
+        public static final double kL3 = 15.3; 
+        public static final double kL4 = 25.9; 
         public static final double kPROCESSOR = 0.2; 
         public static final double kNET = kL4;
         public static final double ALGAE_HIGH = 15.75;
@@ -70,10 +70,11 @@ public class Constants {
             idleMode(IdleMode.kBrake);
             smartCurrentLimit(ElevatorConstants.CURRENT_LIMIT);
             inverted(ElevatorConstants.LEADER_INVERTED);
-            openLoopRampRate(ElevatorConstants.RAMP_RATE);
+            closedLoopRampRate(ElevatorConstants.RAMP_RATE);
             limitSwitch.reverseLimitSwitchEnabled(false);
             limitSwitch.forwardLimitSwitchEnabled(false);
-            closedLoop.outputRange(-0.1, OUTPUT_MAXIMUM, ClosedLoopSlot.kSlot0) // kslot 0 is up
+
+            closedLoop.outputRange(-1.0, OUTPUT_MAXIMUM, ClosedLoopSlot.kSlot0) // kslot 0 is up
                 .p(ElevatorConstants.P_UP, ClosedLoopSlot.kSlot0)
                 .i(ElevatorConstants.I_UP, ClosedLoopSlot.kSlot0)
                 .d(ElevatorConstants.D_UP, ClosedLoopSlot.kSlot0);
