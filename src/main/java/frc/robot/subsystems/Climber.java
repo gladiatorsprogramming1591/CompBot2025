@@ -42,8 +42,10 @@ public class Climber extends SubsystemBase {
 
     @Override
     public void periodic() {
-        double TARGET_ANGLE = 126.5;
-        if (getAngle() < TARGET_ANGLE) {
+        double TARGET_ANGLE_MIN = 130.0;
+        double TARGET_ANGLE_MAX = 126.5;
+        double angle = getAngle();
+        if (angle > TARGET_ANGLE_MIN && angle < TARGET_ANGLE_MAX) {
             winchAtPosition = true;
         } else {
             winchAtPosition = false;
