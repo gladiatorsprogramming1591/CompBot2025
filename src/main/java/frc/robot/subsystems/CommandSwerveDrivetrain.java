@@ -143,22 +143,17 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private SysIdRoutine m_sysIdRoutineToApply = m_sysIdRoutineSteer;
 
     // PhotonCamera m_frontCamera;
-    private static final int MAX_CAMERAS = 2;
+    private static int MAX_CAMERAS = 2; 
     PhotonCamera[] cameras;
     // PhotonCamera m_rightCamera;
     PhotonPoseEstimator[] m_photonPoseEstimators;
     AprilTagFieldLayout fieldLayout;
         private PhotonTrackedTarget lastTarget;
     
-        // public static final Transform3d kFrontCameraLocation = robotInitConstants.isCompBot ? new Transform3d(
-        //         new Translation3d(Units.inchesToMeters(4.5), Units.inchesToMeters(10.9),
-        //             Units.inchesToMeters(9.25)),\[]
-
-        //         new Rotation3d(0.0, 0.0, Math.toRadians(-25.0)))
-        //         : new Transform3d(
-        //             new Translation3d(Units.inchesToMeters(11.007), Units.inchesToMeters(0.1875),
-        //             Units.inchesToMeters(5.789)),
-        //         new Rotation3d(0.0, Math.toRadians(-20.0), Math.toRadians(0.0)));
+        public static final Transform3d kFrontCameraLocation = new Transform3d(
+                    new Translation3d(Units.inchesToMeters(11.007), Units.inchesToMeters(0.1875),
+                    Units.inchesToMeters(5.789)),
+                new Rotation3d(0.0, Math.toRadians(-20.0), Math.toRadians(0.0)));
 
         private static final Transform3d kleftCameraLocation = new Transform3d(
             new Translation3d(Units.inchesToMeters(7.8), Units.inchesToMeters(12.45),
@@ -293,24 +288,33 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
     
             // m_frontCamera = new PhotonCamera("Front");
-            cameras = new PhotonCamera[] {
-                new PhotonCamera("Left"),
-                new PhotonCamera("Right")
-            };
-    
-            m_photonPoseEstimators = new PhotonPoseEstimator[] {
-                new PhotonPoseEstimator(
-                    fieldLayout,
-                    PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-                    kleftCameraLocation
-                ),
-                // TODO: find out how to implent this to pose estimator
-                // ,
-                new PhotonPoseEstimator(
-                    fieldLayout,
-                    PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-                    krightCameraLocation)
-            };
+            if (robotInitConstants.isCompBot) {
+                cameras = new PhotonCamera[] {
+                    new PhotonCamera("Left"),
+                    new PhotonCamera("Right")
+                };
+                m_photonPoseEstimators = new PhotonPoseEstimator[] {
+                    new PhotonPoseEstimator(
+                        fieldLayout,
+                        PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
+                        kleftCameraLocation),
+                    new PhotonPoseEstimator(
+                        fieldLayout,
+                        PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
+                        krightCameraLocation)
+                };
+            } else {
+                MAX_CAMERAS = 1;
+                cameras = new PhotonCamera[] {
+                    new PhotonCamera("Front"),
+                };
+                m_photonPoseEstimators = new PhotonPoseEstimator[] {
+                    new PhotonPoseEstimator(
+                        fieldLayout,
+                        PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
+                        kFrontCameraLocation)
+                };
+            }    
         }
         
         /**
@@ -429,7 +433,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         
         // SmartDashboard.putBoolean("FrontConnected", m_frontCamera.isConnected());
         SmartDashboard.putBoolean("LeftConnected", cameras[0].isConnected());
+         if(robotInitConstants.isCompBot){
         SmartDashboard.putBoolean("RightConnected", cameras[1].isConnected());
+            
+         }
         try {
             //TODO: Learn more on why getAllUnreadResults() returns a list of PhotonPipelineResults instead
             // SmartDashboard.putBoolean("Back Latency OK", m_backamera.getLatestResult().getLatencyMillis() > latencyThreshold);
