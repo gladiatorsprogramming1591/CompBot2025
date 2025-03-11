@@ -7,31 +7,25 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Box1"
+            "pathName": "StartToGH"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Box2"
+            "pathName": "HToGH"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Box3"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Box4"
+            "pathName": "GHToProcessor"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Testing",
+  "folder": null,
   "choreoAuto": false
 }

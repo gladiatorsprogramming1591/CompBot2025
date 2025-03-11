@@ -131,7 +131,7 @@ public class RobotContainer {
         
         driverController.leftBumper().whileTrue(endEffector.intakeAlgaeCommand())
             .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(0),endEffector));
-        driverController.rightTrigger().onTrue(endEffector.ejectCoralCommand())  
+            driverController.rightTrigger().onTrue(ejectCoralAndStow())  
             .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(0),endEffector));
 
 		driverController.x().whileTrue(new AutoReefPoseCommand(drivetrain, reefAlign, this::driveX, this::driveY, this::driveT, ()->ReefSide.LEFT));
@@ -152,10 +152,10 @@ public class RobotContainer {
         operatorController.povUp().onTrue(prepElevatorScore(elevatorPositions.L3));
         operatorController.leftBumper().onTrue(complexElevatorStowCommand(elevatorPositions.STOW));
         operatorController.back().onTrue(new InstantCommand(() -> elevator.zeroElevatorCommand()));
+        operatorController.b().onTrue(complexProcessorCommand(elevatorPositions.PROCESSOR));
 
         // Wrist
         operatorController.a().onTrue(new InstantCommand(()-> wrist.setAngle(WristConstants.WRIST_STOW)));
-        operatorController.b().onTrue(new InstantCommand(()-> wrist.setAngle(WristConstants.WRIST_PROCESSOR)));
         operatorController.x().onTrue(new InstantCommand(()-> wrist.setAngle(WristConstants.GROUND_INTAKE)));
         operatorController.y().onTrue(new InstantCommand(()-> wrist.setAngle(WristConstants.REEF_ACQUIRE_ANGLE)));
 
@@ -169,9 +169,10 @@ public class RobotContainer {
 
         // Default Commands
         // wrist.setDefaultCommand(wrist.manualWristMovement(operatorController.getRightTriggerAxis() - operatorController.getLeftTriggerAxis() * 0.20));
-        // elevator.setDefaultCommand(new RunCommand(() -> elevator.setMotorSpeed(operatorController.getRightY() * 0.50), elevator));
+        // operatorController.rightStick().toggleOnTrue(new RunCommand(() -> elevator.setMotorSpeed(operatorController.getRightY() * 0.50), elevator)
+            // .handleInterrupt(() -> elevator.setMotorSpeed(0)));
     
-        climber.setDefaultCommand(climber.manualClimbMovement(()-> MathUtil.applyDeadband(-operatorController.getRightY(), STATIC_DEADBAND), ()-> MathUtil.applyDeadband(operatorController.getLeftY(), STATIC_DEADBAND)));
+        climber.setDefaultCommand(climber.manualClimbMovement(()-> MathUtil.applyDeadband(operatorController.getRightY(), STATIC_DEADBAND), ()-> MathUtil.applyDeadband(operatorController.getLeftY(), STATIC_DEADBAND)));
         drivetrain.registerTelemetry(logger::telemeterize);
     }
 
@@ -298,11 +299,15 @@ public class RobotContainer {
 
         public Command ejectCoralAndStow() {
             return endEffector.ejectCoralCommand()
-            .andThen(wrist.StowPositionCommand());
+            .andThen(wrist.StowPositionCommand())
+            .andThen(new WaitUntilCommand(wrist::atSetpoint))
+            .andThen( )
+            .andThen();
         }
 
 
         public Command complexIntakeAlgae() {
+
             return endEffector.intakeAlgaeCommand().until(()-> endEffector.hasAlgae())
             .andThen(endEffector.holdAlgaeCommand());//TODO: Verify if this can be interupted
         }

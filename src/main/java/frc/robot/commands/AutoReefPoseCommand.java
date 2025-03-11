@@ -54,7 +54,7 @@ public class AutoReefPoseCommand extends Command {
 
     public void initialize() {
     }
-    
+
     @Override
     public void execute() {
         double distanceVal = 0;
@@ -87,7 +87,7 @@ public class AutoReefPoseCommand extends Command {
 
         if (strafeController.atSetpoint())
             strafeVal = 0;
-        if (distanceController.atSetpoint()) 
+        if (distanceController.atSetpoint())
             distanceVal = 0;
         if (angleController.atSetpoint())
             rotationVal = 0;
@@ -116,9 +116,9 @@ public class AutoReefPoseCommand extends Command {
       // Make this return true when this Command no longer needs to run execute()
     public boolean isFinished() {
         // If all 3 PIDs are at their target, we're done
-        return distanceController.atSetpoint() 
-            && strafeController.atSetpoint() 
-            && angleController.atSetpoint();
+        return distanceController.atSetpoint()
+                && strafeController.atSetpoint()
+                && angleController.atSetpoint();
     }
 
     // Called once after isFinished returns true
@@ -129,7 +129,7 @@ public class AutoReefPoseCommand extends Command {
     // Called when another command which requires one or more of the same
     // subsystems is scheduled to run
     protected void interrupted() {
-        end(); 
+        end();
     }
 
 }
