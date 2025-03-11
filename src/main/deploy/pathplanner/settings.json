@@ -3,9 +3,12 @@
   "robotLength": 0.66,
   "holonomicMode": true,
   "pathFolders": [
-    "StartLineICoral",
+    "AngledStartLineAGSide",
+    "AngledStartLineHKSide",
     "Processor+Reef",
+    "ProcessorAuto",
     "StartLineFCoral",
+    "StartLineICoral",
     "Testing"
   ],
   "autoFolders": [

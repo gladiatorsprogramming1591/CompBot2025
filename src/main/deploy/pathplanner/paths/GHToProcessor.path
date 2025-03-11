@@ -21,7 +21,7 @@
       },
       "prevControl": {
         "x": 5.993852459016393,
-        "y": 2.5205430327868843
+        "y": 2.520543032786884
       },
       "nextControl": null,
       "isLocked": false,
@@ -57,7 +57,7 @@
     "rotation": -90.0
   },
   "reversed": false,
-  "folder": null,
+  "folder": "ProcessorAuto",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 180.0

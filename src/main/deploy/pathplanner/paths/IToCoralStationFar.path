@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.5075,
-        "y": 5.4095
+        "x": 5.33452868852459,
+        "y": 5.013985655737705
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.420290424322037,
-        "y": 5.245871412394116
+        "x": 3.704200819672131,
+        "y": 6.1648053278688515
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "ReefI"
     },
     {
       "anchor": {
-        "x": 5.29425,
-        "y": 5.077999999999999
+        "x": 1.72575,
+        "y": 7.456999999999999
       },
       "prevControl": {
-        "x": 5.689849860844133,
-        "y": 5.152030015175745
+        "x": 3.7276967213114753,
+        "y": 6.34214344262295
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "CoralStationFarBlue"
     }
   ],
   "rotationTargets": [],
@@ -41,11 +41,11 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0.0,
-    "rotation": -119.99999999999999
+    "velocity": 0,
+    "rotation": -59.99999999999999
   },
   "reversed": false,
-  "folder": "ProcessorAuto",
+  "folder": "AngledStartLineHKSide",
   "idealStartingState": {
     "velocity": 0,
     "rotation": -119.99999999999999
