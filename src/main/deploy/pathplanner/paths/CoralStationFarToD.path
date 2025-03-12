@@ -16,12 +16,12 @@
     },
     {
       "anchor": {
-        "x": 4.052,
-        "y": 2.892
+        "x": 3.9975,
+        "y": 2.8452499999999996
       },
       "prevControl": {
-        "x": 3.2727991803278687,
-        "y": 2.1127991803278685
+        "x": 3.218299180327869,
+        "y": 2.066049180327868
       },
       "nextControl": null,
       "isLocked": false,
@@ -45,7 +45,7 @@
     "rotation": 59.99999999999999
   },
   "reversed": false,
-  "folder": null,
+  "folder": "AngledStartLineAGSide",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 51.58194465517798

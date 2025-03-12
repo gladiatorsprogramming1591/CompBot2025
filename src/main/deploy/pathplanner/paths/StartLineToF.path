@@ -34,7 +34,7 @@
   "eventMarkers": [
     {
       "name": "PrepAndScore",
-      "waypointRelativePos": 0.30868486352357,
+      "waypointRelativePos": 0.537474679270757,
       "endWaypointRelativePos": null,
       "command": {
         "type": "sequential",

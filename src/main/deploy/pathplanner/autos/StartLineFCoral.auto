@@ -31,7 +31,7 @@
         {
           "type": "named",
           "data": {
-            "name": "Auto Intake Coral"
+            "name": "Intake Coral"
           }
         },
         {
@@ -61,7 +61,13 @@
         {
           "type": "named",
           "data": {
-            "name": "Auto Intake Coral"
+            "name": "Prep L4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Intake Coral"
           }
         },
         {
