@@ -3,23 +3,12 @@
   "robotLength": 0.66,
   "holonomicMode": true,
   "pathFolders": [
-<<<<<<< HEAD
     "AngledStartLineAGSide",
     "AngledStartLineHKSide",
-=======
->>>>>>> origin/RyanAutos
     "Processor+Reef",
     "ProcessorAuto",
     "StartLineFCoral",
-<<<<<<< HEAD
-    "StartLineICoral",
-    "Testing"
-  ],
-  "autoFolders": [
-    "Testing"
-=======
     "StartLineICoral"
->>>>>>> origin/RyanAutos
   ],
   "autoFolders": [],
   "defaultMaxVel": 2.25,

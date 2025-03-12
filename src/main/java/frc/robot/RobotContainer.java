@@ -422,6 +422,8 @@ public class RobotContainer {
             NamedCommands.registerCommand("Score Algae", endEffector.ejectAlgaeCommand()); //Untested
             NamedCommands.registerCommand("Stow", complexElevatorStowCommand(elevatorPositions.STOW));
             NamedCommands.registerCommand("Prep Processor", complexProcessorCommand(elevatorPositions.STOW));
+            NamedCommands.registerCommand("Auto Reef Left", new AutoReefPoseCommand(drivetrain, reefAlign, this::driveX, this::driveY, this::driveT, ()->ReefSide.LEFT));
+            NamedCommands.registerCommand("Auto Reef Right", new AutoReefPoseCommand(drivetrain, reefAlign, this::driveX, this::driveY, this::driveT, ()->ReefSide.RIGHT));
         }
     }
 }
