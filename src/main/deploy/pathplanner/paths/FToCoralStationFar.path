@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.2845,
-        "y": 2.9817499999999995
+        "x": 5.202663934426229,
+        "y": 3.1199282786885245
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.12425,
-        "y": 2.133499999999999
+        "x": 4.042413934426229,
+        "y": 2.271678278688524
       },
       "isLocked": false,
       "linkedName": "F"
@@ -45,7 +45,7 @@
     "rotation": 51.58194465517798
   },
   "reversed": false,
-  "folder": "AngledStartLineAGSide",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
     "rotation": 119.99999999999999

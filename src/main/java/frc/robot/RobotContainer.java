@@ -297,6 +297,15 @@ public class RobotContainer {
             // .andThen(new WaitUntilCommand(elevator::atSetpoint)); 
         }
 
+        public Command autoComplexIntakeCommand() { 
+             return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
+            .andThen(new ElevatorToPosition(elevator, elevatorPositions.STOW))
+            .andThen(new WaitUntilCommand(elevator::atSetpoint))
+            .andThen(wrist.IntakePositionCommand())
+            .andThen(new WaitUntilCommand(wrist::atSetpoint))
+            .andThen(endEffector.autoIntakeCoralCommand());
+        }
+
         public Command ejectCoralAndStow() {
             return endEffector.ejectCoralCommand()
             .andThen(wrist.StowPositionCommand())
@@ -304,9 +313,7 @@ public class RobotContainer {
             .andThen(new ElevatorToPosition(elevator, elevatorPositions.STOW));
         }
 
-
         public Command complexIntakeAlgae() {
-
             return endEffector.intakeAlgaeCommand().until(()-> endEffector.hasAlgae())
             .andThen(endEffector.holdAlgaeCommand());//TODO: Verify if this can be interupted
         }
@@ -421,6 +428,8 @@ public class RobotContainer {
             NamedCommands.registerCommand("Score Algae", endEffector.ejectAlgaeCommand()); //Untested
             NamedCommands.registerCommand("Stow", complexElevatorStowCommand(elevatorPositions.STOW));
             NamedCommands.registerCommand("Prep Processor", complexProcessorCommand(elevatorPositions.STOW));
+            NamedCommands.registerCommand("Home Coral", endEffector.homingSequenceCommand()); 
+            NamedCommands.registerCommand("Auto Intake Coral", endEffector.autoIntakeCoralCommand());
         }
     }
 }

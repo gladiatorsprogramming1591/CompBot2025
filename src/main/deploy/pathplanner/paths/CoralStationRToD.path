@@ -33,8 +33,26 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
+      "name": "Home Coral",
+      "waypointRelativePos": 0,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "sequential",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": null
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
       "name": "PrepAndScore",
-      "waypointRelativePos": 0.478055367994588,
+      "waypointRelativePos": 0.7473945409429138,
       "endWaypointRelativePos": null,
       "command": {
         "type": "sequential",
