@@ -11,12 +11,6 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "Score Coral"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "JToCoralStationL"
@@ -38,12 +32,6 @@
           "type": "path",
           "data": {
             "pathName": "CoralStationLToB"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Score Coral"
           }
         }
       ]

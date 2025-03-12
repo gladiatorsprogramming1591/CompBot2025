@@ -301,8 +301,7 @@ public class RobotContainer {
             return endEffector.ejectCoralCommand()
             .andThen(wrist.StowPositionCommand())
             .andThen(new WaitUntilCommand(wrist::atSetpoint))
-            .andThen( )
-            .andThen();
+            .andThen(new ElevatorToPosition(elevator, elevatorPositions.STOW));
         }
 
 

@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.2285000000000001,
-        "y": 0.9244999999999993
+        "x": 1.1028688524590162,
+        "y": 0.7703381147540983
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.216542308329193,
-        "y": 1.8935530303030297
+        "x": 2.0909111607882096,
+        "y": 1.7393911450571284
       },
       "isLocked": false,
       "linkedName": "CoralStationTop"
     },
     {
       "anchor": {
-        "x": 3.1882500000000005,
-        "y": 3.8202499999999993
+        "x": 3.2965277777777784,
+        "y": 3.831881313131313
       },
       "prevControl": {
-        "x": 2.0701944444444447,
-        "y": 3.332371212121211
+        "x": 2.1784722222222226,
+        "y": 3.3440025252525247
       },
       "nextControl": null,
       "isLocked": false,
@@ -31,9 +31,34 @@
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "PrepAndScore",
+      "waypointRelativePos": 0.4942606347062839,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "sequential",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Prep L4"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "Score Coral"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
   "globalConstraints": {
-    "maxVelocity": 2.25,
+    "maxVelocity": 3.5,
     "maxAcceleration": 2.5,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,

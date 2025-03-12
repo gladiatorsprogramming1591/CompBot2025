@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.9975,
-        "y": 2.8452499999999996
+        "x": 4.052,
+        "y": 2.892
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.1302222222222222,
-        "y": 2.026734848484849
+        "x": 3.184722222222222,
+        "y": 2.073484848484849
       },
       "isLocked": false,
       "linkedName": "D"
     },
     {
       "anchor": {
-        "x": 1.21875,
-        "y": 0.9342499999999996
+        "x": 1.211,
+        "y": 0.83
       },
       "prevControl": {
-        "x": 2.2167146464646468,
-        "y": 1.5069015151515146
+        "x": 2.2089646464646466,
+        "y": 1.402651515151515
       },
       "nextControl": null,
       "isLocked": false,
@@ -31,9 +31,21 @@
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "Stow",
+      "waypointRelativePos": 0,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Stow"
+        }
+      }
+    }
+  ],
   "globalConstraints": {
-    "maxVelocity": 2.25,
+    "maxVelocity": 3.5,
     "maxAcceleration": 2.5,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
@@ -50,5 +62,5 @@
     "velocity": 0,
     "rotation": 59.99999999999999
   },
-  "useDefaultConstraints": false
+  "useDefaultConstraints": true
 }
