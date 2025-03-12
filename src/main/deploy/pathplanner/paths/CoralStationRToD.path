@@ -33,8 +33,8 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "PrepAndScore",
-      "waypointRelativePos": 0.478055367994588,
+      "name": "Home Coral",
+      "waypointRelativePos": 0.0,
       "endWaypointRelativePos": null,
       "command": {
         "type": "sequential",
@@ -43,7 +43,25 @@
             {
               "type": "named",
               "data": {
-                "name": "Prep L4"
+                "name": "Home Coral"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Prep L4",
+      "waypointRelativePos": 0.7473945409429138,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "sequential",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Prep Auto L4"
               }
             }
           ]

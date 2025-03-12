@@ -13,7 +13,7 @@
         {
           "type": "named",
           "data": {
-            "name": "Prep L4"
+            "name": "Prep Auto L4"
           }
         },
         {
@@ -31,7 +31,7 @@
         {
           "type": "named",
           "data": {
-            "name": "Intake Coral"
+            "name": "Auto Intake Coral"
           }
         },
         {
@@ -61,19 +61,19 @@
         {
           "type": "named",
           "data": {
-            "name": "Prep L4"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Intake Coral"
+            "name": "Auto Intake Coral"
           }
         },
         {
           "type": "path",
           "data": {
             "pathName": "CoralStationRToB"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Prep L4"
           }
         },
         {

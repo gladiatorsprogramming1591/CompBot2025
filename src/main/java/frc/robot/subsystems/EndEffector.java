@@ -112,15 +112,14 @@ public class EndEffector extends SubsystemBase {
 
     public Command autoIntakeCoralCommand() {
         return new SequentialCommandGroup(new RunCommand(() -> setCoralSpeed(EndEffectorConstants.CORAL_INTAKE_SPEED)))
-                .until(this::isCoralFrontBeamBroken);
+                .until(this::hasCoral);
     }
 
     public Command homingSequenceCommand() {
         return new SequentialCommandGroup(new RunCommand(() -> setCoralSpeed(EndEffectorConstants.CORAL_REVERSE_SPEED))
                 .until(this::coralArmed),
                 new RunCommand(() -> setCoralSpeed(0.1)).until(() -> {
-                    return !coralArmed();
-                }), new RunCommand(() -> setCoralSpeed(EndEffectorConstants.CORAL_REVERSE_SPEED)).withTimeout(0.1),
+                    return !coralArmed();                }), new RunCommand(() -> setCoralSpeed(EndEffectorConstants.CORAL_REVERSE_SPEED)).withTimeout(0.1),
                 new InstantCommand(() -> setCoralSpeed(0)));
     }
 

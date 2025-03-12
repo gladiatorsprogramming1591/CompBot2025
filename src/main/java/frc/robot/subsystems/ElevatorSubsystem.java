@@ -51,7 +51,8 @@ public class ElevatorSubsystem extends SubsystemBase {
         PROCESSOR, // same as stow height?
         NETSHOOT, // same as l4 height
         ALGAE_HIGH,
-        ALGAE_LOW
+        ALGAE_LOW, 
+        AUTO_L4
     }
 
     public ElevatorSubsystem() {
@@ -82,6 +83,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         mapEnc.put(elevatorPositions.L2, kL2);
         mapEnc.put(elevatorPositions.L3, kL3);
         mapEnc.put(elevatorPositions.L4, kL4);
+        mapEnc.put(elevatorPositions.AUTO_L4, AUTO_L4);
         mapEnc.put(elevatorPositions.PROCESSOR, kPROCESSOR);
         mapEnc.put(elevatorPositions.NETSHOOT, kNET);
         mapEnc.put(elevatorPositions.ALGAE_HIGH, ALGAE_HIGH);
@@ -176,7 +178,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Follower Velocity", followEncoder.getVelocity());
         SmartDashboard.putNumber("Elevator lastPos", lastPos);
 
-        if ((lastPos == kSTOW) && (getPositionInches() <= kSTOW + TOLERANCE_INCHES + .05)) {
+        if ((lastPos == kSTOW) && (getPositionInches() <= kSTOW + TOLERANCE_INCHES + 0.3 + 0.05)) {
             if (printZero == true) {
                 System.out.println("Zeroing Elevator");
                 printZero = false;

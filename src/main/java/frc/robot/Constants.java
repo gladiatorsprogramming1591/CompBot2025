@@ -31,7 +31,7 @@ public class Constants {
         public static final boolean LEADER_INVERTED = false;
         public static final boolean FOLLOWER_INVERTED_FROM_LEADER = true;
         public static final double RAMP_RATE = 0.001;
-        public static final int CURRENT_LIMIT = 80;
+        public static final int CURRENT_LIMIT = 60;
 
         public static final double OUTPUT_MAXIMUM = 1.0;
         public static final double OUTPUT_MINIMUM = -1.0;
@@ -39,7 +39,7 @@ public class Constants {
         public static final double INCHES_PER_ROTATION = 22.0 / 9.0 / 4.0;
         public static final double INCHES_PER_ABS_ROTATION = 0; // TODO: measure this
         public static final double INITIAL_HEIGHT_INCHES = 0;
-        public static final double TOLERANCE_INCHES = 0.5;
+        public static final double TOLERANCE_INCHES = 0.2;
 
         // Constants for going up
         public static final double P_UP = 0.075;
@@ -66,7 +66,8 @@ public class Constants {
         public static final double kL1 = 2.75;
         public static final double kL2 = 8.04;
         public static final double kL3 = 15.3;
-        public static final double kL4 = 25.4;
+        public static final double kL4 = 24.0;
+        public static final double AUTO_L4 = 23.0;
         public static final double kPROCESSOR = 0.2;
         public static final double kNET = kL4;
         public static final double ALGAE_HIGH = 15.75;

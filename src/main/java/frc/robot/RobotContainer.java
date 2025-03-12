@@ -420,6 +420,7 @@ public class RobotContainer {
             NamedCommands.registerCommand("Intake Coral", complexIntakeCoral());
             NamedCommands.registerCommand("Intake Algae", complexIntakeAlgae());
             NamedCommands.registerCommand("Prep L4", prepElevatorScoreL4(elevatorPositions.L4).andThen(()-> System.out.println("Prep L4")));
+            NamedCommands.registerCommand("Prep Auto L4", prepElevatorScoreL4(elevatorPositions.AUTO_L4).andThen(()-> System.out.println("Prep Auto L4")));
             NamedCommands.registerCommand("Prep L3", prepElevatorScore(elevatorPositions.L3).andThen(()-> System.out.println("Prep L3")));
             NamedCommands.registerCommand("Prep L2", prepElevatorScore(elevatorPositions.L2).andThen(()-> System.out.println("Prep L2")));
             NamedCommands.registerCommand("Prep Algae High", complexHighAlgaeIntakeCommand(elevatorPositions.ALGAE_HIGH));
@@ -429,7 +430,7 @@ public class RobotContainer {
             NamedCommands.registerCommand("Stow", complexElevatorStowCommand(elevatorPositions.STOW));
             NamedCommands.registerCommand("Prep Processor", complexProcessorCommand(elevatorPositions.STOW));
             NamedCommands.registerCommand("Home Coral", endEffector.homingSequenceCommand()); 
-            NamedCommands.registerCommand("Auto Intake Coral", endEffector.autoIntakeCoralCommand());
+            NamedCommands.registerCommand("Auto Intake Coral", autoComplexIntakeCommand());
         }
     }
 }
