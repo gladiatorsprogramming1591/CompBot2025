@@ -2,6 +2,9 @@ package frc.robot;
 
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
+import com.revrobotics.spark.config.MAXMotionConfig.MAXMotionPositionMode;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.AbsoluteEncoderConfig;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
@@ -22,7 +25,8 @@ public class Constants {
     public class ElevatorConstants {
         public static final int ELEVATOR_LEADER_CAN_ID = 1; // Right
         public static final int ELEVATOR_FOLLOWER_CAN_ID = 2; // Left
-        
+        public static final double ABS_ENC_OFFSET = 0;
+
         public static final boolean LEADER_INVERTED = false; 
         public static final boolean FOLLOWER_INVERTED_FROM_LEADER = true;
         public static final double RAMP_RATE = 0.001; 
@@ -32,11 +36,12 @@ public class Constants {
         public static final double OUTPUT_MINIMUM = -1.0; 
 
         public static final double INCHES_PER_ROTATION = 22.0/9.0/4.0;
+        public static final double INCHES_PER_ABS_ROTATION = 0; //TODO: measure this
         public static final double INITIAL_HEIGHT_INCHES = 0;
         public static final double TOLERANCE_INCHES = 0.5;
 
         //Constants for going up 
-        public static final double P_UP = 0.1; 
+        public static final double P_UP = 0.075; 
         public static final double I_UP = 0; 
         public static final double D_UP = 0; 
         public static final double FF_UP = .623; 
@@ -60,7 +65,7 @@ public class Constants {
         public static final double kL1 = 2.75; 
         public static final double kL2 = 8.04; 
         public static final double kL3 = 15.3; 
-        public static final double kL4 = 25.9; 
+        public static final double kL4 = 25.4; 
         public static final double kPROCESSOR = 0.2; 
         public static final double kNET = kL4;
         public static final double ALGAE_HIGH = 15.75;
@@ -80,7 +85,8 @@ public class Constants {
                 .d(ElevatorConstants.D_UP, ClosedLoopSlot.kSlot0);
             closedLoop.maxMotion.maxVelocity(MAX_VEL_UP, ClosedLoopSlot.kSlot0)
                 .maxAcceleration(MAX_ACCEL_UP, ClosedLoopSlot.kSlot0)
-                .allowedClosedLoopError(ALLOWERD_ERR_UP, ClosedLoopSlot.kSlot0);
+                .allowedClosedLoopError(ALLOWERD_ERR_UP, ClosedLoopSlot.kSlot0)
+                .positionMode(MAXMotionPositionMode.kMAXMotionTrapezoidal, ClosedLoopSlot.kSlot0);
 
             closedLoop.outputRange(OUTPUT_MINIMUM, 1, ClosedLoopSlot.kSlot1) // kslot 1 is down
                 .p(ElevatorConstants.P_DOWN, ClosedLoopSlot.kSlot1)
@@ -89,6 +95,10 @@ public class Constants {
             closedLoop.maxMotion.maxVelocity(MAX_VEL_DOWN, ClosedLoopSlot.kSlot1)
                 .maxAcceleration(MAX_ACCEL_DOWN, ClosedLoopSlot.kSlot1)
                 .allowedClosedLoopError(ALLOWERD_ERR_DOWN, ClosedLoopSlot.kSlot1);
+        }};
+        
+        public static final AbsoluteEncoderConfig ABS_ENCODER_CONFIG = new AbsoluteEncoderConfig() {{
+
         }};
     }
 
