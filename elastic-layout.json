@@ -3,347 +3,7 @@
   "grid_size": 100,
   "tabs": [
     {
-      "name": "Drive PID Tuning",
-      "grid_layout": {
-        "layouts": [
-          {
-            "title": "USB_Camera",
-            "x": 400.0,
-            "y": 400.0,
-            "width": 200.0,
-            "height": 200.0,
-            "type": "List Layout",
-            "properties": {
-              "label_position": "TOP"
-            },
-            "children": [
-              {
-                "title": "cameraDistortion",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 200.0,
-                "height": 200.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "/photonvision/USB_Camera/cameraDistortion",
-                  "period": 0.06,
-                  "data_type": "double[]",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "cameraIntrinsics",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 200.0,
-                "height": 200.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "/photonvision/USB_Camera/cameraIntrinsics",
-                  "period": 0.06,
-                  "data_type": "double[]",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "driverMode",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 200.0,
-                "height": 200.0,
-                "type": "Boolean Box",
-                "properties": {
-                  "topic": "/photonvision/USB_Camera/driverMode",
-                  "period": 0.06,
-                  "data_type": "boolean",
-                  "true_color": 4283215696,
-                  "false_color": 4294198070,
-                  "true_icon": "None",
-                  "false_icon": "None"
-                }
-              },
-              {
-                "title": "driverModeRequest",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 200.0,
-                "height": 200.0,
-                "type": "Boolean Box",
-                "properties": {
-                  "topic": "/photonvision/USB_Camera/driverModeRequest",
-                  "period": 0.06,
-                  "data_type": "boolean",
-                  "true_color": 4283215696,
-                  "false_color": 4294198070,
-                  "true_icon": "None",
-                  "false_icon": "None"
-                }
-              },
-              {
-                "title": "hasTarget",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 200.0,
-                "height": 200.0,
-                "type": "Boolean Box",
-                "properties": {
-                  "topic": "/photonvision/USB_Camera/hasTarget",
-                  "period": 0.06,
-                  "data_type": "boolean",
-                  "true_color": 4283215696,
-                  "false_color": 4294198070,
-                  "true_icon": "None",
-                  "false_icon": "None"
-                }
-              },
-              {
-                "title": "heartbeat",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 200.0,
-                "height": 200.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "/photonvision/USB_Camera/heartbeat",
-                  "period": 0.06,
-                  "data_type": "int",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "inputSaveImgCmd",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 200.0,
-                "height": 200.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "/photonvision/USB_Camera/inputSaveImgCmd",
-                  "period": 0.06,
-                  "data_type": "int",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "latencyMillis",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 200.0,
-                "height": 200.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "/photonvision/USB_Camera/latencyMillis",
-                  "period": 0.06,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "outputSaveImgCmd",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 200.0,
-                "height": 200.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "/photonvision/USB_Camera/outputSaveImgCmd",
-                  "period": 0.06,
-                  "data_type": "int",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "pipelineIndexState",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 200.0,
-                "height": 200.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "/photonvision/USB_Camera/pipelineIndexState",
-                  "period": 0.06,
-                  "data_type": "int",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "targetArea",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 200.0,
-                "height": 200.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "/photonvision/USB_Camera/targetArea",
-                  "period": 0.06,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "targetPitch",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 200.0,
-                "height": 200.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "/photonvision/USB_Camera/targetPitch",
-                  "period": 0.06,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "targetPixelsX",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 200.0,
-                "height": 200.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "/photonvision/USB_Camera/targetPixelsX",
-                  "period": 0.06,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "targetPixelsY",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 200.0,
-                "height": 200.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "/photonvision/USB_Camera/targetPixelsY",
-                  "period": 0.06,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "targetSkew",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 200.0,
-                "height": 200.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "/photonvision/USB_Camera/targetSkew",
-                  "period": 0.06,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "targetYaw",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 200.0,
-                "height": 200.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "/photonvision/USB_Camera/targetYaw",
-                  "period": 0.06,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              }
-            ]
-          }
-        ],
-        "containers": [
-          {
-            "title": "kA Drive",
-            "x": 500.0,
-            "y": 200.0,
-            "width": 500.0,
-            "height": 200.0,
-            "type": "Number Slider",
-            "properties": {
-              "topic": "/SmartDashboard/kA Drive",
-              "period": 0.06,
-              "data_type": "double",
-              "min_value": 0.0,
-              "max_value": 0.3,
-              "divisions": 10,
-              "update_continuously": false
-            }
-          },
-          {
-            "title": "kP Drive",
-            "x": 0.0,
-            "y": 0.0,
-            "width": 500.0,
-            "height": 200.0,
-            "type": "Number Slider",
-            "properties": {
-              "topic": "/SmartDashboard/kP Drive",
-              "period": 0.06,
-              "data_type": "double",
-              "min_value": -1.0,
-              "max_value": 100.0,
-              "divisions": 10,
-              "update_continuously": false
-            }
-          },
-          {
-            "title": "kV Drive",
-            "x": 0.0,
-            "y": 200.0,
-            "width": 500.0,
-            "height": 200.0,
-            "type": "Number Slider",
-            "properties": {
-              "topic": "/SmartDashboard/kV Drive",
-              "period": 0.06,
-              "data_type": "double",
-              "min_value": 0.0,
-              "max_value": 0.2,
-              "divisions": 10,
-              "update_continuously": false
-            }
-          },
-          {
-            "title": "kS Drive",
-            "x": 1000.0,
-            "y": 0.0,
-            "width": 500.0,
-            "height": 200.0,
-            "type": "Number Slider",
-            "properties": {
-              "topic": "/SmartDashboard/kS Drive",
-              "period": 0.06,
-              "data_type": "double",
-              "min_value": 0.0,
-              "max_value": 7.0,
-              "divisions": 10,
-              "update_continuously": false
-            }
-          },
-          {
-            "title": "kD Drive",
-            "x": 500.0,
-            "y": 0.0,
-            "width": 500.0,
-            "height": 200.0,
-            "type": "Number Slider",
-            "properties": {
-              "topic": "/SmartDashboard/kD Drive",
-              "period": 0.06,
-              "data_type": "double",
-              "min_value": -1.0,
-              "max_value": 2.0,
-              "divisions": 5,
-              "update_continuously": false
-            }
-          }
-        ]
-      }
-    },
-    {
-      "name": "Main",
+      "name": "Tab 2",
       "grid_layout": {
         "layouts": [],
         "containers": [
@@ -451,19 +111,6 @@
             }
           },
           {
-            "title": "front_Port_1182_Output_MJPEG_Server",
-            "x": 700.0,
-            "y": 0.0,
-            "width": 400.0,
-            "height": 400.0,
-            "type": "Camera Stream",
-            "properties": {
-              "topic": "/CameraPublisher/front_Port_1182_Output_MJPEG_Server",
-              "period": 0.06,
-              "rotation_turns": 0
-            }
-          },
-          {
             "title": "robotPose",
             "x": 500.0,
             "y": 400.0,
@@ -528,23 +175,6 @@
             "type": "Boolean Box",
             "properties": {
               "topic": "/SmartDashboard/Elevator lowerLimit",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
-            "title": "FrontConnected",
-            "x": 1100.0,
-            "y": 200.0,
-            "width": 200.0,
-            "height": 100.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/SmartDashboard/FrontConnected",
               "period": 0.06,
               "data_type": "boolean",
               "true_color": 4283215696,
@@ -667,68 +297,82 @@
               "data_type": "double",
               "show_submit_button": false
             }
-          }
-        ]
-      }
-    },
-    {
-      "name": "Scheduler",
-      "grid_layout": {
-        "layouts": [],
-        "containers": [
+          },
           {
-            "title": "Scheduler",
-            "x": 1100.0,
+            "title": "Climb Pitch",
+            "x": 900.0,
             "y": 0.0,
-            "width": 400.0,
-            "height": 600.0,
-            "type": "Scheduler",
+            "width": 200.0,
+            "height": 100.0,
+            "type": "Text Display",
             "properties": {
-              "topic": "/SmartDashboard/Scheduler",
-              "period": 0.06
+              "topic": "/SmartDashboard/Climb Pitch",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
             }
           }
         ]
       }
     },
     {
-      "name": "Pose/Cams",
+      "name": "Tab 3",
       "grid_layout": {
         "layouts": [],
         "containers": [
           {
-            "title": "Vision x",
+            "title": "Front Beam Broken?",
+            "x": 200.0,
+            "y": 400.0,
+            "width": 200.0,
+            "height": 200.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Front Beam Broken?",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Elevator inches",
             "x": 0.0,
-            "y": 500.0,
-            "width": 100.0,
-            "height": 100.0,
+            "y": 400.0,
+            "width": 200.0,
+            "height": 200.0,
             "type": "Text Display",
             "properties": {
-              "topic": "/SmartDashboard/Vision x",
+              "topic": "/SmartDashboard/Elevator inches",
               "period": 0.06,
               "data_type": "double",
               "show_submit_button": false
             }
           },
           {
-            "title": "Vision y",
-            "x": 100.0,
-            "y": 500.0,
-            "width": 100.0,
-            "height": 100.0,
-            "type": "Text Display",
+            "title": "Rear Beam Broken?",
+            "x": 400.0,
+            "y": 400.0,
+            "width": 200.0,
+            "height": 200.0,
+            "type": "Boolean Box",
             "properties": {
-              "topic": "/SmartDashboard/Vision y",
+              "topic": "/SmartDashboard/Rear Beam Broken?",
               "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": false
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
             }
           },
           {
             "title": "Pose",
             "x": 0.0,
             "y": 0.0,
-            "width": 700.0,
+            "width": 900.0,
             "height": 400.0,
             "type": "Field",
             "properties": {
@@ -745,188 +389,58 @@
             }
           },
           {
-            "title": "Vision xyStd",
-            "x": 400.0,
-            "y": 400.0,
-            "width": 200.0,
-            "height": 100.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/SmartDashboard/Vision xyStd",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": false
-            }
-          },
-          {
-            "title": "Vision rotStd",
-            "x": 400.0,
-            "y": 500.0,
-            "width": 200.0,
-            "height": 100.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/SmartDashboard/Vision rotStd",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": false
-            }
-          },
-          {
-            "title": "Vision rot",
-            "x": 200.0,
-            "y": 500.0,
-            "width": 100.0,
-            "height": 100.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/SmartDashboard/Vision rot",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": false
-            }
-          },
-          {
-            "title": "robotPose",
-            "x": 0.0,
-            "y": 400.0,
-            "width": 400.0,
-            "height": 100.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/Pose/robotPose",
-              "period": 0.06,
-              "data_type": "double[]",
-              "show_submit_button": false
-            }
-          },
-          {
-            "title": "FrontConnected",
-            "x": 0.0,
-            "y": 600.0,
-            "width": 100.0,
-            "height": 100.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/SmartDashboard/FrontConnected",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
-            "title": "Front Latency OK",
-            "x": 100.0,
-            "y": 600.0,
-            "width": 100.0,
-            "height": 100.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/SmartDashboard/Front Latency OK",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
-            "title": "Front Latency",
-            "x": 300.0,
-            "y": 500.0,
-            "width": 100.0,
-            "height": 100.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/SmartDashboard/Front Latency",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": false
-            }
-          },
-          {
-            "title": "distanceVal",
-            "x": 1300.0,
-            "y": 400.0,
-            "width": 100.0,
-            "height": 100.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/SmartDashboard/distanceVal",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": false
-            }
-          },
-          {
-            "title": "strafeVal",
-            "x": 1400.0,
-            "y": 400.0,
-            "width": 100.0,
-            "height": 100.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/SmartDashboard/strafeVal",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": false
-            }
-          },
-          {
-            "title": "rotationVal",
-            "x": 1400.0,
-            "y": 500.0,
-            "width": 100.0,
-            "height": 100.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/SmartDashboard/rotationVal",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": false
-            }
-          },
-          {
-            "title": "goalY",
+            "title": "pi_Port_1182_Output_MJPEG_Server",
             "x": 1200.0,
-            "y": 400.0,
-            "width": 100.0,
-            "height": 100.0,
-            "type": "Text Display",
+            "y": 0.0,
+            "width": 300.0,
+            "height": 300.0,
+            "type": "Camera Stream",
             "properties": {
-              "topic": "/SmartDashboard/goalY",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": false
+              "topic": "/CameraPublisher/pi_Port_1182_Output_MJPEG_Server",
+              "period": 0.06
             }
           },
           {
-            "title": "goalX",
-            "x": 1100.0,
-            "y": 400.0,
-            "width": 100.0,
-            "height": 100.0,
-            "type": "Text Display",
+            "title": "pi_Port_1184_Output_MJPEG_Server",
+            "x": 1200.0,
+            "y": 300.0,
+            "width": 300.0,
+            "height": 300.0,
+            "type": "Camera Stream",
             "properties": {
-              "topic": "/SmartDashboard/goalX",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": false
+              "topic": "/CameraPublisher/pi_Port_1184_Output_MJPEG_Server",
+              "period": 0.06
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Tab 3",
+      "grid_layout": {
+        "layouts": [],
+        "containers": [
+          {
+            "title": "Scheduler",
+            "x": 1100.0,
+            "y": 0.0,
+            "width": 400.0,
+            "height": 600.0,
+            "type": "Scheduler",
+            "properties": {
+              "topic": "/SmartDashboard/Scheduler",
+              "period": 0.06
             }
           },
           {
-            "title": "goalRotation",
-            "x": 1100.0,
-            "y": 500.0,
-            "width": 100.0,
-            "height": 100.0,
+            "title": "Climb Encoder Angle",
+            "x": 600.0,
+            "y": 0.0,
+            "width": 200.0,
+            "height": 200.0,
             "type": "Text Display",
             "properties": {
-              "topic": "/SmartDashboard/goalRotation",
+              "topic": "/SmartDashboard/Climb Encoder Angle",
               "period": 0.06,
               "data_type": "double",
               "show_submit_button": false
