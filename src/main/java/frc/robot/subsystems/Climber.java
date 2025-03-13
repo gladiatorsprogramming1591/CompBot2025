@@ -99,7 +99,9 @@ public class Climber extends SubsystemBase {
         public DefaultCommand(Climber climber, DoubleSupplier rollerSupplier, DoubleSupplier winchSupplier) {
             addRequirements(climber);
             addCommands(
-                new RunCommand(()-> climber.setWinchSpeed(winchSupplier.getAsDouble())).onlyIf(()-> getAngle() > 105.0),
+                new RunCommand(()-> climber.setWinchSpeed(winchSupplier.getAsDouble()))
+                    .until(()-> getAngle() > 105.0)
+                    .andThen(()->climber.setWinchSpeed(0)),
                 new RunCommand(()-> climber.setclimbRollerMotor(rollerSupplier.getAsDouble()))
             );
         }
