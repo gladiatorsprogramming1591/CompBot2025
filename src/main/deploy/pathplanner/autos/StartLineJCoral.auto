@@ -11,15 +11,45 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "Prep Auto L4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Score Coral"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "IToCoralStationL"
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "Auto Intake Coral"
+          }
+        },
+        {
           "type": "path",
           "data": {
-            "pathName": "CoralStationLToK"
+            "pathName": "CoralStationFarToK"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Prep L4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Score Coral"
           }
         },
         {
@@ -29,9 +59,27 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "Auto Intake Coral"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "CoralStationLToA"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Prep L4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Score Coral"
           }
         }
       ]
