@@ -11,27 +11,51 @@
           }
         },
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "ComplexScoreCommand"
+            "pathName": "FToCoralStationR"
           }
         },
         {
-          "type": "named",
+          "type": "wait",
           "data": {
-            "name": "ScoreCoral"
+            "waitTime": 0.5
           }
         },
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "ComplexStow"
+            "pathName": "CoralStationRToD"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "DToCoralStationR"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "CoralStationRToB"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
           }
         }
       ]
     }
   },
-  "resetOdom": true,
+  "resetOdom": false,
   "folder": null,
   "choreoAuto": false
 }

@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.2845,
-        "y": 3.1085
+        "x": 5.15775,
+        "y": 3.0402500000000003
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.212573770491804,
-        "y": 1.7898524590163944
+        "x": 5.085823770491803,
+        "y": 1.721602459016395
       },
       "isLocked": false,
       "linkedName": "F"
     },
     {
       "anchor": {
-        "x": 1.2107581967213117,
-        "y": 0.8302766393442619
+        "x": 1.14075,
+        "y": 0.8367499999999995
       },
       "prevControl": {
-        "x": 2.097848360655737,
-        "y": 1.2858094262295068
+        "x": 2.0278401639344255,
+        "y": 1.2922827868852442
       },
       "nextControl": null,
       "isLocked": false,
@@ -31,9 +31,21 @@
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "Stow",
+      "waypointRelativePos": 0,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Stow"
+        }
+      }
+    }
+  ],
   "globalConstraints": {
-    "maxVelocity": 2.5,
+    "maxVelocity": 3.5,
     "maxAcceleration": 2.5,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,

@@ -20,38 +20,35 @@ public class EndEffector extends SubsystemBase {
     SparkLimitSwitch coralRearBeam;
     SparkLimitSwitch coralFrontBeam;
 
-   
-    public EndEffector(){
-         intakeMotor = new SparkFlex(EndEffectorConstants.EE_MOTOR_ID, MotorType.kBrushless);
-            intakeMotor.configure(
-                EndEffectorConstants.MOTOR_CONFIG, 
+    public EndEffector() {
+        intakeMotor = new SparkFlex(EndEffectorConstants.EE_MOTOR_ID, MotorType.kBrushless);
+        intakeMotor.configure(
+                EndEffectorConstants.MOTOR_CONFIG,
                 SparkBase.ResetMode.kResetSafeParameters,
-                SparkBase.PersistMode.kPersistParameters
-            );
+                SparkBase.PersistMode.kPersistParameters);
 
-            coralFrontBeam = intakeMotor.getForwardLimitSwitch();
-            coralRearBeam = intakeMotor.getReverseLimitSwitch();
+        coralFrontBeam = intakeMotor.getReverseLimitSwitch();
+        coralRearBeam = intakeMotor.getForwardLimitSwitch();
     }
 
-    //Methods for Coral
+    // Methods for Coral
     public void setCoralSpeed(double speed) {
         intakeMotor.set(speed);
     }
-    
+
     public void intakeCoral() {
-        intakeMotor.set(EndEffectorConstants.CORAL_INTAKE_SPEED); 
+        intakeMotor.set(EndEffectorConstants.CORAL_INTAKE_SPEED);
     }
 
     public void ejectCoral() {
         intakeMotor.set(EndEffectorConstants.CORAL_EJECT_SPEED);
     }
 
-
     public boolean isCoralFrontBeamBroken() {
         return coralFrontBeam.isPressed();
     }
 
-    public boolean isCoralRearBeamBroken(){
+    public boolean isCoralRearBeamBroken() {
         return coralRearBeam.isPressed();
     }
 
@@ -65,16 +62,16 @@ public class EndEffector extends SubsystemBase {
     }
 
     public void ejectAlgae() {
-        intakeMotor.set(EndEffectorConstants.ALGAE_EJECT_SPEED); 
+        intakeMotor.set(EndEffectorConstants.ALGAE_EJECT_SPEED);
     }
 
     /**
-     *spins intake backwards to arm the coral
+     * spins intake backwards to arm the coral
      */
     public void armCoral() {
         intakeMotor.set(EndEffectorConstants.ARM_CORAL_SPEED);
     }
-    
+
     public boolean coralArmed() {
         return isCoralRearBeamBroken() && isCoralFrontBeamBroken();
     }
@@ -84,45 +81,64 @@ public class EndEffector extends SubsystemBase {
     }
 
     public void algaeCheckRoutine() {
-        if(intakeMotor.getOutputCurrent() < EndEffectorConstants.HAS_ALGAE_CURRENT){intakeMotor.stopMotor();}//Multiple loop check routine
+        if (intakeMotor.getOutputCurrent() < EndEffectorConstants.HAS_ALGAE_CURRENT) {
+            intakeMotor.stopMotor();
+        } // Multiple loop check routine
     }
 
     public Command intakeAlgaeCommand() {
         return new RunCommand(() -> setCoralSpeed(EndEffectorConstants.ALGAE_INTAKE_SPEED));
     }
 
+    public Command holdAlgaeCommand() {
+        return new RunCommand(() -> setCoralSpeed(EndEffectorConstants.ALGAE_HOLD_SPEED));
+    }
+
     /**
-     * Runs the intake until the robot has coral, slowing down as coral progresses through the system
+     * Runs the intake until the robot has coral, slowing down as coral progresses
+     * through the system
+     * 
      * @return the command
      */
-     public Command intakeCoralCommand() {
-        return new SequentialCommandGroup(new RunCommand(() -> setCoralSpeed(0.1))
-            .until(this::hasCoral),
-            new RunCommand(() -> setCoralSpeed(-0.1))
-            .until(this::coralArmed),
-            new RunCommand(() ->setCoralSpeed(0)));
+    public Command intakeCoralCommand() {
+        return new SequentialCommandGroup(new RunCommand(() -> setCoralSpeed(EndEffectorConstants.CORAL_INTAKE_SPEED))
+                .until(this::hasCoral),
+                new RunCommand(() -> setCoralSpeed(EndEffectorConstants.CORAL_REVERSE_SPEED))
+                        .until(this::coralArmed),
+                new RunCommand(() -> setCoralSpeed(0.1)).until(() -> {
+                    return !coralArmed();
+                }), new InstantCommand(() -> setCoralSpeed(0)));
+    }
+
+    public Command autoIntakeCoralCommand() {
+        return new SequentialCommandGroup(new RunCommand(() -> setCoralSpeed(EndEffectorConstants.CORAL_INTAKE_SPEED)))
+                .until(this::hasCoral);
+    }
+
+    public Command homingSequenceCommand() {
+        return new SequentialCommandGroup(new RunCommand(() -> setCoralSpeed(EndEffectorConstants.CORAL_REVERSE_SPEED))
+                .until(this::coralArmed),
+                new RunCommand(() -> setCoralSpeed(0.1)).until(() -> {
+                    return !coralArmed();                }), new RunCommand(() -> setCoralSpeed(EndEffectorConstants.CORAL_REVERSE_SPEED)).withTimeout(0.1),
+                new InstantCommand(() -> setCoralSpeed(0)));
     }
 
     public Command ejectCoralCommand() {
         return new SequentialCommandGroup(new RunCommand(() -> ejectCoral())
-            .until(()-> (!isCoralRearBeamBroken()) && !isCoralFrontBeamBroken()),
-            new InstantCommand(() ->setCoralSpeed(0)));
+                .until(() -> (!isCoralRearBeamBroken()) && !isCoralFrontBeamBroken()),
+                new InstantCommand(() -> setCoralSpeed(0)));
     }
 
-    public Command ejectAlgaeCommand(){
-        return new InstantCommand(()-> ejectAlgae()); 
+    public Command ejectAlgaeCommand() {
+        return new InstantCommand(() -> ejectAlgae());
     }
-    
-
-
-
-
 
     @Override
     public void periodic() {
-        SmartDashboard.putBoolean("Has Algae?", hasAlgae()); 
+        SmartDashboard.putBoolean("Has Algae?", hasAlgae());
         SmartDashboard.putNumber("ee Current", intakeMotor.getOutputCurrent());
-        SmartDashboard.putBoolean("Rear Beam Broken?", isCoralRearBeamBroken()); 
-        SmartDashboard.putBoolean("Front Beam Broken?", isCoralFrontBeamBroken()); 
+        SmartDashboard.putNumber("ee Motor Controller Voltage", intakeMotor.getBusVoltage());
+        SmartDashboard.putBoolean("Rear Beam Broken?", isCoralRearBeamBroken());
+        SmartDashboard.putBoolean("Front Beam Broken?", isCoralFrontBeamBroken());
     }
 }

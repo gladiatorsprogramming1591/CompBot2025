@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.3235,
-        "y": 2.972
+        "x": 7.600204918032786,
+        "y": 5.013985655737705
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.352614092147027,
-        "y": 2.7237010478506716
+        "x": 6.641188524590163,
+        "y": 5.013985655737705
       },
       "isLocked": false,
-      "linkedName": "I4"
+      "linkedName": "AngledBlueStart"
     },
     {
       "anchor": {
-        "x": 5.979861111111112,
-        "y": 0.45738636363636376
+        "x": 5.33452868852459,
+        "y": 5.013985655737705
       },
       "prevControl": {
-        "x": 5.6576061557618695,
-        "y": 1.5311186936239574
+        "x": 6.629200819672136,
+        "y": 5.0379610655737705
       },
       "nextControl": null,
-      "isLocked": false,
-      "linkedName": "Processor"
+      "isLocked": true,
+      "linkedName": "ReefI"
     }
   ],
   "rotationTargets": [],
@@ -33,7 +33,7 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 2.5,
+    "maxVelocity": 2.25,
     "maxAcceleration": 2.5,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -90.0
+    "rotation": -119.99999999999999
   },
   "reversed": false,
-  "folder": null,
+  "folder": "AngledStartLineHKSide",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 119.99999999999999
+    "rotation": -119.99999999999999
   },
   "useDefaultConstraints": true
 }

@@ -3,13 +3,15 @@
   "robotLength": 0.66,
   "holonomicMode": true,
   "pathFolders": [
-    "Testing",
-    "StartLineFCoral"
+    "StartLineICoral",
+    "Processor+Reef",
+    "StartLineFCoral",
+    "Testing"
   ],
   "autoFolders": [
     "Testing"
   ],
-  "defaultMaxVel": 2.5,
+  "defaultMaxVel": 3.5,
   "defaultMaxAccel": 2.5,
   "defaultMaxAngVel": 540.0,
   "defaultMaxAngAccel": 720.0,

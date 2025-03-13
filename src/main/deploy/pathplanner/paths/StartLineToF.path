@@ -8,20 +8,20 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.108811496781178,
-        "y": 2.703688748713783
+        "x": 6.0840000000000005,
+        "y": 2.728249999999999
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 5.2845,
-        "y": 3.1085
+        "x": 5.15775,
+        "y": 3.0402500000000003
       },
       "prevControl": {
-        "x": 6.097718906052106,
-        "y": 2.920528323436228
+        "x": 5.9475,
+        "y": 2.728249999999999
       },
       "nextControl": null,
       "isLocked": false,
@@ -31,9 +31,28 @@
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "PrepAndScore",
+      "waypointRelativePos": 0.30868486352357,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "sequential",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Prep Auto L4"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
   "globalConstraints": {
-    "maxVelocity": 2.5,
+    "maxVelocity": 3.5,
     "maxAcceleration": 2.5,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,

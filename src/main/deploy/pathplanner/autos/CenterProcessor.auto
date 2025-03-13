@@ -7,25 +7,25 @@
         {
           "type": "path",
           "data": {
-            "pathName": "StartLineToI"
+            "pathName": "StartToGH"
           }
         },
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "ComplexScoreCommand"
+            "pathName": "HToGH"
           }
         },
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "ScoreCoral"
+            "pathName": "GHToProcessor"
           }
         }
       ]
     }
   },
-  "resetOdom": false,
+  "resetOdom": true,
   "folder": null,
   "choreoAuto": false
 }

@@ -7,13 +7,61 @@
         {
           "type": "path",
           "data": {
-            "pathName": "StartLineToEF"
+            "pathName": "StartLineToF"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Prep L4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Score Coral"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Stow"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "EFToProcessor"
+            "pathName": "FToEF"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Prep Algae High"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Intake Algae"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "FEToProcessor"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Prep Processor"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Score Algae"
           }
         },
         {
@@ -23,9 +71,33 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "Intake Coral"
+          }
+        },
+        {
           "type": "path",
           "data": {
-            "pathName": "CoralStationRightToCD"
+            "pathName": "CoralStationRightToD"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Prep L4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Score Coral"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Stow"
           }
         }
       ]

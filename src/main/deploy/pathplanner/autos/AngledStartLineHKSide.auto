@@ -1,0 +1,43 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "AngledStartBlueToI"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "IToCoralStationFar"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "CoralStationFarToJ"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "JToCoralStationFar"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "CoralStationFarToK"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": false,
+  "folder": null,
+  "choreoAuto": false
+}

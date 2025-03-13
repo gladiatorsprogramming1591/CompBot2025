@@ -1,21 +1,19 @@
 package frc.robot.subsystems;
 
+import java.util.function.DoubleSupplier;
+
 import com.revrobotics.AbsoluteEncoder;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.SparkRelativeEncoder;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.WristConstants;
 
 public class Wrist extends SubsystemBase {
@@ -32,7 +30,7 @@ public class Wrist extends SubsystemBase {
           );   
           wristEncoder = wristMotor.getAbsoluteEncoder(); 
           wristController = wristMotor.getClosedLoopController(); 
-          holdAngle = ElevatorConstants.STOW_ANGLE; 
+          holdAngle = WristConstants.WRIST_STOW; 
         
     }
 
@@ -73,6 +71,18 @@ public class Wrist extends SubsystemBase {
         wristMotor.set(speed);
     }
 
+    public void setWristForwardSpeed(DoubleSupplier speedSupplier)
+    {
+        SmartDashboard.putNumber("Wrist Motor Speed", speedSupplier.getAsDouble());
+        wristMotor.set(speedSupplier.getAsDouble()*0.2);
+    }
+
+    public void setWristReverseSpeed(DoubleSupplier speedSupplier)
+    {
+        SmartDashboard.putNumber("Wrist Motor Speed", speedSupplier.getAsDouble());
+        wristMotor.set(speedSupplier.getAsDouble()*-0.2);
+    }
+
     public void setAngle(double angle)
     {
          holdAngle = angle;
@@ -85,14 +95,10 @@ public class Wrist extends SubsystemBase {
     }
 
     public boolean atSetpoint(){
-     double tolerance = 5;
+     double tolerance = 6;
           return Math.abs(getAngle() - holdAngle) < tolerance; 
     }
 
-    public Command AquirePositionCommand()
-    {
-        return new InstantCommand(()->setAngle(WristConstants.REEF_ACQUIRE_ANGLE));
-    }     
     public Command StowPositionCommand(){
          return new InstantCommand(()->setAngle(WristConstants.WRIST_STOW)); 
     }
@@ -105,15 +111,33 @@ public class Wrist extends SubsystemBase {
           return new InstantCommand(()-> setAngle(WristConstants.WRIST_PROCESSOR)); 
     }
 
+    public Command HoverPositionCommandL2(){
+          return new InstantCommand(()->setAngle(WristConstants.WRIST_HOVER_L2)); 
+     }
     public Command HoverPositionCommand(){
           return new InstantCommand(()->setAngle(WristConstants.WRIST_HOVER)); 
      }
+
+     public Command L4HoverPositionCommand(){
+          return new InstantCommand(()->setAngle(WristConstants.WRIST_HOVER_L4)); 
+     }
+     public Command LowAlgaePositionCommand(){
+          return new InstantCommand(()->setAngle(WristConstants.WRIST_ALGAE_LOW)); 
+     }
+     public Command HighAlgaePositionCommand(){
+          return new InstantCommand(()->setAngle(WristConstants.WRIST_ALGAE_HIGH)); 
+     }
+
     public Command HoldPositionCommand()
     {
          return new RunCommand(()->setHoldAngle(),this);
     }
 
-    public Command manualWristMovement(double speed){
-        return new RunCommand(()-> setWristMotor(speed)); 
+    public Command manualWristForwardMovement(DoubleSupplier speedSupplier){
+        return new RunCommand(()-> setWristForwardSpeed(speedSupplier), this); 
     }
+
+    public Command manualWristReverseMovement(DoubleSupplier speedSupplier){
+     return new RunCommand(()-> setWristReverseSpeed(speedSupplier), this); 
+ }
 }
