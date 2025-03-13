@@ -147,7 +147,7 @@ public class RobotContainer {
         // ===================================== Operator Controls =====================================
         // Elevator
         operatorController.povDown().onTrue(prepElevatorScore(elevatorPositions.L1)); 
-        operatorController.povLeft().onTrue(prepElevatorScore(elevatorPositions.L2)); 
+        operatorController.povLeft().onTrue(prepElevatorScoreL2(elevatorPositions.L2)); 
         operatorController.povRight().onTrue(prepElevatorScoreL4(elevatorPositions.L4)); 
         operatorController.povUp().onTrue(prepElevatorScore(elevatorPositions.L3));
         operatorController.leftBumper().onTrue(complexElevatorStowCommand(elevatorPositions.STOW));
@@ -239,6 +239,15 @@ public class RobotContainer {
 
 
         public Command prepElevatorScore(elevatorPositions position) {
+            System.out.println("Running complex score command"); 
+            return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
+            .andThen((new ElevatorToPosition(elevator,position)))
+            .andThen(new WaitUntilCommand(elevator::atSetpoint))
+            .andThen(wrist.HoverPositionCommandL2())
+            .andThen(new RunCommand(() -> endEffector.setCoralSpeed(-0.15),endEffector).withTimeout(0.10))
+            .andThen(new InstantCommand(() -> endEffector.setCoralSpeed(0.0),endEffector));
+        }
+        public Command prepElevatorScoreL2(elevatorPositions position) {
             System.out.println("Running complex score command"); 
             return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
             .andThen((new ElevatorToPosition(elevator,position)))

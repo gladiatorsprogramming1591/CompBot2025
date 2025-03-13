@@ -39,7 +39,7 @@ public class Constants {
         public static final double INCHES_PER_ROTATION = 22.0 / 9.0 / 4.0;
         public static final double INCHES_PER_ABS_ROTATION = 0; // TODO: measure this
         public static final double INITIAL_HEIGHT_INCHES = 0;
-        public static final double TOLERANCE_INCHES = 0.2;
+        public static final double TOLERANCE_INCHES = 0.5;
 
         // Constants for going up
         public static final double P_UP = 0.075;
@@ -64,10 +64,10 @@ public class Constants {
         // Elevator Positions
         public static final double kSTOW = 0.4;
         public static final double kL1 = 2.75;
-        public static final double kL2 = 8.04;
+        public static final double kL2 = 7.04;
         public static final double kL3 = 15.3;
-        public static final double kL4 = 24.0;
-        public static final double AUTO_L4 = 23.0;
+        public static final double kL4 = 25.5;
+        public static final double AUTO_L4 = 25.5;
         public static final double kPROCESSOR = 0.2;
         public static final double kNET = kL4;
         public static final double ALGAE_HIGH = 15.75;
@@ -78,7 +78,7 @@ public class Constants {
                 idleMode(IdleMode.kBrake);
                 smartCurrentLimit(ElevatorConstants.CURRENT_LIMIT);
                 inverted(ElevatorConstants.LEADER_INVERTED);
-                closedLoopRampRate(ElevatorConstants.RAMP_RATE);
+                // closedLoopRampRate(ElevatorConstants.RAMP_RATE);
                 limitSwitch.reverseLimitSwitchEnabled(false);
                 limitSwitch.forwardLimitSwitchEnabled(false);
 
@@ -147,6 +147,7 @@ public class Constants {
         public static final double GROUND_INTAKE = WRIST_INTAKE + 70.0;
         public static final double WRIST_PROCESSOR = WRIST_INTAKE + 25.0;
         public static final double WRIST_HOVER = WRIST_INTAKE + 34.0;
+        public static final double WRIST_HOVER_L2 = WRIST_INTAKE + 39.0;
         public static final double WRIST_HOVER_L4 = WRIST_INTAKE + 46.0; // +39
         public static final double WRIST_ALGAE_LOW = WRIST_INTAKE + 41.0;
         public static final double WRIST_ALGAE_HIGH = WRIST_INTAKE + 34.0;
