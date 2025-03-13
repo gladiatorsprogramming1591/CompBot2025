@@ -142,10 +142,10 @@ public class Constants {
     public class WristConstants {
         // Wrist Position
         public static final double WRIST_INTAKE = 255.0; // 254
-        public static final double WRIST_STOW = WRIST_INTAKE + 16.5;
+        public static final double WRIST_STOW = WRIST_INTAKE + 12;
         public static final double REEF_ACQUIRE_ANGLE = WRIST_INTAKE + 22.0;
         public static final double GROUND_INTAKE = WRIST_INTAKE + 70.0;
-        public static final double WRIST_PROCESSOR = WRIST_INTAKE + 25.0;
+        public static final double WRIST_PROCESSOR = WRIST_INTAKE + 23.0;
         public static final double WRIST_HOVER = WRIST_INTAKE + 34.0;
         public static final double WRIST_HOVER_L2 = WRIST_INTAKE + 39.0;
         public static final double WRIST_HOVER_L4 = WRIST_INTAKE + 46.0; // +39

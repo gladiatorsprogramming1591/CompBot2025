@@ -66,6 +66,7 @@ public class Climber extends SubsystemBase {
         SmartDashboard.putNumber("Climb Pitch", pitch);
         SmartDashboard.putNumber("Winch Current", winchMotor.getOutputCurrent()); 
         SmartDashboard.putNumber("Climb Roller Current", climbRollerMotor.getOutputCurrent()); 
+        SmartDashboard.putBoolean("Start Winch Angle", isAtStartAngle()); 
     }
 
     /**
@@ -75,6 +76,11 @@ public class Climber extends SubsystemBase {
     public double getAngle()
     {
          return climberEncoder.getPosition();
+    }
+
+    public boolean isAtStartAngle(){
+        return (Math.abs(getAngle() - 127) < 1);
+            
     }
 
     public void setclimbRollerMotor(double speed)
@@ -93,7 +99,7 @@ public class Climber extends SubsystemBase {
         public DefaultCommand(Climber climber, DoubleSupplier rollerSupplier, DoubleSupplier winchSupplier) {
             addRequirements(climber);
             addCommands(
-                new RunCommand(()-> climber.setWinchSpeed(winchSupplier.getAsDouble())),
+                new RunCommand(()-> climber.setWinchSpeed(winchSupplier.getAsDouble())).onlyIf(()-> getAngle() > 105.0),
                 new RunCommand(()-> climber.setclimbRollerMotor(rollerSupplier.getAsDouble()))
             );
         }

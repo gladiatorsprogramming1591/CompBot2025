@@ -484,6 +484,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
     public double getPitch() {
+        return getPigeon2().getRoll().getValueAsDouble();
+    }
+
+    public double getRoll() {
         return getPigeon2().getPitch().getValueAsDouble();
     }
     

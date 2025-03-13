@@ -16,6 +16,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -93,6 +94,8 @@ public class RobotContainer {
         autoChooser = AutoBuilder.buildAutoChooser(); // A default auto can be passed in as parameter.
         SmartDashboard.putData("Auto Mode", autoChooser);
         SmartDashboard.putData(drivetrain.getCurrentCommand());
+        SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime()); 
+        SmartDashboard.putNumber("", DriverStation.getStickButtons(1));
         
         if (robotInitConstants.isCompBot) configureBindingsComp(); else configureBindingsChassis();
         
@@ -154,7 +157,7 @@ public class RobotContainer {
         operatorController.povUp().onTrue(prepElevatorScore(elevatorPositions.L3));
         operatorController.leftBumper().onTrue(complexElevatorStowCommand(elevatorPositions.STOW));
         operatorController.back().onTrue(new InstantCommand(() -> elevator.zeroElevatorCommand()));
-        operatorController.b().onTrue(complexProcessorCommand(elevatorPositions.PROCESSOR));
+        operatorController.b().onTrue(complexProcessorCommand(elevatorPositions.STOW));
 
         // Wrist
         // operatorController.a().onTrue(new InstantCommand(()-> wrist.setAngle(WristConstants.WRIST_STOW)));
