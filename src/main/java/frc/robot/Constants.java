@@ -232,6 +232,12 @@ public class Constants {
         };
     }
 
+    public class ServoConstants {
+        public static final int kFlapServoChannel = 0;
+        public static final double kServoUpAngle = 135;
+        public static final double kServoDownAngle = 45;
+    }
+
     public class VisionConstants {
     }
 
