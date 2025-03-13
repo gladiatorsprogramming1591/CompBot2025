@@ -140,7 +140,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         if (rotations < getPositionRotations()) {
             controller.setReference(rotations, ControlType.kMAXMotionPositionControl, ClosedLoopSlot.kSlot1, FF_DOWN);
         } else {
-            controller.setReference(rotations, ControlType.kMAXMotionPositionControl, ClosedLoopSlot.kSlot0, FF_UP);
+            controller.setReference(rotations, ControlType.kPosition, ClosedLoopSlot.kSlot0, FF_UP);
         }
     }
 

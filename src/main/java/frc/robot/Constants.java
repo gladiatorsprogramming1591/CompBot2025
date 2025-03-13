@@ -42,7 +42,7 @@ public class Constants {
         public static final double TOLERANCE_INCHES = 0.5;
 
         // Constants for going up
-        public static final double P_UP = 0.075;
+        public static final double P_UP = 0.1;
         public static final double I_UP = 0;
         public static final double D_UP = 0;
         public static final double FF_UP = .623;
@@ -66,7 +66,7 @@ public class Constants {
         public static final double kL1 = 2.75;
         public static final double kL2 = 7.04;
         public static final double kL3 = 15.3;
-        public static final double kL4 = 25.5;
+        public static final double kL4 = 26.4;
         public static final double AUTO_L4 = 25.5;
         public static final double kPROCESSOR = 0.2;
         public static final double kNET = kL4;
