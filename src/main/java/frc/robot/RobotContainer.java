@@ -161,9 +161,9 @@ public class RobotContainer {
         operatorController.x().onTrue(new InstantCommand(()-> wrist.setAngle(WristConstants.GROUND_INTAKE)));
         operatorController.y().onTrue(new InstantCommand(()-> wrist.setAngle(WristConstants.REEF_ACQUIRE_ANGLE)));
 
-        // operatorController.rightTrigger().onTrue(complexHighAlgaeIntakeCommand(elevatorPositions.ALGAE_HIGH));
+        operatorController.rightTrigger().onTrue(complexHighAlgaeIntakeCommand(elevatorPositions.ALGAE_HIGH));
         operatorController.leftTrigger().onTrue(complexLowAlgaeIntakeCommand(elevatorPositions.ALGAE_LOW));
-        operatorController.rightTrigger().onTrue(flapServo.setFlapAngleCommand(()-> operatorController.getRightTriggerAxis()));
+        // operatorController.rightTrigger().onTrue(flapServo.setFlapAngleCommand(()-> operatorController.getRightTriggerAxis()));
         operatorController.a().onTrue(flapServo.setFlapUpCommand());
         operatorController.rightBumper().onTrue(flapServo.setFlapDownCommand());
 
@@ -175,7 +175,7 @@ public class RobotContainer {
         // Default Commands
         // wrist.setDefaultCommand(wrist.manualWristMovement(operatorController.getRightTriggerAxis() - operatorController.getLeftTriggerAxis() * 0.20));
         // operatorController.rightStick().toggleOnTrue(new RunCommand(() -> elevator.setMotorSpeed(operatorController.getRightY() * 0.50), elevator)
-            // .handleInterrupt(() -> elevator.setMotorSpeed(0)));
+        //     .handleInterrupt(() -> elevator.setMotorSpeed(0)));
     
         climber.setDefaultCommand(climber.manualClimbMovement(()-> MathUtil.applyDeadband(operatorController.getRightY(), STATIC_DEADBAND), ()-> MathUtil.applyDeadband(operatorController.getLeftY(), STATIC_DEADBAND)));
         drivetrain.registerTelemetry(logger::telemeterize);
