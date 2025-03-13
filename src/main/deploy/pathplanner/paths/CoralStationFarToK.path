@@ -3,16 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.72575,
-        "y": 7.456999999999999
+        "x": 1.103,
+        "y": 7.28
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.886,
-        "y": 6.3454999999999995
+        "x": 2.26325,
+        "y": 6.168500000000001
       },
       "isLocked": false,
-      "linkedName": "CoralStationFarBlue"
+      "linkedName": "CoralStationL"
     },
     {
       "anchor": {
@@ -31,7 +31,30 @@
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "Home Coral",
+      "waypointRelativePos": 0.0,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Home Coral"
+        }
+      }
+    },
+    {
+      "name": "Prep L4",
+      "waypointRelativePos": 0.75,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Prep L4"
+        }
+      }
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 2.25,
     "maxAcceleration": 2.5,
@@ -48,7 +71,7 @@
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -59.99999999999999
+    "rotation": -54.0
   },
   "useDefaultConstraints": true
 }
