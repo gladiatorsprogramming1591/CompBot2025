@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.7335858585858586,
-        "y": 4.980429292929293
+        "x": 5.158,
+        "y": 5.01
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.0424242424242425,
-        "y": 5.641098484848485
+        "x": 5.086055407979756,
+        "y": 6.329039413997565
       },
       "isLocked": false,
-      "linkedName": "L"
+      "linkedName": "I"
     },
     {
       "anchor": {
-        "x": 1.1867827868852459,
-        "y": 7.243698770491803
+        "x": 1.103,
+        "y": 7.28
       },
       "prevControl": {
-        "x": 2.1015555141579734,
-        "y": 6.440731598774632
+        "x": 1.989899200086743,
+        "y": 6.824567448588163
       },
       "nextControl": null,
       "isLocked": false,
@@ -34,7 +34,7 @@
   "eventMarkers": [
     {
       "name": "Stow",
-      "waypointRelativePos": 0,
+      "waypointRelativePos": 0.0,
       "endWaypointRelativePos": null,
       "command": {
         "type": "sequential",
@@ -44,12 +44,6 @@
               "type": "named",
               "data": {
                 "name": "Stow"
-              }
-            },
-            {
-              "type": "named",
-              "data": {
-                "name": "Intake Coral"
               }
             }
           ]
@@ -73,7 +67,7 @@
   "folder": "StartLineICoral",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -59.99999999999999
+    "rotation": -119.99999999999999
   },
   "useDefaultConstraints": true
 }

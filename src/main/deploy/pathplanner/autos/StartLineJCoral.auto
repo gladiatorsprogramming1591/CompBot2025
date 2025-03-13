@@ -13,25 +13,25 @@
         {
           "type": "path",
           "data": {
-            "pathName": "JToCoralStationL"
+            "pathName": "IToCoralStationL"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "CoralStationLToL"
+            "pathName": "CoralStationLToK"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "LToCoralStationL"
+            "pathName": "KToCoralStationL"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "CoralStationLToB"
+            "pathName": "CoralStationLToA"
           }
         }
       ]

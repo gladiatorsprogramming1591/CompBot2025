@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.1867827868852459,
-        "y": 7.243698770491803
+        "x": 4.052,
+        "y": 5.158
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.3556590495129455,
-        "y": 6.288269477563847
+        "x": 3.1843813827395047,
+        "y": 5.976832666045381
       },
       "isLocked": false,
-      "linkedName": "CoralStationL"
+      "linkedName": "K"
     },
     {
       "anchor": {
-        "x": 3.7335858585858586,
-        "y": 4.980429292929293
+        "x": 1.103,
+        "y": 7.28
       },
       "prevControl": {
-        "x": 3.0830808080822454,
-        "y": 5.55978535353669
+        "x": 2.101318474520508,
+        "y": 6.707146420600302
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "L"
+      "linkedName": "CoralStationL"
     }
   ],
   "rotationTargets": [],
@@ -33,13 +33,20 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "Prep L4",
-      "waypointRelativePos": 0.7022282241728501,
+      "name": "Stow",
+      "waypointRelativePos": 0,
       "endWaypointRelativePos": null,
       "command": {
-        "type": "named",
+        "type": "sequential",
         "data": {
-          "name": "Prep L4"
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Stow"
+              }
+            }
+          ]
         }
       }
     }
@@ -54,13 +61,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -59.99999999999999
+    "rotation": -54.0
   },
   "reversed": false,
   "folder": "StartLineICoral",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -54.0
+    "rotation": -60.06848815949227
   },
   "useDefaultConstraints": true
 }

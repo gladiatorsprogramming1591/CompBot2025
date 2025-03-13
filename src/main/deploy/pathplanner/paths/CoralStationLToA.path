@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.1867827868852459,
-        "y": 7.243698770491803
+        "x": 1.103,
+        "y": 7.28
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.670747433356995,
-        "y": 6.47122402301857
+        "x": 2.0910862699316968,
+        "y": 6.310906855264951
       },
       "isLocked": false,
       "linkedName": "CoralStationL"
@@ -17,15 +17,15 @@
     {
       "anchor": {
         "x": 3.2965277777777784,
-        "y": 3.831881313131313
+        "y": 4.218
       },
       "prevControl": {
-        "x": 1.7617424242495272,
-        "y": 3.628598484849999
+        "x": 2.1783522381731046,
+        "y": 4.70593797006361
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "B"
+      "linkedName": "A"
     }
   ],
   "rotationTargets": [],
@@ -33,8 +33,19 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
+      "name": "Home Coral",
+      "waypointRelativePos": 0,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Home Coral"
+        }
+      }
+    },
+    {
       "name": "Prep L4",
-      "waypointRelativePos": 0.8480756245779646,
+      "waypointRelativePos": 0.61,
       "endWaypointRelativePos": null,
       "command": {
         "type": "sequential",
@@ -44,12 +55,6 @@
               "type": "named",
               "data": {
                 "name": "Prep L4"
-              }
-            },
-            {
-              "type": "named",
-              "data": {
-                "name": "Score Coral"
               }
             }
           ]
