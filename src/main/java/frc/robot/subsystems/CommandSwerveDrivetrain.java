@@ -20,6 +20,7 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -163,12 +164,12 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         private static final Transform3d krightCameraLocation = new Transform3d(
             new Translation3d(Units.inchesToMeters(7.8), Units.inchesToMeters(-12.45),
                 Units.inchesToMeters(7.9)),
-            new Rotation3d(0.0, Math.toRadians(-12.0 - 1.0), Math.toRadians(29.0)));
+            new Rotation3d(0.0, Math.toRadians(-12), Math.toRadians(29.0)));
 
     
         public static final double VISION_FIELD_MARGIN = 0.5;
         public static final double VISION_Z_MARGIN = 0.75;
-        public static final double VISION_STD_XY_SCALE = 0.02;
+        public static final double VISION_STD_XY_SCALE = 0.04;
         public static final double VISION_STD_ROT_SCALE = 0.035;
         public static final double FIELD_LENGTH = 16.5417;
         public static final double FIELD_WIDTH = 8.0136;
@@ -407,15 +408,15 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                         SmartDashboard.putNumber("Robot ts", Utils.getCurrentTimeSeconds());
                         SmartDashboard.putNumber("Vision xyStd", xyStd);
                         SmartDashboard.putNumber("Vision rotStd", rotStd);
-                        // addVisionMeasurement(pose2d, pose.get().timestampSeconds, VecBuilder.fill(xyStd, xyStd, rotStd));
+                        addVisionMeasurement(pose2d, Utils.fpgaToCurrentTime(pose.get().timestampSeconds), VecBuilder.fill(xyStd, xyStd, rotStd));
                         if(!m_hasAppliedVisionPose) {
                             resetPose(pose2d);
                             m_hasAppliedVisionPose = true;
                         }
 
-                        if(xyStd < 0.15){
-                            addVisionMeasurement(pose2d, Utils.fpgaToCurrentTime(pose.get().timestampSeconds));
-                        }
+                        // if(xyStd < 0.15){
+                        //     addVisionMeasurement(pose2d, Utils.fpgaToCurrentTime(pose.get().timestampSeconds));
+                        // }
 
                         continue;
                     }
