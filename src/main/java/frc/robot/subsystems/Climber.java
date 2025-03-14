@@ -67,6 +67,7 @@ public class Climber extends SubsystemBase {
         SmartDashboard.putNumber("Winch Current", winchMotor.getOutputCurrent()); 
         SmartDashboard.putNumber("Climb Roller Current", climbRollerMotor.getOutputCurrent()); 
         SmartDashboard.putBoolean("Start Winch Angle", isAtStartAngle()); 
+        SmartDashboard.putNumber("Climber Vel", getWinchVelocity());
     }
 
     /**
@@ -92,7 +93,7 @@ public class Climber extends SubsystemBase {
     public void setWinchSpeed(double speed)
     {
         final double MAX_VELOCITY_SCALE = 1.0;
-        if ((getWinchVelocity() < 0) && (getAngle() < 105)) {
+        if ((getWinchVelocity() < 0) && (getAngle() < 109.0)) { //Does completely stop motor, but is satisfactory for now. Overshoots by 5 degrees under no load
             SmartDashboard.putNumber("Winch Motor Speed", 0);
             winchMotor.set(0);
         } else {
@@ -103,7 +104,6 @@ public class Climber extends SubsystemBase {
 
     public double getWinchVelocity() {
         double velocity = climberEncoder.getVelocity();
-        SmartDashboard.putNumber("Climber Vel", velocity);
         return velocity;
     }
 
