@@ -91,17 +91,29 @@ public class Climber extends SubsystemBase {
 
     public void setWinchSpeed(double speed)
     {
-        SmartDashboard.putNumber("Winch Motor Speed", speed);
-        winchMotor.set(speed*1.0);
+        final double MAX_VELOCITY_SCALE = 1.0;
+        if ((getWinchVelocity() < 0) && (getAngle() < 105)) {
+            SmartDashboard.putNumber("Winch Motor Speed", 0);
+            winchMotor.set(0);
+        } else {
+            SmartDashboard.putNumber("Winch Motor Speed", speed);
+            winchMotor.set(speed*MAX_VELOCITY_SCALE);
+        }
+    }
+
+    public double getWinchVelocity() {
+        double velocity = climberEncoder.getVelocity();
+        SmartDashboard.putNumber("Climber Vel", velocity);
+        return velocity;
     }
 
     class DefaultCommand extends ParallelCommandGroup {
         public DefaultCommand(Climber climber, DoubleSupplier rollerSupplier, DoubleSupplier winchSupplier) {
             addRequirements(climber);
             addCommands(
-                new RunCommand(()-> climber.setWinchSpeed(winchSupplier.getAsDouble()))
-                    .until(()-> getAngle() > 105.0)
-                    .andThen(()->climber.setWinchSpeed(0)),
+                new RunCommand(()-> climber.setWinchSpeed(winchSupplier.getAsDouble())),
+                    // .until(()-> (getWinchVelocity() > 0) ? getAngle() > 105.0 : true)
+                    // .andThen(()->climber.setWinchSpeed(0)),
                 new RunCommand(()-> climber.setclimbRollerMotor(rollerSupplier.getAsDouble()))
             );
         }
