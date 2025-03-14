@@ -58,8 +58,8 @@ public class RobotContainer {
     private double MaxSpeed = robotInitConstants.isCompBot ? PoseidonTunerConstants.kSpeedAt12Volts.in(MetersPerSecond)
             : ChazTunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 1 1/2 of a rotation per second max angular velocity
-    private double maxSpeedPercent = 0.50;
-    private double maxAngularRatePercent = 0.25;
+    private double maxSpeedPercent = 0.65;
+    private double maxAngularRatePercent = 0.40;
     public static double kineticDeadband = KINETIC_DEADBAND;
 
 

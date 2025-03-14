@@ -22,7 +22,7 @@ public class AutoReefPoseCommand extends Command {
     private Supplier<ReefSide> position;
     // private RobotState state;
 
-    private PIDController distanceController = new PIDController(3.5,0, 0.0);
+    private PIDController distanceController = new PIDController(1,0, 0.0);
     private PIDController strafeController = new PIDController(10, 0, 0.0);
     private PIDController angleController = new PIDController(0.5, 0, 0.02);
 
@@ -83,7 +83,7 @@ public class AutoReefPoseCommand extends Command {
         strafeVal = distanceController.calculate(goalX); 
         distanceVal = strafeController.calculate(goalY);
         rotationVal = angleController.calculate(goalRotation);
-        strafeVal = 1/(Math.exp(Math.abs(distanceVal)));
+        strafeVal = 1/(Math.exp(Math.abs(distanceVal)*2));  
 
         if (strafeController.atSetpoint())
             strafeVal = 0;

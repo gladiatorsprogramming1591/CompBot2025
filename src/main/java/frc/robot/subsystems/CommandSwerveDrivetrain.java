@@ -371,9 +371,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                     if(!result.hasTargets()) continue;
                     lastTarget = result.getBestTarget();
                     double latency = result.metadata.getLatencyMillis();  
-                    SmartDashboard.putNumber("Front Latency", latency); 
+                    SmartDashboard.putNumber("Vision Latency", latency); 
                     double latencyThreshold = 12.0;
-                    SmartDashboard.putBoolean("Front Latency OK", latency > latencyThreshold);
+                    SmartDashboard.putBoolean("Vision Latency OK", latency > latencyThreshold);
                     pose = m_photonPoseEstimators[cameraIdx].update(result);
                 }
                 if (pose != null && pose.isPresent()) {
