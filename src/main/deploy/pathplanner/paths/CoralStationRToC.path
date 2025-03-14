@@ -3,33 +3,47 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.14075,
-        "y": 0.8367499999999995
+        "x": 1.3064999999999998,
+        "y": 0.71
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.128792308329193,
-        "y": 1.8058030303030297
+        "x": 2.1777746683023587,
+        "y": 1.4786745758401239
       },
       "isLocked": false,
       "linkedName": "CoralStationTop"
     },
     {
       "anchor": {
-        "x": 3.2965277777777784,
-        "y": 3.831881313131313
+        "x": 3.689,
+        "y": 3.1079405737704913
       },
       "prevControl": {
-        "x": 2.1784722222222226,
-        "y": 3.3440025252525247
+        "x": 3.096152727156074,
+        "y": 2.5620745467623927
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "C"
     }
   ],
   "rotationTargets": [],
-  "constraintZones": [],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0.6,
+      "maxWaypointRelativePos": 1.0,
+      "constraints": {
+        "maxVelocity": 3.0,
+        "maxAcceleration": 2.5,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
   "pointTowardsZones": [],
   "eventMarkers": [
     {
@@ -45,7 +59,7 @@
     },
     {
       "name": "PrepAndScore",
-      "waypointRelativePos": 0.6064516129032244,
+      "waypointRelativePos": 0.37654320987655243,
       "endWaypointRelativePos": null,
       "command": {
         "type": "sequential",
@@ -64,7 +78,7 @@
   ],
   "globalConstraints": {
     "maxVelocity": 3.5,
-    "maxAcceleration": 2.5,
+    "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
@@ -72,7 +86,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 54.0
   },
   "reversed": false,
   "folder": "StartLineFCoral",
