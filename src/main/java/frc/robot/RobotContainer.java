@@ -456,10 +456,10 @@ public class RobotContainer {
         if (robotInitConstants.isCompBot) {
             NamedCommands.registerCommand("Intake Coral", complexIntakeCoral());
             NamedCommands.registerCommand("Intake Algae", complexIntakeAlgae());
-            NamedCommands.registerCommand("Prep L4", prepElevatorScoreL4(elevatorPositions.L4).andThen(()-> System.out.println("Prep L4")));
-            NamedCommands.registerCommand("Confirm Prep L4", confirmPrepElevatorScoreL4(elevatorPositions.L4).andThen(()-> System.out.println("Confirm Prep L4")));
-            NamedCommands.registerCommand("Prep Auto L4", prepElevatorScoreL4(elevatorPositions.AUTO_L4).andThen(()-> System.out.println("Prep Auto L4")));
-            NamedCommands.registerCommand("Confirm Prep Auto L4", confirmPrepElevatorScoreL4(elevatorPositions.AUTO_L4).andThen(()-> System.out.println("Confirm Prep Auto L4")));
+            NamedCommands.registerCommand("Prep L4", prepElevatorScoreL4(elevatorPositions.L4).handleInterrupt((() -> endEffector.setCoralSpeed(0))).andThen(()-> System.out.println("Prep L4")));
+            NamedCommands.registerCommand("Confirm Prep L4", confirmPrepElevatorScoreL4(elevatorPositions.L4).handleInterrupt((() -> endEffector.setCoralSpeed(0))).andThen(()-> System.out.println("Confirm Prep L4")));
+            NamedCommands.registerCommand("Prep Auto L4", prepElevatorScoreL4(elevatorPositions.AUTO_L4).handleInterrupt((() -> endEffector.setCoralSpeed(0))).andThen(()-> System.out.println("Prep Auto L4")));
+            NamedCommands.registerCommand("Confirm Prep Auto L4", confirmPrepElevatorScoreL4(elevatorPositions.AUTO_L4).handleInterrupt((() -> endEffector.setCoralSpeed(0))).andThen(()-> System.out.println("Confirm Prep Auto L4")));
             NamedCommands.registerCommand("Prep L3", prepElevatorScore(elevatorPositions.L3).andThen(()-> System.out.println("Prep L3")));
             NamedCommands.registerCommand("Prep L2", prepElevatorScore(elevatorPositions.L2).andThen(()-> System.out.println("Prep L2")));
             NamedCommands.registerCommand("Prep Algae High", complexHighAlgaeIntakeCommand(elevatorPositions.ALGAE_HIGH));
