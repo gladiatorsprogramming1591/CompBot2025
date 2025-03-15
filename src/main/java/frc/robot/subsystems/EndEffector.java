@@ -80,6 +80,10 @@ public class EndEffector extends SubsystemBase {
         return ((!isCoralRearBeamBroken()) && isCoralFrontBeamBroken());
     }
 
+    public boolean isCoralInFunnel() {
+        return (isCoralRearBeamBroken() && !isCoralFrontBeamBroken());
+    }
+
     public void algaeCheckRoutine() {
         if (intakeMotor.getOutputCurrent() < EndEffectorConstants.HAS_ALGAE_CURRENT) {
             intakeMotor.stopMotor();
@@ -112,6 +116,7 @@ public class EndEffector extends SubsystemBase {
 
     public Command autoIntakeCoralCommand() {
         return new SequentialCommandGroup(new RunCommand(() -> setCoralSpeed(EndEffectorConstants.CORAL_INTAKE_SPEED)))
+                .onlyIf(() -> !isCoralFrontBeamBroken())
                 .until(this::hasCoral)
                 .andThen(new InstantCommand(()-> setCoralSpeed(0)));
     }

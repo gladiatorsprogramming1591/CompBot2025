@@ -47,19 +47,8 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "Home Coral",
+      "name": "Intake, Home, Raise L4 Coral",
       "waypointRelativePos": 0,
-      "endWaypointRelativePos": null,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "Home Coral"
-        }
-      }
-    },
-    {
-      "name": "PrepAndScore",
-      "waypointRelativePos": 0.37654320987655243,
       "endWaypointRelativePos": null,
       "command": {
         "type": "sequential",
@@ -68,7 +57,19 @@
             {
               "type": "named",
               "data": {
-                "name": "Prep Auto L4"
+                "name": "Auto Intake Coral"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "Home Coral"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "Prep L4"
               }
             }
           ]
