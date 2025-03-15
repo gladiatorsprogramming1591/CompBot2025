@@ -57,6 +57,12 @@
             {
               "type": "named",
               "data": {
+                "name": "Auto Intake Coral"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
                 "name": "Home Coral"
               }
             }

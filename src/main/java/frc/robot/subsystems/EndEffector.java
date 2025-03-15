@@ -80,6 +80,10 @@ public class EndEffector extends SubsystemBase {
         return ((!isCoralRearBeamBroken()) && isCoralFrontBeamBroken());
     }
 
+    public boolean isCoralInFunnel() {
+        return (isCoralRearBeamBroken() && !isCoralFrontBeamBroken());
+    }
+
     public void algaeCheckRoutine() {
         if (intakeMotor.getOutputCurrent() < EndEffectorConstants.HAS_ALGAE_CURRENT) {
             intakeMotor.stopMotor();

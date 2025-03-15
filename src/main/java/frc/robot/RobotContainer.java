@@ -53,23 +53,24 @@ public class RobotContainer {
 	public final ElevatorSubsystem elevator = robotInitConstants.isCompBot ? new ElevatorSubsystem() : null;
     private final Climber climber = robotInitConstants.isCompBot ? new Climber(drivetrain) : null;
     private final FlapServo flapServo = robotInitConstants.isCompBot ? new FlapServo() : null;
-
-
-
+    
+    
+    private boolean prepL4Finished;
+    
     private double MaxSpeed = robotInitConstants.isCompBot ? PoseidonTunerConstants.kSpeedAt12Volts.in(MetersPerSecond)
-            : ChazTunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
+    : ChazTunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 1 1/2 of a rotation per second max angular velocity
     private double maxSpeedPercent = 0.65;
     private double maxAngularRatePercent = 0.40;
     public static double kineticDeadband = KINETIC_DEADBAND;
-
-
+    
+    
     /* Setting up bindings for necessary control of the swerve drive platform */
     // TODO: Issue: Deadband is not applied while bot is in motion (e.g. strafing while driving).
     // - Suspicion that output does not scale from 0 to max after the deadband (joystick is touchy). 
     // TODO: Idea?: Try changing OpenLoopVoltage to Velocity if we switch to FOC
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-            // .withDeadband(MaxSpeed * 0.05).withRotationalDeadband(MaxAngularRate * 0.05) // Add a 5% deadband
+    // .withDeadband(MaxSpeed * 0.05).withRotationalDeadband(MaxAngularRate * 0.05) // Add a 5% deadband
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
     // private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
     // private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
@@ -88,163 +89,170 @@ public class RobotContainer {
     private final SwerveRequest.RobotCentric reefAlign = new SwerveRequest.RobotCentric()
         // .withDeadband(MaxSpeed * 0.05).withRotationalDeadband(MaxAngularRate * 0.05) // Add a 5% deadband
         .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
-    
-    public RobotContainer() {
-        DataLogManager.start();
-        registerNamedCommands();
-        autoChooser = AutoBuilder.buildAutoChooser(); // A default auto can be passed in as parameter.
-        SmartDashboard.putData("Auto Mode", autoChooser);
-        SmartDashboard.putData(drivetrain.getCurrentCommand());
-        SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime()); 
-        SmartDashboard.putNumber("", DriverStation.getStickButtons(1));
-        
-        if (robotInitConstants.isCompBot) configureBindingsComp(); else configureBindingsChassis();
-        
-    }
-    
-    private void configureBindingsComp() {
-        // =====================================  Driver Controls  =====================================
-        // Drivetrain
-        // Note that X is defined as forward according to WPILib convention,
-        // and Y is defined as to the left according to WPILib convention.
-        drivetrain.setDefaultCommand(
-                // Drivetrain will execute this command periodically
-                drivetrain.applyRequest(() ->
-                        drive.withVelocityX(xLimiter.calculate(-drivetrain.apply2dDynamicDeadband(driverController.getLeftY(), driverController.getLeftX(), STATIC_DEADBAND, KINETIC_DEADBAND, true) * MaxSpeed * maxSpeedPercent,
-                                            INITIAL_LIMIT * Math.pow(LIMIT_SCALE_PER_INCH, elevator.getPositionInches()), TIME_TO_STOP)) // Drive forward with negative Y (forward)
-                                    .withVelocityY(yLimiter.calculate(-drivetrain.apply2dDynamicDeadband(driverController.getLeftX(), driverController.getLeftY(), STATIC_DEADBAND, KINETIC_DEADBAND, true) * MaxSpeed * maxSpeedPercent,
-                                            INITIAL_LIMIT * Math.pow(LIMIT_SCALE_PER_INCH, elevator.getPositionInches()), TIME_TO_STOP)) // Drive left with negative X (left)
-                                    .withRotationalRate(-MathUtil.applyDeadband(driverController.getRightX(), ROTATION_DEADBAND, maxAngularRatePercent) * MaxAngularRate) // Drive counterclockwise with negative X (left)
-                )
-        );
-
-        // reset the field-centric heading on back button press
-        driverController.back().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
-        driverController.start().onTrue(new InstantCommand(()-> slowMode(true)))
-            .onFalse(new InstantCommand(()-> slowMode(false)));
-        // driverController.rightStick().toggleOnTrue(new InstantCommand(() -> cardinalDriveMode(true))
-        //     .handleInterrupt(() -> cardinalDriveMode(false)));
-        
-        // driverController.rightTrigger()
-        //     .whileTrue(new RunCommand(()->AutoScoreAlign()))
-		// 	.onFalse(new InstantCommand(()->{aligning=false;})); // this needs to be cleaned up ASAP
-
-        // End Effector
-        driverController.leftTrigger().whileTrue(complexIntakeCoral())
-            .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(0),endEffector));
-        driverController.rightBumper().whileTrue(endEffector.ejectAlgaeCommand())
-            .onFalse(new InstantCommand(()-> wrist.setWristMotor(0)));
-        
-        driverController.leftBumper().whileTrue(endEffector.intakeAlgaeCommand())
-            .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(0),endEffector));
-            driverController.rightTrigger().onTrue(ejectCoralAndStow())  
-            .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(0),endEffector));
-
-		driverController.x().whileTrue(new AutoReefPoseCommand(drivetrain, reefAlign, this::driveX, this::driveY, this::driveT, ()->ReefSide.LEFT));
-		driverController.y().whileTrue(new AutoReefPoseCommand(drivetrain, reefAlign, this::driveX, this::driveY, this::driveT, ()->ReefSide.RIGHT));
-		driverController.a().whileTrue(new AutoReefPoseCommand(drivetrain, reefAlign, this::driveX, this::driveY, this::driveT, ()->FieldConstants.getNearestReefSide(drivetrain.getState().Pose)));
-
-        // Wrist
-        // driverController.rightTrigger().whileTrue(wrist.manualWristForwardMovement(driverController::getRightTriggerAxis))
-        //     .onFalse(new InstantCommand(()-> wrist.setWristMotor(0),wrist));
-        // driverController.leftTrigger().whileTrue(wrist.manualWristReverseMovement(driverController::getLeftTriggerAxis))
-        //     .onFalse(new InstantCommand(()-> wrist.setWristMotor(0),wrist));
             
-        // ===================================== Operator Controls =====================================
-        // Elevator
-        operatorController.povDown().onTrue(prepElevatorScore(elevatorPositions.L1)); 
-        operatorController.povLeft().onTrue(prepElevatorScoreL2(elevatorPositions.L2)); 
-        operatorController.povRight().onTrue(prepElevatorScoreL4(elevatorPositions.L4)); 
-        operatorController.povUp().onTrue(prepElevatorScore(elevatorPositions.L3));
-        operatorController.leftBumper().onTrue(complexElevatorStowCommand(elevatorPositions.STOW));
-        operatorController.back().onTrue(new InstantCommand(() -> elevator.zeroElevatorCommand()));
-        operatorController.b().onTrue(complexProcessorCommand(elevatorPositions.STOW));
-
-        // Wrist
-        // operatorController.a().onTrue(new InstantCommand(()-> wrist.setAngle(WristConstants.WRIST_STOW)));
-        operatorController.x().onTrue(new InstantCommand(()-> wrist.setAngle(WristConstants.GROUND_INTAKE)));
-        operatorController.y().onTrue(new InstantCommand(()-> wrist.setAngle(WristConstants.REEF_ACQUIRE_ANGLE)));
-
-        operatorController.rightTrigger().onTrue(complexHighAlgaeIntakeCommand(elevatorPositions.ALGAE_HIGH));
-        operatorController.leftTrigger().onTrue(complexLowAlgaeIntakeCommand(elevatorPositions.ALGAE_LOW));
-        // operatorController.rightTrigger().onTrue(flapServo.setFlapAngleCommand(()-> operatorController.getRightTriggerAxis()));
-        operatorController.a().onTrue(flapServo.setFlapUpCommand());
-        operatorController.rightBumper().onTrue(flapServo.setFlapDownCommand());
-
-        // operatorController.rightTrigger().whileTrue(wrist.manualWristMovement(operatorController.getRightTriggerAxis()*0.20))
-        //     .onFalse(new InstantCommand(()-> wrist.setWristMotor(0)));
-        // operatorController.leftTrigger().whileTrue(wrist.manualWristMovement(-operatorController.getLeftTriggerAxis()*0.20))
-        //     .onFalse(new InstantCommand(()-> wrist.setWristMotor(0)));
-
-        // Default Commands
-        // wrist.setDefaultCommand(wrist.manualWristMovement(operatorController.getRightTriggerAxis() - operatorController.getLeftTriggerAxis() * 0.20));
-        // operatorController.rightStick().toggleOnTrue(new RunCommand(() -> elevator.setMotorSpeed(operatorController.getRightY() * 0.50), elevator)
-        //     .handleInterrupt(() -> elevator.setMotorSpeed(0)));
-    
-        climber.setDefaultCommand(climber.manualClimbMovement(()-> MathUtil.applyDeadband(operatorController.getRightY(), STATIC_DEADBAND), ()-> MathUtil.applyDeadband(operatorController.getLeftY(), STATIC_DEADBAND)));
-        drivetrain.registerTelemetry(logger::telemeterize);
-    }
-
-    private void configureBindingsChassis() {
-        // Note that X is defined as forward according to WPILib convention,
-        // and Y is defined as to the left according to WPILib convention.
-        drivetrain.setDefaultCommand(
-                // Drivetrain will execute this command periodically
-                drivetrain.applyRequest(() ->
-                        drive.withVelocityX(xLimiter.calculate(-drivetrain.apply2dDynamicDeadband(driverController.getLeftY(), driverController.getLeftX(), STATIC_DEADBAND, KINETIC_DEADBAND, true) * MaxSpeed * maxSpeedPercent,
-                                            INITIAL_LIMIT, TIME_TO_STOP)) // Drive forward with negative Y (forward)
-                                    .withVelocityY(yLimiter.calculate(-drivetrain.apply2dDynamicDeadband(driverController.getLeftX(), driverController.getLeftY(), STATIC_DEADBAND, KINETIC_DEADBAND, true) * MaxSpeed * maxSpeedPercent,
-                                            INITIAL_LIMIT, TIME_TO_STOP)) // Drive left with negative X (left)
-                                    .withRotationalRate(-MathUtil.applyDeadband(driverController.getRightX(), ROTATION_DEADBAND, maxAngularRatePercent) * MaxAngularRate) // Drive counterclockwise with negative X (left)
-)
-        );
+            public RobotContainer() {
+                DataLogManager.start();
+                registerNamedCommands();
+                autoChooser = AutoBuilder.buildAutoChooser(); // A default auto can be passed in as parameter.
+                SmartDashboard.putData("Auto Mode", autoChooser);
+                SmartDashboard.putData(drivetrain.getCurrentCommand());
+                SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime()); 
+                SmartDashboard.putNumber("", DriverStation.getStickButtons(1));
+                
+                if (robotInitConstants.isCompBot) configureBindingsComp(); else configureBindingsChassis();
+                
+            }
+            
+            private void configureBindingsComp() {
+                // =====================================  Driver Controls  =====================================
+                // Drivetrain
+                // Note that X is defined as forward according to WPILib convention,
+                // and Y is defined as to the left according to WPILib convention.
+                drivetrain.setDefaultCommand(
+                        // Drivetrain will execute this command periodically
+                        drivetrain.applyRequest(() ->
+                                drive.withVelocityX(xLimiter.calculate(-drivetrain.apply2dDynamicDeadband(driverController.getLeftY(), driverController.getLeftX(), STATIC_DEADBAND, KINETIC_DEADBAND, true) * MaxSpeed * maxSpeedPercent,
+                                                    INITIAL_LIMIT * Math.pow(LIMIT_SCALE_PER_INCH, elevator.getPositionInches()), TIME_TO_STOP)) // Drive forward with negative Y (forward)
+                                            .withVelocityY(yLimiter.calculate(-drivetrain.apply2dDynamicDeadband(driverController.getLeftX(), driverController.getLeftY(), STATIC_DEADBAND, KINETIC_DEADBAND, true) * MaxSpeed * maxSpeedPercent,
+                                                    INITIAL_LIMIT * Math.pow(LIMIT_SCALE_PER_INCH, elevator.getPositionInches()), TIME_TO_STOP)) // Drive left with negative X (left)
+                                            .withRotationalRate(-MathUtil.applyDeadband(driverController.getRightX(), ROTATION_DEADBAND, maxAngularRatePercent) * MaxAngularRate) // Drive counterclockwise with negative X (left)
+                        )
+                );
         
-        // reset the field-centric heading on left bumper press
-        driverController.back().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
-        driverController.start().onTrue(new InstantCommand(()-> slowMode(true)))
-            .onFalse(new InstantCommand(()-> slowMode(false)));
-
-        driverController.x().whileTrue(new AutoReefPoseCommand(drivetrain, reefAlign, this::driveXChassis, this::driveYChassis, this::driveT, ()->ReefSide.LEFT));
-        driverController.y().whileTrue(new AutoReefPoseCommand(drivetrain, reefAlign, this::driveXChassis, this::driveYChassis, this::driveT, ()->ReefSide.RIGHT));
-        driverController.a().whileTrue(new AutoReefPoseCommand(drivetrain, reefAlign, this::driveXChassis, this::driveYChassis, this::driveT, ()->FieldConstants.getNearestReefSide(drivetrain.getState().Pose)));    
-
-        // Drivetrain tunning commands
-        // joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
-        // joystick.b().whileTrue(drivetrain.applyRequest(() ->
-        //         point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
-        // ));
-        // // Run SysId routines when holding back/start and X/Y.
-        // // Note that each routine should be run exactly once in a single log.
-        // joystick.back().and(joystick.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
-        // joystick.back().and(joystick.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
-        // joystick.start().and(joystick.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
-        // joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
-        // joystick.leftTrigger().onTrue(Commands.runOnce(SignalLogger::start));
-        // joystick.rightTrigger().onTrue(Commands.runOnce(SignalLogger::stop));
+                // reset the field-centric heading on back button press
+                driverController.back().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+                driverController.start().onTrue(new InstantCommand(()-> slowMode(true)))
+                    .onFalse(new InstantCommand(()-> slowMode(false)));
+                // driverController.rightStick().toggleOnTrue(new InstantCommand(() -> cardinalDriveMode(true))
+                //     .handleInterrupt(() -> cardinalDriveMode(false)));
+                
+                // driverController.rightTrigger()
+                //     .whileTrue(new RunCommand(()->AutoScoreAlign()))
+                // 	.onFalse(new InstantCommand(()->{aligning=false;})); // this needs to be cleaned up ASAP
         
-        drivetrain.registerTelemetry(logger::telemeterize);
-    }
-
-
-    public void slowMode(boolean isSlow){
-        if(isSlow){
-            maxAngularRatePercent = 0.1; 
-            maxSpeedPercent = 0.2; 
-        }
-        else {
-           maxAngularRatePercent = 1.0; 
-           maxSpeedPercent = 1.0;  
-        }
-    }
-
-    public void cardinalDriveMode(boolean isCardinalDrive){
-        if(isCardinalDrive){
-            kineticDeadband = 0.75; 
-        }
-        else {
-           kineticDeadband = KINETIC_DEADBAND;  
-        }
-    }
+                // End Effector
+                driverController.leftTrigger().whileTrue(complexIntakeCoral())
+                    .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(0),endEffector));
+                driverController.rightBumper().whileTrue(endEffector.ejectAlgaeCommand())
+                    .onFalse(new InstantCommand(()-> wrist.setWristMotor(0)));
+                
+                driverController.leftBumper().whileTrue(endEffector.intakeAlgaeCommand())
+                    .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(0),endEffector));
+                    driverController.rightTrigger().onTrue(ejectCoralAndStow())  
+                    .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(0),endEffector));
+        
+                driverController.x().whileTrue(new AutoReefPoseCommand(drivetrain, reefAlign, this::driveX, this::driveY, this::driveT, ()->ReefSide.LEFT));
+                driverController.y().whileTrue(new AutoReefPoseCommand(drivetrain, reefAlign, this::driveX, this::driveY, this::driveT, ()->ReefSide.RIGHT));
+                driverController.a().whileTrue(new AutoReefPoseCommand(drivetrain, reefAlign, this::driveX, this::driveY, this::driveT, ()->FieldConstants.getNearestReefSide(drivetrain.getState().Pose)));
+        
+                // Wrist
+                // driverController.rightTrigger().whileTrue(wrist.manualWristForwardMovement(driverController::getRightTriggerAxis))
+                //     .onFalse(new InstantCommand(()-> wrist.setWristMotor(0),wrist));
+                // driverController.leftTrigger().whileTrue(wrist.manualWristReverseMovement(driverController::getLeftTriggerAxis))
+                //     .onFalse(new InstantCommand(()-> wrist.setWristMotor(0),wrist));
+                    
+                // ===================================== Operator Controls =====================================
+                // Elevator
+                operatorController.povDown().onTrue(prepElevatorScore(elevatorPositions.L1)); 
+                operatorController.povLeft().onTrue(prepElevatorScoreL2(elevatorPositions.L2)); 
+                operatorController.povRight().onTrue(prepElevatorScoreL4(elevatorPositions.L4)); 
+                operatorController.povUp().onTrue(prepElevatorScore(elevatorPositions.L3));
+                operatorController.leftBumper().onTrue(complexElevatorStowCommand(elevatorPositions.STOW));
+                operatorController.back().onTrue(new InstantCommand(() -> elevator.zeroElevatorCommand()));
+                operatorController.b().onTrue(complexProcessorCommand(elevatorPositions.STOW));
+        
+                // Wrist
+                // operatorController.a().onTrue(new InstantCommand(()-> wrist.setAngle(WristConstants.WRIST_STOW)));
+                operatorController.x().onTrue(new InstantCommand(()-> wrist.setAngle(WristConstants.GROUND_INTAKE)));
+                operatorController.y().onTrue(new InstantCommand(()-> wrist.setAngle(WristConstants.REEF_ACQUIRE_ANGLE)));
+        
+                operatorController.rightTrigger().onTrue(complexHighAlgaeIntakeCommand(elevatorPositions.ALGAE_HIGH));
+                operatorController.leftTrigger().onTrue(complexLowAlgaeIntakeCommand(elevatorPositions.ALGAE_LOW));
+                // operatorController.rightTrigger().onTrue(flapServo.setFlapAngleCommand(()-> operatorController.getRightTriggerAxis()));
+                operatorController.a().onTrue(flapServo.setFlapUpCommand());
+                operatorController.rightBumper().onTrue(flapServo.setFlapDownCommand());
+        
+                // operatorController.rightTrigger().whileTrue(wrist.manualWristMovement(operatorController.getRightTriggerAxis()*0.20))
+                //     .onFalse(new InstantCommand(()-> wrist.setWristMotor(0)));
+                // operatorController.leftTrigger().whileTrue(wrist.manualWristMovement(-operatorController.getLeftTriggerAxis()*0.20))
+                //     .onFalse(new InstantCommand(()-> wrist.setWristMotor(0)));
+        
+                // Default Commands
+                // wrist.setDefaultCommand(wrist.manualWristMovement(operatorController.getRightTriggerAxis() - operatorController.getLeftTriggerAxis() * 0.20));
+                // operatorController.rightStick().toggleOnTrue(new RunCommand(() -> elevator.setMotorSpeed(operatorController.getRightY() * 0.50), elevator)
+                //     .handleInterrupt(() -> elevator.setMotorSpeed(0)));
+            
+                climber.setDefaultCommand(climber.manualClimbMovement(()-> MathUtil.applyDeadband(operatorController.getRightY(), STATIC_DEADBAND), ()-> MathUtil.applyDeadband(operatorController.getLeftY(), STATIC_DEADBAND)));
+                drivetrain.registerTelemetry(logger::telemeterize);
+            }
+        
+            private void configureBindingsChassis() {
+                // Note that X is defined as forward according to WPILib convention,
+                // and Y is defined as to the left according to WPILib convention.
+                drivetrain.setDefaultCommand(
+                        // Drivetrain will execute this command periodically
+                        drivetrain.applyRequest(() ->
+                                drive.withVelocityX(xLimiter.calculate(-drivetrain.apply2dDynamicDeadband(driverController.getLeftY(), driverController.getLeftX(), STATIC_DEADBAND, KINETIC_DEADBAND, true) * MaxSpeed * maxSpeedPercent,
+                                                    INITIAL_LIMIT, TIME_TO_STOP)) // Drive forward with negative Y (forward)
+                                            .withVelocityY(yLimiter.calculate(-drivetrain.apply2dDynamicDeadband(driverController.getLeftX(), driverController.getLeftY(), STATIC_DEADBAND, KINETIC_DEADBAND, true) * MaxSpeed * maxSpeedPercent,
+                                                    INITIAL_LIMIT, TIME_TO_STOP)) // Drive left with negative X (left)
+                                            .withRotationalRate(-MathUtil.applyDeadband(driverController.getRightX(), ROTATION_DEADBAND, maxAngularRatePercent) * MaxAngularRate) // Drive counterclockwise with negative X (left)
+        )
+                );
+                
+                // reset the field-centric heading on left bumper press
+                driverController.back().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+                driverController.start().onTrue(new InstantCommand(()-> slowMode(true)))
+                    .onFalse(new InstantCommand(()-> slowMode(false)));
+        
+                driverController.x().whileTrue(new AutoReefPoseCommand(drivetrain, reefAlign, this::driveXChassis, this::driveYChassis, this::driveT, ()->ReefSide.LEFT));
+                driverController.y().whileTrue(new AutoReefPoseCommand(drivetrain, reefAlign, this::driveXChassis, this::driveYChassis, this::driveT, ()->ReefSide.RIGHT));
+                driverController.a().whileTrue(new AutoReefPoseCommand(drivetrain, reefAlign, this::driveXChassis, this::driveYChassis, this::driveT, ()->FieldConstants.getNearestReefSide(drivetrain.getState().Pose)));    
+        
+                // Drivetrain tunning commands
+                // joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
+                // joystick.b().whileTrue(drivetrain.applyRequest(() ->
+                //         point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
+                // ));
+                // // Run SysId routines when holding back/start and X/Y.
+                // // Note that each routine should be run exactly once in a single log.
+                // joystick.back().and(joystick.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
+                // joystick.back().and(joystick.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
+                // joystick.start().and(joystick.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
+                // joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+                // joystick.leftTrigger().onTrue(Commands.runOnce(SignalLogger::start));
+                // joystick.rightTrigger().onTrue(Commands.runOnce(SignalLogger::stop));
+                
+                drivetrain.registerTelemetry(logger::telemeterize);
+            }
+        
+        
+            public void slowMode(boolean isSlow){
+                if(isSlow){
+                    maxAngularRatePercent = 0.1; 
+                    maxSpeedPercent = 0.2; 
+                }
+                else {
+                   maxAngularRatePercent = 1.0; 
+                   maxSpeedPercent = 1.0;  
+                }
+            }
+        
+            public void cardinalDriveMode(boolean isCardinalDrive){
+                if(isCardinalDrive){
+                    kineticDeadband = 0.75; 
+                }
+                else {
+                   kineticDeadband = KINETIC_DEADBAND;  
+                }
+            }
+        
+            public void prepL4Finished(boolean isFinished) {
+                if (isFinished)
+                prepL4Finished = true;
+                else
+                prepL4Finished = false;
+            }
 
 
         public Command prepElevatorScore(elevatorPositions position) {
@@ -273,7 +281,18 @@ public class RobotContainer {
             .andThen(new WaitUntilCommand(elevator::atSetpoint))
             .andThen(wrist.L4HoverPositionCommand())
             .andThen(new RunCommand(() -> endEffector.setCoralSpeed(-0.15),endEffector).withTimeout(0.25))
-            .andThen(new InstantCommand(() -> endEffector.setCoralSpeed(0.0),endEffector));
+            .andThen(new InstantCommand(() -> endEffector.setCoralSpeed(0.0),endEffector))
+            .andThen(new InstantCommand(() -> prepL4Finished(true)));
+        }
+
+        public Command confirmPrepElevatorScoreL4(elevatorPositions position) {
+            return prepL4Finished ? new InstantCommand(() -> prepL4Finished(false))
+            : new ElevatorToPosition(elevator,position)
+            .andThen(new WaitUntilCommand(elevator::atSetpoint))
+            .andThen(wrist.L4HoverPositionCommand())
+            .andThen(new RunCommand(() -> endEffector.setCoralSpeed(-0.15),endEffector).withTimeout(0.25))
+            .andThen(new InstantCommand(() -> endEffector.setCoralSpeed(0.0),endEffector))
+            .andThen(new InstantCommand(() -> prepL4Finished(false)));
         }
     
         public Command complexElevatorStowCommand(elevatorPositions position) {
@@ -438,7 +457,9 @@ public class RobotContainer {
             NamedCommands.registerCommand("Intake Coral", complexIntakeCoral());
             NamedCommands.registerCommand("Intake Algae", complexIntakeAlgae());
             NamedCommands.registerCommand("Prep L4", prepElevatorScoreL4(elevatorPositions.L4).andThen(()-> System.out.println("Prep L4")));
+            NamedCommands.registerCommand("Confirm Prep L4", confirmPrepElevatorScoreL4(elevatorPositions.L4).andThen(()-> System.out.println("Confirm Prep L4")));
             NamedCommands.registerCommand("Prep Auto L4", prepElevatorScoreL4(elevatorPositions.AUTO_L4).andThen(()-> System.out.println("Prep Auto L4")));
+            NamedCommands.registerCommand("Confirm Prep Auto L4", confirmPrepElevatorScoreL4(elevatorPositions.AUTO_L4).andThen(()-> System.out.println("Confirm Prep Auto L4")));
             NamedCommands.registerCommand("Prep L3", prepElevatorScore(elevatorPositions.L3).andThen(()-> System.out.println("Prep L3")));
             NamedCommands.registerCommand("Prep L2", prepElevatorScore(elevatorPositions.L2).andThen(()-> System.out.println("Prep L2")));
             NamedCommands.registerCommand("Prep Algae High", complexHighAlgaeIntakeCommand(elevatorPositions.ALGAE_HIGH));
@@ -449,6 +470,7 @@ public class RobotContainer {
             NamedCommands.registerCommand("Prep Processor", complexProcessorCommand(elevatorPositions.STOW));
             NamedCommands.registerCommand("Home Coral", endEffector.homingSequenceCommand()); 
             NamedCommands.registerCommand("Auto Intake Coral", autoComplexIntakeCommand());
+            NamedCommands.registerCommand("Funnel Beam Break", new WaitUntilCommand(() -> endEffector.isCoralInFunnel()));
         }
     }
 }
