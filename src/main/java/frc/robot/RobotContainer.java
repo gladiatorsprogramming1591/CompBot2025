@@ -55,7 +55,7 @@ public class RobotContainer {
     private final FlapServo flapServo = robotInitConstants.isCompBot ? new FlapServo() : null;
     
     
-    private boolean prepL4Finished;
+    private boolean prepL4Finished = false;
     
     private double MaxSpeed = robotInitConstants.isCompBot ? PoseidonTunerConstants.kSpeedAt12Volts.in(MetersPerSecond)
     : ChazTunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -334,9 +334,8 @@ public class RobotContainer {
             // .andThen(new WaitUntilCommand(elevator::atSetpoint)); 
         }
 
-        public Command autoComplexIntakeCommand() { 
-             return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
-            .andThen(new ElevatorToPosition(elevator, elevatorPositions.STOW))
+        public Command autoComplexIntakeCommand() { // TODO: LP: check if elevator last pos was stow
+             return new ElevatorToPosition(elevator, elevatorPositions.STOW)
             .andThen(new WaitUntilCommand(elevator::atSetpoint))
             .andThen(wrist.IntakePositionCommand())
             .andThen(new WaitUntilCommand(wrist::atSetpoint))
@@ -471,6 +470,7 @@ public class RobotContainer {
             NamedCommands.registerCommand("Home Coral", endEffector.homingSequenceCommand()); 
             NamedCommands.registerCommand("Auto Intake Coral", autoComplexIntakeCommand());
             NamedCommands.registerCommand("Funnel Beam Break", new WaitUntilCommand(() -> endEffector.isCoralInFunnel()));
+            NamedCommands.registerCommand("Stop intake", new InstantCommand(() -> endEffector.setCoralSpeed(0)));
         }
     }
 }

@@ -13,7 +13,7 @@
         {
           "type": "named",
           "data": {
-            "name": "Confirm Prep Auto L4"
+            "name": "Confirm Prep L4"
           }
         },
         {
@@ -29,19 +29,32 @@
           }
         },
         {
-          "type": "race",
+          "type": "sequential",
           "data": {
             "commands": [
               {
-                "type": "named",
+                "type": "race",
                 "data": {
-                  "name": "Funnel Beam Break"
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "Funnel Beam Break"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "Auto Intake Coral"
+                      }
+                    }
+                  ]
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "Auto Intake Coral"
+                  "name": "Stop intake"
                 }
               }
             ]
@@ -72,19 +85,32 @@
           }
         },
         {
-          "type": "race",
+          "type": "sequential",
           "data": {
             "commands": [
               {
-                "type": "named",
+                "type": "race",
                 "data": {
-                  "name": "Funnel Beam Break"
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "Funnel Beam Break"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "Auto Intake Coral"
+                      }
+                    }
+                  ]
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "Auto Intake Coral"
+                  "name": "Stop intake"
                 }
               }
             ]
