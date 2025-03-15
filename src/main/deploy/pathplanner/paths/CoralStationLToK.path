@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.103,
-        "y": 7.28
+        "x": 1.306,
+        "y": 7.342
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.3375831589919427,
-        "y": 6.452956818821729
+        "x": 2.540583158991943,
+        "y": 6.514956818821728
       },
       "isLocked": false,
       "linkedName": "CoralStationL"
@@ -72,7 +72,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -60.06848815949227
+    "rotation": -59.99999999999999
   },
   "reversed": false,
   "folder": "StartLineICoral",

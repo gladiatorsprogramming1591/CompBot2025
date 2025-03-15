@@ -3,54 +3,69 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.103,
-        "y": 7.28
+        "x": 1.306,
+        "y": 7.342
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.0910862699316968,
-        "y": 6.310906855264951
+        "x": 2.1773607721197537,
+        "y": 6.573251403376327
       },
       "isLocked": false,
       "linkedName": "CoralStationL"
     },
     {
       "anchor": {
-        "x": 3.2965277777777784,
-        "y": 4.218
+        "x": 3.689,
+        "y": 4.944
       },
       "prevControl": {
-        "x": 2.1783522381731046,
-        "y": 4.70593797006361
+        "x": 3.09605818005297,
+        "y": 5.489945050493091
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "A"
+      "linkedName": "L"
     }
   ],
   "rotationTargets": [],
-  "constraintZones": [],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0.6,
+      "maxWaypointRelativePos": 1.0,
+      "constraints": {
+        "maxVelocity": 3.0,
+        "maxAcceleration": 2.5,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "Home Coral",
+      "name": "Intake, Home, Raise L4 Coral",
       "waypointRelativePos": 0,
-      "endWaypointRelativePos": null,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "Home Coral"
-        }
-      }
-    },
-    {
-      "name": "Prep L4",
-      "waypointRelativePos": 0.61,
       "endWaypointRelativePos": null,
       "command": {
         "type": "sequential",
         "data": {
           "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Auto Intake Coral"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "Home Coral"
+              }
+            },
             {
               "type": "named",
               "data": {
@@ -72,7 +87,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": -54.0
   },
   "reversed": false,
   "folder": "StartLineICoral",
@@ -80,5 +95,5 @@
     "velocity": 0,
     "rotation": -54.0
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }
