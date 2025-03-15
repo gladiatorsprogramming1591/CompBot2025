@@ -280,7 +280,8 @@ public class RobotContainer {
             .andThen((new ElevatorToPosition(elevator,position)))
             .andThen(new WaitUntilCommand(elevator::atSetpoint))
             .andThen(wrist.L4HoverPositionCommand())
-            .andThen(new RunCommand(() -> endEffector.setCoralSpeed(-0.15),endEffector).withTimeout(0.25))
+            .andThen(new RunCommand(() -> endEffector.setCoralSpeed(-0.15),endEffector).withTimeout(0.25)
+                .alongWith(new InstantCommand(() -> prepL4Finished(true))))
             .andThen(new InstantCommand(() -> endEffector.setCoralSpeed(0.0),endEffector))
             .andThen(new InstantCommand(() -> prepL4Finished(true)));
         }
@@ -290,7 +291,7 @@ public class RobotContainer {
             : new ElevatorToPosition(elevator,position)
             .andThen(new WaitUntilCommand(elevator::atSetpoint))
             .andThen(wrist.L4HoverPositionCommand())
-            .andThen(new RunCommand(() -> endEffector.setCoralSpeed(-0.25),endEffector).withTimeout(0.15))
+            .andThen(new RunCommand(() -> endEffector.setCoralSpeed(-0.15),endEffector).withTimeout(0.25))
             .andThen(new InstantCommand(() -> endEffector.setCoralSpeed(0.0),endEffector))
             .andThen(new InstantCommand(() -> prepL4Finished(false)));
         }
