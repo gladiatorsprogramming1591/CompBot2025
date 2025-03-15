@@ -81,7 +81,10 @@ public class EndEffector extends SubsystemBase {
     }
 
     public boolean isCoralInFunnel() {
-        return (isCoralRearBeamBroken() && !isCoralFrontBeamBroken());
+        boolean rearBeamBroken;
+        rearBeamBroken = isCoralRearBeamBroken();
+        System.out.println("isCoralInFunnel = " + rearBeamBroken);
+        return rearBeamBroken;
     }
 
     public void algaeCheckRoutine() {
