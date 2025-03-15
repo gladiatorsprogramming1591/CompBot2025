@@ -16,6 +16,8 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -34,6 +36,7 @@ import frc.robot.generated.TunerConstants.*;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.EndEffector;
+import frc.robot.subsystems.FlapServo;
 import frc.robot.subsystems.Wrist;
 import frc.robot.subsystems.Climber;
 import frc.robot.utilities.DynamicRateLimiter;
@@ -49,14 +52,15 @@ public class RobotContainer {
 	private final Wrist wrist = robotInitConstants.isCompBot ? new Wrist() : null;
 	public final ElevatorSubsystem elevator = robotInitConstants.isCompBot ? new ElevatorSubsystem() : null;
     private final Climber climber = robotInitConstants.isCompBot ? new Climber(drivetrain) : null;
+    private final FlapServo flapServo = robotInitConstants.isCompBot ? new FlapServo() : null;
 
 
 
     private double MaxSpeed = robotInitConstants.isCompBot ? PoseidonTunerConstants.kSpeedAt12Volts.in(MetersPerSecond)
             : ChazTunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 1 1/2 of a rotation per second max angular velocity
-    private double maxSpeedPercent = 0.50;
-    private double maxAngularRatePercent = 0.25;
+    private double maxSpeedPercent = 0.65;
+    private double maxAngularRatePercent = 0.40;
     public static double kineticDeadband = KINETIC_DEADBAND;
 
 
@@ -86,11 +90,13 @@ public class RobotContainer {
         .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
     
     public RobotContainer() {
-        // DataLogManager.start();
+        DataLogManager.start();
         registerNamedCommands();
         autoChooser = AutoBuilder.buildAutoChooser(); // A default auto can be passed in as parameter.
         SmartDashboard.putData("Auto Mode", autoChooser);
         SmartDashboard.putData(drivetrain.getCurrentCommand());
+        SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime()); 
+        SmartDashboard.putNumber("", DriverStation.getStickButtons(1));
         
         if (robotInitConstants.isCompBot) configureBindingsComp(); else configureBindingsChassis();
         
@@ -152,15 +158,18 @@ public class RobotContainer {
         operatorController.povUp().onTrue(prepElevatorScore(elevatorPositions.L3));
         operatorController.leftBumper().onTrue(complexElevatorStowCommand(elevatorPositions.STOW));
         operatorController.back().onTrue(new InstantCommand(() -> elevator.zeroElevatorCommand()));
-        operatorController.b().onTrue(complexProcessorCommand(elevatorPositions.PROCESSOR));
+        operatorController.b().onTrue(complexProcessorCommand(elevatorPositions.STOW));
 
         // Wrist
-        operatorController.a().onTrue(new InstantCommand(()-> wrist.setAngle(WristConstants.WRIST_STOW)));
+        // operatorController.a().onTrue(new InstantCommand(()-> wrist.setAngle(WristConstants.WRIST_STOW)));
         operatorController.x().onTrue(new InstantCommand(()-> wrist.setAngle(WristConstants.GROUND_INTAKE)));
         operatorController.y().onTrue(new InstantCommand(()-> wrist.setAngle(WristConstants.REEF_ACQUIRE_ANGLE)));
 
         operatorController.rightTrigger().onTrue(complexHighAlgaeIntakeCommand(elevatorPositions.ALGAE_HIGH));
         operatorController.leftTrigger().onTrue(complexLowAlgaeIntakeCommand(elevatorPositions.ALGAE_LOW));
+        // operatorController.rightTrigger().onTrue(flapServo.setFlapAngleCommand(()-> operatorController.getRightTriggerAxis()));
+        operatorController.a().onTrue(flapServo.setFlapUpCommand());
+        operatorController.rightBumper().onTrue(flapServo.setFlapDownCommand());
 
         // operatorController.rightTrigger().whileTrue(wrist.manualWristMovement(operatorController.getRightTriggerAxis()*0.20))
         //     .onFalse(new InstantCommand(()-> wrist.setWristMotor(0)));
@@ -170,7 +179,7 @@ public class RobotContainer {
         // Default Commands
         // wrist.setDefaultCommand(wrist.manualWristMovement(operatorController.getRightTriggerAxis() - operatorController.getLeftTriggerAxis() * 0.20));
         // operatorController.rightStick().toggleOnTrue(new RunCommand(() -> elevator.setMotorSpeed(operatorController.getRightY() * 0.50), elevator)
-            // .handleInterrupt(() -> elevator.setMotorSpeed(0)));
+        //     .handleInterrupt(() -> elevator.setMotorSpeed(0)));
     
         climber.setDefaultCommand(climber.manualClimbMovement(()-> MathUtil.applyDeadband(operatorController.getRightY(), STATIC_DEADBAND), ()-> MathUtil.applyDeadband(operatorController.getLeftY(), STATIC_DEADBAND)));
         drivetrain.registerTelemetry(logger::telemeterize);

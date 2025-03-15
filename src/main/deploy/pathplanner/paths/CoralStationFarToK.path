@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.72575,
-        "y": 7.456999999999999
+        "x": 1.103,
+        "y": 7.28
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.886,
-        "y": 6.3454999999999995
+        "x": 2.26325,
+        "y": 6.168500000000001
       },
       "isLocked": false,
-      "linkedName": "CoralStationFarBlue"
+      "linkedName": "CoralStationL"
     },
     {
       "anchor": {
-        "x": 3.94875,
-        "y": 5.204749999999999
+        "x": 4.052,
+        "y": 5.158
       },
       "prevControl": {
-        "x": 3.01275,
-        "y": 6.199249999999998
+        "x": 3.1159999999999997,
+        "y": 6.1525
       },
       "nextControl": null,
       "isLocked": false,
@@ -31,10 +31,33 @@
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "Home Coral",
+      "waypointRelativePos": 0.0,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Home Coral"
+        }
+      }
+    },
+    {
+      "name": "Prep L4",
+      "waypointRelativePos": 0.75,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Prep L4"
+        }
+      }
+    }
+  ],
   "globalConstraints": {
-    "maxVelocity": 2.25,
-    "maxAcceleration": 2.5,
+    "maxVelocity": 3.5,
+    "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
@@ -45,10 +68,10 @@
     "rotation": -60.06848815949227
   },
   "reversed": false,
-  "folder": "AngledStartLineHKSide",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -59.99999999999999
+    "rotation": -54.0
   },
   "useDefaultConstraints": true
 }

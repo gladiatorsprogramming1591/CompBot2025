@@ -42,7 +42,7 @@ public class Constants {
         public static final double TOLERANCE_INCHES = 0.5;
 
         // Constants for going up
-        public static final double P_UP = 0.075;
+        public static final double P_UP = 0.1;
         public static final double I_UP = 0;
         public static final double D_UP = 0;
         public static final double FF_UP = .623;
@@ -66,7 +66,7 @@ public class Constants {
         public static final double kL1 = 2.75;
         public static final double kL2 = 7.04;
         public static final double kL3 = 15.3;
-        public static final double kL4 = 25.5;
+        public static final double kL4 = 26.4;
         public static final double AUTO_L4 = 25.5;
         public static final double kPROCESSOR = 0.2;
         public static final double kNET = kL4;
@@ -142,10 +142,10 @@ public class Constants {
     public class WristConstants {
         // Wrist Position
         public static final double WRIST_INTAKE = 255.0; // 254
-        public static final double WRIST_STOW = WRIST_INTAKE + 16.5;
+        public static final double WRIST_STOW = WRIST_INTAKE + 12;
         public static final double REEF_ACQUIRE_ANGLE = WRIST_INTAKE + 22.0;
         public static final double GROUND_INTAKE = WRIST_INTAKE + 70.0;
-        public static final double WRIST_PROCESSOR = WRIST_INTAKE + 25.0;
+        public static final double WRIST_PROCESSOR = WRIST_INTAKE + 23.0;
         public static final double WRIST_HOVER = WRIST_INTAKE + 34.0;
         public static final double WRIST_HOVER_L2 = WRIST_INTAKE + 39.0;
         public static final double WRIST_HOVER_L4 = WRIST_INTAKE + 46.0; // +39
@@ -184,7 +184,7 @@ public class Constants {
 
     public class ClimberConstants {
         public static final int CLIMB_ROLLER_CAN_ID = 50;
-        public static final int CLIMB_ROLLER_CURRENT_LIMIT = 30;
+        public static final int CLIMB_ROLLER_CURRENT_LIMIT = 80;
         public static final boolean CLIMB_ROLLER_MOTOR_INVERTED = true;
         public static final double CLIMB_ROLLER_RAMP_RATE = 0.1;
         public static final double CLIMB_ROLLER_P = 0.025;
@@ -208,7 +208,7 @@ public class Constants {
         };
 
         public static final int WINCH_CAN_ID = 60;
-        public static final int WINCH_CURRENT_LIMIT = 30;
+        public static final int WINCH_CURRENT_LIMIT = 80;
         public static final boolean WINCH_MOTOR_INVERTED = true;
         public static final double WINCH_RAMP_RATE = 0.1;
         public static final double WINCH_P = 0.025;
@@ -230,6 +230,12 @@ public class Constants {
                 absoluteEncoder.positionConversionFactor(360);
             }
         };
+    }
+
+    public class ServoConstants {
+        public static final int kFlapServoChannel = 9;
+        public static final double kServoUpAngle = 180;
+        public static final double kServoDownAngle = 120;
     }
 
     public class VisionConstants {

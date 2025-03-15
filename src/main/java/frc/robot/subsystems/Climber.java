@@ -66,6 +66,8 @@ public class Climber extends SubsystemBase {
         SmartDashboard.putNumber("Climb Pitch", pitch);
         SmartDashboard.putNumber("Winch Current", winchMotor.getOutputCurrent()); 
         SmartDashboard.putNumber("Climb Roller Current", climbRollerMotor.getOutputCurrent()); 
+        SmartDashboard.putBoolean("Start Winch Angle", isAtStartAngle()); 
+        SmartDashboard.putNumber("Climber Vel", getWinchVelocity());
     }
 
     /**
@@ -77,6 +79,11 @@ public class Climber extends SubsystemBase {
          return climberEncoder.getPosition();
     }
 
+    public boolean isAtStartAngle(){
+        return (Math.abs(getAngle() - 127) < 1);
+            
+    }
+
     public void setclimbRollerMotor(double speed)
     {
         SmartDashboard.putNumber("Climb Roller Motor Speed", speed);
@@ -85,8 +92,19 @@ public class Climber extends SubsystemBase {
 
     public void setWinchSpeed(double speed)
     {
-        SmartDashboard.putNumber("Winch Motor Speed", speed);
-        winchMotor.set(speed*1.0);
+        final double MAX_VELOCITY_SCALE = 1.0;
+        if ((getWinchVelocity() < 0) && (getAngle() < 109.0)) { //Does completely stop motor, but is satisfactory for now. Overshoots by 5 degrees under no load
+            SmartDashboard.putNumber("Winch Motor Speed", 0);
+            winchMotor.set(0);
+        } else {
+            SmartDashboard.putNumber("Winch Motor Speed", speed);
+            winchMotor.set(speed*MAX_VELOCITY_SCALE);
+        }
+    }
+
+    public double getWinchVelocity() {
+        double velocity = climberEncoder.getVelocity();
+        return velocity;
     }
 
     class DefaultCommand extends ParallelCommandGroup {
@@ -94,6 +112,8 @@ public class Climber extends SubsystemBase {
             addRequirements(climber);
             addCommands(
                 new RunCommand(()-> climber.setWinchSpeed(winchSupplier.getAsDouble())),
+                    // .until(()-> (getWinchVelocity() > 0) ? getAngle() > 105.0 : true)
+                    // .andThen(()->climber.setWinchSpeed(0)),
                 new RunCommand(()-> climber.setclimbRollerMotor(rollerSupplier.getAsDouble()))
             );
         }

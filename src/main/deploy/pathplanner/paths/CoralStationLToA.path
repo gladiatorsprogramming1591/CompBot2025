@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.943118686868687,
-        "y": 5.153219696969697
+        "x": 1.103,
+        "y": 7.28
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.75,
-        "y": 5.864709595959596
+        "x": 2.0910862699316968,
+        "y": 6.310906855264951
       },
       "isLocked": false,
-      "linkedName": "J"
+      "linkedName": "CoralStationL"
     },
     {
       "anchor": {
-        "x": 1.1867827868852459,
-        "y": 7.243698770491803
+        "x": 3.2965277777777784,
+        "y": 4.218
       },
       "prevControl": {
-        "x": 2.304838342440802,
-        "y": 6.999759376552409
+        "x": 2.1783522381731046,
+        "y": 4.70593797006361
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "CoralStationL"
+      "linkedName": "A"
     }
   ],
   "rotationTargets": [],
@@ -33,8 +33,19 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "Stow",
-      "waypointRelativePos": 0.07292370020256321,
+      "name": "Home Coral",
+      "waypointRelativePos": 0,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Home Coral"
+        }
+      }
+    },
+    {
+      "name": "Prep L4",
+      "waypointRelativePos": 0.61,
       "endWaypointRelativePos": null,
       "command": {
         "type": "sequential",
@@ -43,13 +54,7 @@
             {
               "type": "named",
               "data": {
-                "name": "Stow"
-              }
-            },
-            {
-              "type": "named",
-              "data": {
-                "name": "Intake Coral"
+                "name": "Prep L4"
               }
             }
           ]
@@ -59,7 +64,7 @@
   ],
   "globalConstraints": {
     "maxVelocity": 3.5,
-    "maxAcceleration": 2.5,
+    "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
@@ -67,13 +72,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -54.0
+    "rotation": 0.0
   },
   "reversed": false,
   "folder": "StartLineICoral",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -119.99999999999999
+    "rotation": -54.0
   },
   "useDefaultConstraints": true
 }

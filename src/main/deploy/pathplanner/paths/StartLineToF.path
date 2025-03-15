@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.0840000000000005,
-        "y": 2.728249999999999
+        "x": 6.689139344262295,
+        "y": 2.5804815573770488
       },
       "isLocked": false,
       "linkedName": null
@@ -20,8 +20,8 @@
         "y": 3.0402500000000003
       },
       "prevControl": {
-        "x": 5.9475,
-        "y": 2.728249999999999
+        "x": 5.670184426229508,
+        "y": 2.652407786885245
       },
       "nextControl": null,
       "isLocked": false,
@@ -34,7 +34,7 @@
   "eventMarkers": [
     {
       "name": "PrepAndScore",
-      "waypointRelativePos": 0.30868486352357,
+      "waypointRelativePos": 0.04795821462488546,
       "endWaypointRelativePos": null,
       "command": {
         "type": "sequential",
@@ -52,7 +52,7 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 3.5,
+    "maxVelocity": 3.0,
     "maxAcceleration": 2.5,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
@@ -69,5 +69,5 @@
     "velocity": 0,
     "rotation": 180.0
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }

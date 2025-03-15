@@ -3,55 +3,50 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.5075,
-        "y": 5.4095
+        "x": 7.28,
+        "y": 5.61
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.358504098360656,
-        "y": 5.481506147540983
+        "x": 6.0842410581830215,
+        "y": 5.321797721964697
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 4.943118686868687,
-        "y": 5.153219696969697
+        "x": 5.158,
+        "y": 5.01
       },
       "prevControl": {
-        "x": 5.33871854771282,
-        "y": 5.227249712145443
+        "x": 5.947614571138512,
+        "y": 5.321945234048772
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": "J"
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.5,
-      "rotationDegrees": -119.99999999999999
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "Prep L4",
-      "waypointRelativePos": 0.5428764348413183,
+      "name": "PrepAndScore",
+      "waypointRelativePos": 0.31,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
         "data": {
-          "name": "Prep L4"
+          "name": "Prep Auto L4"
         }
       }
     }
   ],
   "globalConstraints": {
     "maxVelocity": 3.5,
-    "maxAcceleration": 2.5,
+    "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
