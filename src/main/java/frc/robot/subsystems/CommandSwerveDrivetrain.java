@@ -389,8 +389,18 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                     ) {
                         double sum = 0.0;
                         for (PhotonTrackedTarget target : pose.get().targetsUsed) {
-                            Optional<Pose3d> tagPose =
-                                fieldLayout.getTagPose(target.getFiducialId());
+                            int fiducialId = target.getFiducialId();
+                            switch(fiducialId){
+                                case 1:
+                                    continue;
+                                case 2:
+                                    continue;
+                                case 12:
+                                    continue;
+                                case 13:
+                                    continue;
+                            }
+                            Optional<Pose3d> tagPose = fieldLayout.getTagPose(fiducialId);
                             if (tagPose.isEmpty()) continue;
                             sum += currentPose.getTranslation().getDistance(tagPose.get().getTranslation().toTranslation2d());
                         }
