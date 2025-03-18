@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
@@ -287,13 +288,15 @@ public class RobotContainer {
         }
 
         public Command confirmPrepElevatorScoreL4(elevatorPositions position) {
-            return prepL4Finished ? new InstantCommand(() -> prepL4Finished(false))
-            : new ElevatorToPosition(elevator,position)
-            .andThen(new WaitUntilCommand(elevator::atSetpoint))
-            .andThen(wrist.L4HoverPositionCommand())
-            .andThen(new RunCommand(() -> endEffector.setCoralSpeed(-0.15),endEffector).withTimeout(0.25))
-            .andThen(new InstantCommand(() -> endEffector.setCoralSpeed(0.0),endEffector))
-            .andThen(new InstantCommand(() -> prepL4Finished(false)));
+            return new ConditionalCommand(
+            new InstantCommand(()-> prepL4Finished = false),
+            new ElevatorToPosition(elevator,position).onlyIf(()-> prepL4Finished)
+                .andThen(new WaitUntilCommand(elevator::atSetpoint))
+                .andThen(wrist.L4HoverPositionCommand())
+                .andThen(new RunCommand(() -> endEffector.setCoralSpeed(-0.15),endEffector).withTimeout(0.25))
+                .andThen(new InstantCommand(() -> endEffector.setCoralSpeed(0.0),endEffector))
+                .andThen(new InstantCommand(() -> prepL4Finished(false))),
+            () -> prepL4Finished);
         }
     
         public Command complexElevatorStowCommand(elevatorPositions position) {
