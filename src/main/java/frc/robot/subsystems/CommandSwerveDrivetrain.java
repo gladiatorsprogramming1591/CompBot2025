@@ -395,6 +395,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                             sum += currentPose.getTranslation().getDistance(tagPose.get().getTranslation().toTranslation2d());
                         }
 
+                        double estPoseOffset = currentPose.getTranslation().getDistance(pose2d.getTranslation());
+                        SmartDashboard.putNumber("estPoseOffset", estPoseOffset);
+
                         int tagCount = pose.get().targetsUsed.size();
                         double stdScale = Math.pow(sum / tagCount, 2.0) / tagCount;
                         double xyStd = VISION_STD_XY_SCALE * stdScale;
