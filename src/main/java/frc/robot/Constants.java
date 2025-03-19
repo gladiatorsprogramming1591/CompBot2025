@@ -22,6 +22,10 @@ public class Constants {
         public static final double LIMIT_SCALE_PER_INCH = 0.92;
     }
 
+    public static final class PathPlannerConstants {
+        
+    }
+
     public class ElevatorConstants {
         public static final int ELEVATOR_LEADER_CAN_ID = 1; // Right
         public static final int ELEVATOR_FOLLOWER_CAN_ID = 2; // Left
