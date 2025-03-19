@@ -102,6 +102,17 @@ public class RobotContainer {
             
             public RobotContainer() {
                 DataLogManager.start();
+                // startLineFCoralStartPath = new PathPlannerPath(
+                //     PathPlannerPath.waypointsFromPoses(
+                //         new Pose2d(new Translation2d(5.158, 3.040), new Rotation2d(Units.degreesToRadians(142.879))), 
+                //         new Pose2d(new Translation2d(5.158, 3.040), new Rotation2d(Units.degreesToRadians(142.879)))), 
+                //     new PathConstraints(
+                //       3.0, 2.5, 
+                //       Units.degreesToRadians(540.0), Units.degreesToRadians(720.0)
+                //     ),
+                //     null, // Ideal starting state can be null for on-the-fly paths
+                //     new GoalEndState(0.0, new Rotation2d(Units.degreesToRadians(120.0)))
+                // );
                 registerNamedCommands();
                 autoChooser = AutoBuilder.buildAutoChooser(); // A default auto can be passed in as parameter.
                 SmartDashboard.putData("Auto Mode", autoChooser);
@@ -511,7 +522,6 @@ public class RobotContainer {
             NamedCommands.registerCommand("Auto Intake Coral", autoComplexIntakeCommand());
             NamedCommands.registerCommand("Funnel Beam Break", new WaitUntilCommand(() -> endEffector.isCoralInFunnel()));
             NamedCommands.registerCommand("Stop intake", new InstantCommand(() -> endEffector.setCoralSpeed(0)));
-            NamedCommands.registerCommand("startLineFCoral Start Path", Commands.runOnce(() -> AutoBuilder.followPath(startLineFCoralStartPath).schedule(), drivetrain));
         }
     }
 }
