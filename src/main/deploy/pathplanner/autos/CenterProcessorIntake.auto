@@ -1,0 +1,97 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Jiana's Sigma Auto"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Prep Algae Low"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Intake Algae"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "HG Processer"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Prep Processor"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Score Algae"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Processor EF"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Prep Algae High"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Intake Algae"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "EF Processor"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Prep Processor"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Score Algae"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ProcessorCoralIntake"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Auto Intake Coral"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}
