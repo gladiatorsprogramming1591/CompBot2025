@@ -28,11 +28,12 @@ public class ElevatorSubsystem extends SubsystemBase {
     DigitalInput lowerLimit;
     Trigger zeroTrigger;
 
-    SparkBase leader;
-    SparkBase follower;
+    SparkFlex leader;
+    SparkFlex follower;
 
     RelativeEncoder leadEncoder;
     RelativeEncoder followEncoder;
+    RelativeEncoder relativeExternalEncoder;
     AbsoluteEncoder absEncoder;
     SparkClosedLoopController controller;
     SparkLimitSwitch bottomLimitSwitch;
@@ -70,6 +71,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         leadEncoder = leader.getEncoder();
         followEncoder = follower.getEncoder();
         absEncoder = follower.getAbsoluteEncoder();
+        relativeExternalEncoder = follower.getExternalEncoder();
         controller = leader.getClosedLoopController();
 
         bottomLimitSwitch = leader.getReverseLimitSwitch();
@@ -114,6 +116,10 @@ public class ElevatorSubsystem extends SubsystemBase {
         return absEncoder.getPosition();
     }
 
+    public double getExternalPositionRotations() {
+        return relativeExternalEncoder.getPosition();
+    }
+
     /**
      * Returns the current height
      * 
@@ -124,7 +130,11 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public double getABSPositionInches() {
-        return getABSPositionRotations() * INCHES_PER_ABS_ROTATION + INITIAL_HEIGHT_INCHES;
+        return getABSPositionRotations() * INCHES_PER_EXTERNAL_ROTATION + INITIAL_HEIGHT_INCHES;
+    }
+
+    public double getExternalPositionInches() {
+        return getExternalPositionRotations() * INCHES_PER_EXTERNAL_ROTATION + INITIAL_HEIGHT_INCHES;
     }
 
     /**
@@ -178,6 +188,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Follower Velocity", followEncoder.getVelocity());
         SmartDashboard.putNumber("Elevator lastPos", lastPos);
         SmartDashboard.putNumber("Elevator ABS inches", getABSPositionInches());
+        SmartDashboard.putNumber("Elevator relative external inches", getExternalPositionInches());
 
         if ((lastPos == kSTOW) && (getPositionInches() <= kSTOW + TOLERANCE_INCHES + 0.05)) {
             if (printZero == true) {
