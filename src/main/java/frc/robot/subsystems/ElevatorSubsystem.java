@@ -69,7 +69,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         leadEncoder = leader.getEncoder();
         followEncoder = follower.getEncoder();
-        absEncoder = leader.getAbsoluteEncoder();
+        absEncoder = follower.getAbsoluteEncoder();
         controller = leader.getClosedLoopController();
 
         bottomLimitSwitch = leader.getReverseLimitSwitch();
@@ -177,6 +177,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Follower Output Current", follower.getOutputCurrent());
         SmartDashboard.putNumber("Follower Velocity", followEncoder.getVelocity());
         SmartDashboard.putNumber("Elevator lastPos", lastPos);
+        SmartDashboard.putNumber("Elevator ABS inches", getABSPositionInches());
 
         if ((lastPos == kSTOW) && (getPositionInches() <= kSTOW + TOLERANCE_INCHES + 0.05)) {
             if (printZero == true) {
