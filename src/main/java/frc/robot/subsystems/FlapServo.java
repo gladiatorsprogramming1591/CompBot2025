@@ -39,4 +39,14 @@ public class FlapServo extends SubsystemBase {
   public Command setFlapAngleCommand(DoubleSupplier angleSupplier) {
     return new RunCommand(()-> setFlapServoAngle(angleSupplier.getAsDouble() * 60 + 120),this);
   }
+
+  public Command toggleFlapCommand() {
+    return new RunCommand(()-> {
+      if(m_FlapServo.getAngle() == ServoConstants.kServoUpAngle){
+        setFlapServoAngle(ServoConstants.kServoDownAngle);
+      } else {
+        setFlapServoAngle(ServoConstants.kServoUpAngle);
+      }
+    },this);
+  }
 }
