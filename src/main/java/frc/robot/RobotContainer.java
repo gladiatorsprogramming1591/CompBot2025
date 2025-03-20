@@ -181,6 +181,7 @@ public class RobotContainer {
                 operatorController.leftBumper().onTrue(complexElevatorStowCommand(elevatorPositions.STOW));
                 operatorController.back().onTrue(new InstantCommand(() -> elevator.zeroElevatorCommand()));
                 operatorController.b().onTrue(complexProcessorCommand(elevatorPositions.STOW));
+                operatorController.rightStick().onTrue(complexBargeCommand(elevatorPositions.L4));
         
                 // Wrist
                 // operatorController.a().onTrue(new InstantCommand(()-> wrist.setAngle(WristConstants.WRIST_STOW)));
@@ -254,6 +255,7 @@ public class RobotContainer {
                 driverController.start().onTrue(new InstantCommand(()-> slowMode(true)))
                     .onFalse(new InstantCommand(()-> slowMode(false)));
         
+                
                 driverController.x().whileTrue(new AutoReefPoseCommand(drivetrain, reefAlign, this::driveXChassis, this::driveYChassis, this::driveT, ()->ReefSide.LEFT));
                 driverController.y().whileTrue(new AutoReefPoseCommand(drivetrain, reefAlign, this::driveXChassis, this::driveYChassis, this::driveT, ()->ReefSide.RIGHT));
                 driverController.a().whileTrue(new AutoReefPoseCommand(drivetrain, reefAlign, this::driveXChassis, this::driveYChassis, this::driveT, ()->FieldConstants.getNearestReefSide(drivetrain.getState().Pose)));    
@@ -371,6 +373,14 @@ public class RobotContainer {
             .andThen((new ElevatorToPosition(elevator,position)))
             .andThen(new WaitUntilCommand(elevator::atSetpoint))
             .andThen(wrist.HighAlgaePositionCommand())
+            .andThen(new WaitUntilCommand(wrist::atSetpoint));
+        }
+
+        public Command complexBargeCommand(elevatorPositions position){
+            return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
+            .andThen((new ElevatorToPosition(elevator,position)))
+            .andThen(new WaitUntilCommand(elevator::atSetpoint))
+            .andThen(wrist.StowPositionCommand())
             .andThen(new WaitUntilCommand(wrist::atSetpoint));
         }
 
