@@ -229,7 +229,8 @@ public class RobotContainer {
                 path.preventFlipping = true;
 
                 AutoBuilder.followPath(path).schedule();
-                }));
+                },
+                drivetrain));
 
                 drivetrain.registerTelemetry(logger::telemeterize);
             }
