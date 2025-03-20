@@ -40,7 +40,7 @@ public class Constants {
         public static final double OUTPUT_MINIMUM = -1.0;
 
         public static final double INCHES_PER_ROTATION = 22.0 / 9.0 / 4.0;
-        public static final double INCHES_PER_ABS_ROTATION = 0; // TODO: measure this
+        public static final double INCHES_PER_ABS_ROTATION = 1.7576*Math.PI; // TODO: measure this
         public static final double INITIAL_HEIGHT_INCHES = 0;
         public static final double TOLERANCE_INCHES = 0.5;
 
