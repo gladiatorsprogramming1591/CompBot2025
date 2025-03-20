@@ -11,6 +11,7 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
@@ -53,8 +54,9 @@ public class RobotContainer {
     private final Wrist wrist = robotInitConstants.isCompBot ? new Wrist() : null;
     public final ElevatorSubsystem elevator = robotInitConstants.isCompBot ? new ElevatorSubsystem() : null;
     private final Climber climber = robotInitConstants.isCompBot ? new Climber(drivetrain) : null;
-    private final FlapServo flapServo = robotInitConstants.isCompBot ? new FlapServo() : null;
-
+    private final FlapServo flapServo = robotInitConstants.isCompBot ? new FlapServo() : null;    
+    public PathPlannerPath startLineFCoralStartPath;
+    
     private boolean prepL4Finished = false;
 
     private double MaxSpeed = robotInitConstants.isCompBot ? PoseidonTunerConstants.kSpeedAt12Volts.in(MetersPerSecond)
@@ -335,7 +337,7 @@ public class RobotContainer {
                 .andThen(new WaitUntilCommand(elevator::atSetpoint))
                 .andThen(wrist.IntakePositionCommand())
                 .andThen(new WaitUntilCommand(wrist::atSetpoint))
-                .andThen(endEffector.intakeCoralCommand())
+                .andThen(endEffector.intakeCoralCommand2())
                 .andThen(wrist.StowPositionCommand());
         // .andThen(new ElevatorToPosition(elevator, elevatorPositions.L2))
         // .andThen(new WaitUntilCommand(elevator::atSetpoint));
