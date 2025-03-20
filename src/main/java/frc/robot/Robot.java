@@ -7,6 +7,7 @@ package frc.robot;
 import java.util.List;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
@@ -47,6 +48,11 @@ public class Robot extends TimedRobot {
   public void disabledPeriodic() {
     // Add a button to SmartDashboard that will create and follow an on-the-fly path
     // This example will simply move the robot 2m in the +X field direction
+    updateStartLineFCoralStartPath();
+
+  }
+
+  private void updateStartLineFCoralStartPath() {
     if (++periodicCycle == 10) // Only runs once every 200ms 10th periodic cycle (200ms)
     {
       Pose2d currentPose = m_robotContainer.drivetrain.getState().Pose;
@@ -70,7 +76,6 @@ public class Robot extends TimedRobot {
       m_robotContainer.startLineFCoralStartPath.preventFlipping = true;
       periodicCycle = 0;
     }
-
   }
 
   @Override
@@ -78,6 +83,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
+    NamedCommands.registerCommand("startLineFCoral Start Path", AutoBuilder.followPath(m_robotContainer.startLineFCoralStartPath));
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     if (m_autonomousCommand != null) {
