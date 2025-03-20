@@ -122,7 +122,7 @@ public class Wrist extends SubsystemBase {
           return new InstantCommand(()->setAngle(WristConstants.WRIST_HOVER_L4)); 
      }
      public Command LowAlgaePositionCommand(){
-          return new InstantCommand(()->setAngle(WristConstants.WRIST_ALGAE_LOW)); 
+          return new InstantCommand(()->setAngle(WristConstants.GROUND_INTAKE)); 
      }
      public Command HighAlgaePositionCommand(){
           return new InstantCommand(()->setAngle(WristConstants.WRIST_ALGAE_HIGH)); 

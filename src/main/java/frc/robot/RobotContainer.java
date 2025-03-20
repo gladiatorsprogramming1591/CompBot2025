@@ -178,14 +178,14 @@ public class RobotContainer {
         operatorController.rightBumper().onTrue(complexBargeCommand(elevatorPositions.NETSHOOT)); 
         
         operatorController.b().onTrue(complexProcessorCommand(elevatorPositions.PROCESSOR));
-        operatorController.rightStick().onTrue(complexBargeCommand(elevatorPositions.NETSHOOT));
+        // operatorController.rightStick().onTrue(complexBargeCommand(elevatorPositions.NETSHOOT));
 
         // Wrist
         operatorController.x().onTrue(new InstantCommand(() -> wrist.setAngle(WristConstants.GROUND_INTAKE)));
         operatorController.y().onTrue(new InstantCommand(() -> wrist.setAngle(WristConstants.WRIST_STOW)));
         operatorController.leftTrigger().onTrue(complexLowAlgaeIntakeCommand(elevatorPositions.ALGAE_LOW));
         operatorController.rightTrigger().onTrue(complexHighAlgaeIntakeCommand(elevatorPositions.ALGAE_HIGH));
-
+        
         //Deep Climb
 
         operatorController.a().onTrue(flapServo.toggleFlapCommand());
