@@ -47,6 +47,7 @@ import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+import org.photonvision.PhotonUtils;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
@@ -58,6 +59,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private static final double kSimLoopPeriod = 0.005; // 5 ms
     private Notifier m_simNotifier = null;
     private double m_lastSimTime;
+    Pose2d currentPose;
     PowerDistribution m_pdh = robotInitConstants.isCompBot ? new PowerDistribution(1, ModuleType.kRev) : new PowerDistribution(21, ModuleType.kRev);
 
     /* Blue alliance sees forward as 0 degrees (toward red alliance wall) */
@@ -149,6 +151,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     PhotonPoseEstimator[] m_photonPoseEstimators;
     AprilTagFieldLayout fieldLayout;
         private PhotonTrackedTarget lastTarget;
+        private int longDistangePoseEstimationCount = 0;
+        private static final double maximumAmbiguity = 0.25;
     
         public static final Transform3d kFrontCameraLocation = new Transform3d(
                     new Translation3d(Units.inchesToMeters(11.007), Units.inchesToMeters(0.1875),
@@ -348,9 +352,56 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         public Command sysIdDynamic(SysIdRoutine.Direction direction) {
             return m_sysIdRoutineToApply.dynamic(direction);
         }
+                
+        /**
+         * Filter pose via the ambiguity and find best estimate between all of the camera's throwing out distances more than
+         * 10m for a short amount of time.
+         *
+         * @param pose Estimated robot pose.
+         * @return Could be empty if there isn't a good reading.
+         */
+        private Optional<EstimatedRobotPose> filterPose(Optional<EstimatedRobotPose> pose, int cameraIdx)
+        {
+            if (pose.isPresent())
+            {
+                double bestTargetAmbiguity = 1; // 1 is max ambiguity
+                for (PhotonTrackedTarget target : pose.get().targetsUsed)
+                {
+                    double ambiguity = target.getPoseAmbiguity();
+                    SmartDashboard.putNumber("Ambiguity " + target.getFiducialId() + "." + cameraIdx, ambiguity);
+                    if (ambiguity != -1 && ambiguity < bestTargetAmbiguity)
+                    {
+                        bestTargetAmbiguity = ambiguity;
+                    }
+                }
+                //ambiguity to high dont use estimate
+                if (bestTargetAmbiguity > maximumAmbiguity)
+                {
+                    System.out.println("Ignoring pose on camera " + cameraIdx + " with ambiguity " + bestTargetAmbiguity);
+                    return Optional.empty();
+                }
+
+                //est pose is very far from recorded robot pose
+                if (PhotonUtils.getDistanceToPose(currentPose, pose.get().estimatedPose.toPose2d()) > 1)
+                {
+                    longDistangePoseEstimationCount++;
+
+                    //if it calculates that were 10 meter away for more than 10 times in a row its probably right
+                    if (longDistangePoseEstimationCount < 10)
+                    {
+                        return Optional.empty();
+                    }
+                } else
+                {
+                    longDistangePoseEstimationCount = 0;
+                }
+                return pose;
+            }
+            return Optional.empty();
+        }
     
         public void updatePoseEstimationWithFilter() {
-            Pose2d currentPose = getState().Pose;
+            currentPose = getState().Pose;
             for (int cameraIdx = 0; cameraIdx < MAX_CAMERAS; cameraIdx++) {
                 // TODO: need to find the camera associated with a pose estimator, hard coded to front
                 // var results = m_frontCamera.getAllUnreadResults();
@@ -375,6 +426,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                     double latencyThreshold = 12.0;
                     SmartDashboard.putBoolean("Vision Latency OK", latency > latencyThreshold);
                     pose = m_photonPoseEstimators[cameraIdx].update(result);
+                    if(pose != null) pose = filterPose(pose, cameraIdx);
                 }
                 if (pose != null && pose.isPresent()) {
                     Pose3d pose3d = pose.get().estimatedPose;
