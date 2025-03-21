@@ -176,7 +176,6 @@ public class RobotContainer {
 
         operatorController.leftBumper().onTrue(complexElevatorStowCommand(elevatorPositions.STOW));
         operatorController.rightBumper().onTrue(complexBargeCommand(elevatorPositions.NETSHOOT)); 
-        
         operatorController.b().onTrue(complexProcessorCommand(elevatorPositions.PROCESSOR));
         // operatorController.rightStick().onTrue(complexBargeCommand(elevatorPositions.NETSHOOT));
 
@@ -185,6 +184,10 @@ public class RobotContainer {
         operatorController.y().onTrue(new InstantCommand(() -> wrist.setAngle(WristConstants.WRIST_STOW)));
         operatorController.leftTrigger().onTrue(complexLowAlgaeIntakeCommand(elevatorPositions.ALGAE_LOW));
         operatorController.rightTrigger().onTrue(complexHighAlgaeIntakeCommand(elevatorPositions.ALGAE_HIGH));
+
+        operatorController.start().onTrue(new InstantCommand(() ->endEffector.setCoralSpeed(-1.0), endEffector))
+                .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(1.0), endEffector));
+
         
         //Deep Climb
 
@@ -367,7 +370,7 @@ public class RobotContainer {
         return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
                 .andThen(new ElevatorToPosition(elevator, position))
                 .andThen(new WaitUntilCommand(elevator::atSetpoint))
-                .andThen(wrist.IntakePositionCommand());
+                .andThen(wrist.StowPositionCommand());
     }
 
     public void AutoScoreAlign() {

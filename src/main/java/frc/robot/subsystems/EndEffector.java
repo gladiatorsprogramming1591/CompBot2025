@@ -120,8 +120,8 @@ public class EndEffector extends SubsystemBase {
     public Command intakeCoralCommand2() {
         return new SequentialCommandGroup(new RunCommand(() -> setCoralSpeed(EndEffectorConstants.CORAL_INTAKE_SPEED))
                 .until(this::hasCoral),
-                new RunCommand(() -> setCoralSpeed(EndEffectorConstants.CORAL_REVERSE_SPEED))
-                        .withTimeout(0.1),
+                new RunCommand(() -> setCoralSpeed(EndEffectorConstants.CORAL_REVERSE_SPEED2))
+                        .withTimeout(0.15),
                 new InstantCommand(() -> setCoralSpeed(0)));
     }
 

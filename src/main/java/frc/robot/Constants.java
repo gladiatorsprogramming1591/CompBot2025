@@ -72,10 +72,9 @@ public class Constants {
         public static final double kL4 = 26.4;
         public static final double AUTO_L4 = 25.5;
         public static final double kPROCESSOR = 0.5;
-        public static final double kNET = kL4;
+        public static final double kNET = 27;
         public static final double ALGAE_HIGH = 8.53;
         public static final double ALGAE_LOW = 7.8;
-
         public static final SparkFlexConfig MOTOR_CONFIG = new SparkFlexConfig() {
             {
                 idleMode(IdleMode.kBrake);
@@ -120,6 +119,7 @@ public class Constants {
         // Coral Constants
         public static final double CORAL_INTAKE_SPEED = 0.2;
         public static final double CORAL_REVERSE_SPEED = -0.15;
+        public static final double CORAL_REVERSE_SPEED2 = -0.3;
         public static final double CORAL_EJECT_SPEED = 0.5;
         public static final double ARM_CORAL_SPEED = 0;
         public static final double L1_CORAL_EJECT_SPEED = 0.75;
