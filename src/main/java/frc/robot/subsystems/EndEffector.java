@@ -149,7 +149,7 @@ public class EndEffector extends SubsystemBase {
     public Command ejectAlgaeCommand() {
         return new InstantCommand(() -> ejectAlgae());
     }
-
+    
     @Override
     public void periodic() {
         SmartDashboard.putBoolean("Has Algae?", hasAlgae());

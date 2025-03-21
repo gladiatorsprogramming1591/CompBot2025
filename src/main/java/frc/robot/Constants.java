@@ -74,7 +74,7 @@ public class Constants {
         public static final double kPROCESSOR = 0.5;
         public static final double kNET = 27;
         public static final double ALGAE_HIGH = 8.53;
-        public static final double ALGAE_LOW = 7.8;
+        public static final double ALGAE_LOW = 2.75;
         public static final SparkFlexConfig MOTOR_CONFIG = new SparkFlexConfig() {
             {
                 idleMode(IdleMode.kBrake);
@@ -152,7 +152,7 @@ public class Constants {
         public static final double WRIST_HOVER = WRIST_INTAKE + 34.0;
         public static final double WRIST_HOVER_L2 = WRIST_INTAKE + 39.0;
         public static final double WRIST_HOVER_L4 = WRIST_INTAKE + 46.0; // +39
-        public static final double WRIST_ALGAE_LOW = WRIST_INTAKE + 41.0;
+        public static final double WRIST_ALGAE_LOW = WRIST_INTAKE + 34.0;
         public static final double WRIST_ALGAE_HIGH = WRIST_INTAKE + 33.0;
         public static final double WRIST_DUNK_CORAL = WRIST_INTAKE;
         public static final double WRIST_L1 = WRIST_INTAKE;

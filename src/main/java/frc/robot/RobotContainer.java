@@ -32,6 +32,7 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.WristConstants;
 import frc.robot.commands.AlignToReefCommand;
 import frc.robot.commands.AutoReefPoseCommand;
+import frc.robot.commands.DoNothing;
 import frc.robot.commands.ElevatorToPosition;
 import frc.robot.generated.TunerConstants;
 import frc.robot.generated.TunerConstants.*;
@@ -164,7 +165,12 @@ public class RobotContainer {
         driverController.a().whileTrue(new AutoReefPoseCommand(drivetrain, reefAlign, this::driveX, this::driveY,
                 this::driveT, () -> FieldConstants.getNearestReefSide(drivetrain.getState().Pose)));
 
-
+        driverController.b()
+                .onTrue(new ElevatorToPosition(elevator, elevatorPositions.NETSHOOT)
+                .alongWith(endEffector.holdAlgaeCommand())
+                .alongWith(new DoNothing().withTimeout(0.58)
+                .andThen(new RunCommand(()-> endEffector.setCoralSpeed(1.0)).withTimeout(1.0)))
+                .andThen(new ElevatorToPosition(elevator, elevatorPositions.STOW)));
         // ===================================== Operator Controls
         // =====================================
         // Elevator
