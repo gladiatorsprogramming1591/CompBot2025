@@ -43,7 +43,7 @@ public class ElevatorToPosition extends Command {
 
     @Override
     public void execute(){
-        m_elevator.ElevatorToPosition(m_targetPos);
+        m_elevator.ElevatorToPositionExternalEnc(m_targetPos);
     }
 
     @Override

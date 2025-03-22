@@ -8,11 +8,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants.ElevatorConstants;
 
 import java.util.EnumMap;
 
-import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase;
@@ -31,15 +29,15 @@ public class ElevatorSubsystem extends SubsystemBase {
     SparkFlex leader;
     SparkFlex follower;
 
-    RelativeEncoder leadEncoder;
-    RelativeEncoder followEncoder;
-    RelativeEncoder relativeExternalEncoder;
-    AbsoluteEncoder absEncoder;
+    RelativeEncoder leadInternalEncoder;
+    RelativeEncoder followerInternalEncoder;
+    RelativeEncoder externalEncoder; // Through-bore encoder
     SparkClosedLoopController controller;
     SparkLimitSwitch bottomLimitSwitch;
 
     private double lastPos;
-    private boolean printZero = true; // Flag to indicate whether to print when we are zeroing during stow position
+    private boolean printInternalEncZero = true; // Flag to indicate whether to print when we are zeroing during stow position
+    private boolean printBothEncZero = true;
 
     EnumMap<elevatorPositions, Double> mapEnc = new EnumMap<>(elevatorPositions.class);
 
@@ -68,17 +66,16 @@ public class ElevatorSubsystem extends SubsystemBase {
                 SparkBase.ResetMode.kResetSafeParameters,
                 SparkBase.PersistMode.kPersistParameters);
 
-        leadEncoder = leader.getEncoder();
-        followEncoder = follower.getEncoder();
-        absEncoder = follower.getAbsoluteEncoder();
-        relativeExternalEncoder = follower.getExternalEncoder();
+        leadInternalEncoder = leader.getEncoder();
+        followerInternalEncoder = follower.getEncoder();
+        externalEncoder = follower.getExternalEncoder();
         controller = leader.getClosedLoopController();
 
         bottomLimitSwitch = leader.getReverseLimitSwitch();
         zeroTrigger = new Trigger(this::isElevatorNotAtBottom);
-        zeroTrigger.onFalse(zeroElevatorCommand());
+        zeroTrigger.onFalse(zeroElevatorInternalEncCommand().alongWith(zeroElevatorInternalEncCommand()));
 
-        lastPos = 0.0;
+        lastPos = kSTOW;
 
         mapEnc.put(elevatorPositions.STOW, kSTOW);
         mapEnc.put(elevatorPositions.L1, kL1);
@@ -108,16 +105,12 @@ public class ElevatorSubsystem extends SubsystemBase {
         leader.set(0);
     }
 
-    public double getPositionRotations() {
-        return leadEncoder.getPosition();
-    }
-
-    public double getABSPositionRotations() {
-        return absEncoder.getPosition();
+    public double getInternalPositionRotations() {
+        return leadInternalEncoder.getPosition();
     }
 
     public double getExternalPositionRotations() {
-        return relativeExternalEncoder.getPosition();
+        return externalEncoder.getPosition();
     }
 
     /**
@@ -125,12 +118,8 @@ public class ElevatorSubsystem extends SubsystemBase {
      * 
      * @return the height, in inches
      */
-    public double getPositionInches() {
-        return getPositionRotations() * INCHES_PER_ROTATION + INITIAL_HEIGHT_INCHES;
-    }
-
-    public double getABSPositionInches() {
-        return getABSPositionRotations() * INCHES_PER_EXTERNAL_ROTATION + INITIAL_HEIGHT_INCHES;
+    public double getInternalPositionInches() {
+        return getInternalPositionRotations() * INCHES_PER_INTERNAL_ROTATION + INITIAL_HEIGHT_INCHES;
     }
 
     public double getExternalPositionInches() {
@@ -142,66 +131,114 @@ public class ElevatorSubsystem extends SubsystemBase {
      * 
      * @return the number of rotations
      */
-    public double inchesToRotations(double inches) {
-        return (inches - INITIAL_HEIGHT_INCHES) / INCHES_PER_ROTATION;
+    public double inchesToInternalRotations(double inches) {
+        return (inches - INITIAL_HEIGHT_INCHES) / INCHES_PER_INTERNAL_ROTATION;
     }
 
-    public void setPositionRotations(double rotations) {
-        if (rotations < getPositionRotations()) {
+    public double inchesToExternalRotations(double inches) {
+        return (inches - INITIAL_HEIGHT_INCHES) / INCHES_PER_EXTERNAL_ROTATION;
+    }
+
+    public void setPositionInternalRotations(double rotations) {
+        if (rotations < getInternalPositionRotations()) {
+            controller.setReference(rotations, ControlType.kMAXMotionPositionControl, ClosedLoopSlot.kSlot1, FF_DOWN);
+        } else {
+            controller.setReference(rotations, ControlType.kPosition, ClosedLoopSlot.kSlot0, FF_UP);
+        }
+    }
+    
+    public void setPositionExternalRotations(double rotations) {
+        rotations *= (INCHES_PER_EXTERNAL_ROTATION/INCHES_PER_INTERNAL_ROTATION);
+        if (rotations < getExternalPositionRotations()) {
             controller.setReference(rotations, ControlType.kMAXMotionPositionControl, ClosedLoopSlot.kSlot1, FF_DOWN);
         } else {
             controller.setReference(rotations, ControlType.kPosition, ClosedLoopSlot.kSlot0, FF_UP);
         }
     }
 
-    public boolean atSetpoint() {
-        boolean atTarget = Math.abs(getPositionInches() - lastPos) < TOLERANCE_INCHES;
+    public boolean atSetpointInternalEnc() {
+        boolean atTarget = Math.abs(getInternalPositionInches() - lastPos) < TOLERANCE_INCHES;
         if (atTarget)
-            System.out.println("Elevator at setpoint");
+            System.out.println("Elevator at setpoint (Internal Enc)");
         return atTarget;
     }
 
-    public void ElevatorToPosition(elevatorPositions positions) {
-        lastPos = mapEnc.get(positions) + ElevatorConstants.ABS_ENC_OFFSET;
-        setPositionRotations(inchesToRotations(lastPos));
+    public boolean atSetpointExternalEnc() {
+        boolean atTarget = Math.abs(getExternalPositionInches() - lastPos) < TOLERANCE_INCHES;
+        if (atTarget)
+            System.out.println("Elevator at setpoint (External Enc)");
+        return atTarget;
     }
 
-    public Command zeroElevatorCommand() {
+    public void ElevatorToPositionInternalEnc(elevatorPositions positions) {
+        lastPos = mapEnc.get(positions);
+        setPositionInternalRotations(inchesToInternalRotations(lastPos));
+    }
+
+    public void ElevatorToPositionExternalEnc(elevatorPositions positions) {
+        lastPos = mapEnc.get(positions);
+        setPositionExternalRotations(inchesToExternalRotations(lastPos));
+    }
+
+    public Command zeroElevatorInternalEncCommand() {
         return new InstantCommand(() -> {
-            System.out.println("ZeroCommand");
-            leadEncoder.setPosition(0);
+            System.out.println("ZeroInternalEncCommand");
+            leadInternalEncoder.setPosition(0);
         });
     }
 
-    public void zeroElevator() {
-        leadEncoder.setPosition(0);
+    public Command zeroElevatorExternalEncCommand() {
+        return new InstantCommand(() -> {
+            System.out.println("ZeroExternalEncCommand");
+            externalEncoder.setPosition(0);
+        });
+    }
+
+    public void zeroElevatorInternalEnc() {
+        leadInternalEncoder.setPosition(0);
+    }
+
+    public void zeroElevatorExternalEnc() {
+        externalEncoder.setPosition(0);
+    }
+
+    public void zeroElevatorBothEnc() {
+        zeroElevatorInternalEnc();
+        zeroElevatorExternalEnc();
     }
 
     @Override
     public void periodic() {
         SmartDashboard.putBoolean("Elevator lowerLimit", bottomLimitSwitch.isPressed());
-        SmartDashboard.putNumber("Elevator inches", getPositionInches());
+        SmartDashboard.putNumber("Elevator inches (Internal Enc)", getInternalPositionInches());
+        SmartDashboard.putNumber("Elevator inches (External Enc)", getExternalPositionInches());
         SmartDashboard.putNumber("Elevator current", leader.getOutputCurrent());
-        SmartDashboard.putNumber("LastPos", lastPos);
-        SmartDashboard.putNumber("Elevator Vel", leadEncoder.getVelocity());
+        SmartDashboard.putNumber("Elevator leader Vel", leadInternalEncoder.getVelocity());
+        SmartDashboard.putNumber("Elevator Vel (External Enc)", externalEncoder.getVelocity());
         SmartDashboard.putNumber("Follower Output Current", follower.getOutputCurrent());
-        SmartDashboard.putNumber("Follower Velocity", followEncoder.getVelocity());
+        SmartDashboard.putNumber("Elevator follower vel", followerInternalEncoder.getVelocity());
         SmartDashboard.putNumber("Elevator lastPos", lastPos);
-        SmartDashboard.putNumber("Elevator ABS inches", getABSPositionInches());
-        SmartDashboard.putNumber("Elevator relative external inches", getExternalPositionInches());
+        SmartDashboard.putNumber("Elevator throgh-bore enc inches", getExternalPositionInches());
 
-        if ((lastPos == kSTOW) && (getPositionInches() <= kSTOW + TOLERANCE_INCHES + 0.05)) {
-            if (printZero == true) {
-                System.out.println("Zeroing Elevator");
-                printZero = false;
+        if ((lastPos == kSTOW) && (getInternalPositionInches() <= kSTOW + TOLERANCE_INCHES + 0.05)) {
+            if (printInternalEncZero == true) {
+                System.out.println("Zeroing Elevator internal encoder");
+                printInternalEncZero = false;
             }
             leader.stopMotor();
-            zeroElevator();
+            zeroElevatorInternalEnc();
         } else {
-            printZero = true;
+            printInternalEncZero = true;
         }
+
         if (bottomLimitSwitch.isPressed() && lastPos == kSTOW) {
-            zeroElevator();
+            if (printBothEncZero == true) {
+                System.out.println("Zeroing Elevator encoders (Both External & Internal)");
+                printBothEncZero = false;
+            }
+            zeroElevatorBothEnc();
+        } else {
+            printBothEncZero = true;
         }
     }
 

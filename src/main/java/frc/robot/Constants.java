@@ -3,6 +3,7 @@ package frc.robot;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.MAXMotionConfig.MAXMotionPositionMode;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.AbsoluteEncoderConfig;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
@@ -39,7 +40,7 @@ public class Constants {
         public static final double OUTPUT_MAXIMUM = 1.0;
         public static final double OUTPUT_MINIMUM = -1.0;
 
-        public static final double INCHES_PER_ROTATION = 22.0 / 9.0 / 4.0;
+        public static final double INCHES_PER_INTERNAL_ROTATION = 22.0 / 9.0 / 4.0;
         public static final double INCHES_PER_EXTERNAL_ROTATION = (1.7576 / 2) * Math.PI; // TODO: measure this
         public static final double INITIAL_HEIGHT_INCHES = 0;
         public static final double TOLERANCE_INCHES = 0.5;

@@ -127,13 +127,13 @@ public class RobotContainer {
                                 -drivetrain.apply2dDynamicDeadband(driverController.getLeftY(),
                                         driverController.getLeftX(), STATIC_DEADBAND, KINETIC_DEADBAND, true) * MaxSpeed
                                         * maxSpeedPercent,
-                                INITIAL_LIMIT * Math.pow(LIMIT_SCALE_PER_INCH, elevator.getPositionInches()),
+                                INITIAL_LIMIT * Math.pow(LIMIT_SCALE_PER_INCH, elevator.getExternalPositionInches()),
                                 TIME_TO_STOP)) // Drive forward with negative Y (forward)
                         .withVelocityY(yLimiter.calculate(
                                 -drivetrain.apply2dDynamicDeadband(driverController.getLeftX(),
                                         driverController.getLeftY(), STATIC_DEADBAND, KINETIC_DEADBAND, true) * MaxSpeed
                                         * maxSpeedPercent,
-                                INITIAL_LIMIT * Math.pow(LIMIT_SCALE_PER_INCH, elevator.getPositionInches()),
+                                INITIAL_LIMIT * Math.pow(LIMIT_SCALE_PER_INCH, elevator.getExternalPositionInches()),
                                 TIME_TO_STOP)) // Drive left with negative X (left)
                         .withRotationalRate(-MathUtil.applyDeadband(driverController.getRightX(), ROTATION_DEADBAND,
                                 maxAngularRatePercent) * MaxAngularRate) // Drive counterclockwise with negative X
@@ -174,7 +174,7 @@ public class RobotContainer {
         // ===================================== Operator Controls
         // =====================================
         // Elevator
-        operatorController.back().onTrue(new InstantCommand(() -> elevator.zeroElevatorCommand()));
+        operatorController.back().onTrue(new InstantCommand(() -> elevator.zeroElevatorExternalEncCommand()));
         operatorController.povDown().onTrue(prepElevatorScore(elevatorPositions.L1));
         operatorController.povLeft().onTrue(prepElevatorScoreL2(elevatorPositions.L2));
         operatorController.povRight().onTrue(prepElevatorScoreL4(elevatorPositions.L4));
@@ -272,7 +272,7 @@ public class RobotContainer {
         System.out.println("Running complex score command");
         return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
                 .andThen((new ElevatorToPosition(elevator, position)))
-                .andThen(new WaitUntilCommand(elevator::atSetpoint))
+                .andThen(new WaitUntilCommand(elevator::atSetpointExternalEnc))
                 .andThen(wrist.HoverPositionCommandL2())
                 .andThen(new RunCommand(() -> endEffector.setCoralSpeed(-0.15), endEffector).withTimeout(0.10))
                 .andThen(new InstantCommand(() -> endEffector.setCoralSpeed(0.0), endEffector));
@@ -282,7 +282,7 @@ public class RobotContainer {
         System.out.println("Running complex score command");
         return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
                 .andThen((new ElevatorToPosition(elevator, position)))
-                .andThen(new WaitUntilCommand(elevator::atSetpoint))
+                .andThen(new WaitUntilCommand(elevator::atSetpointExternalEnc))
                 .andThen(wrist.HoverPositionCommand())
                 .andThen(new RunCommand(() -> endEffector.setCoralSpeed(-0.15), endEffector).withTimeout(0.10))
                 .andThen(new InstantCommand(() -> endEffector.setCoralSpeed(0.0), endEffector));
@@ -292,7 +292,7 @@ public class RobotContainer {
         System.out.println("Running complex score command");
         return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
                 .andThen((new ElevatorToPosition(elevator, position)))
-                .andThen(new WaitUntilCommand(elevator::atSetpoint))
+                .andThen(new WaitUntilCommand(elevator::atSetpointExternalEnc))
                 .andThen(wrist.L4HoverPositionCommand())
                 .andThen(new RunCommand(() -> endEffector.setCoralSpeed(-0.15), endEffector).withTimeout(0.25)
                         .alongWith(new InstantCommand(() -> prepL4Finished(true))))
@@ -304,7 +304,7 @@ public class RobotContainer {
         return new ConditionalCommand(
                 new InstantCommand(() -> prepL4Finished = false),
                 new ElevatorToPosition(elevator, position).onlyIf(() -> prepL4Finished)
-                        .andThen(new WaitUntilCommand(elevator::atSetpoint))
+                        .andThen(new WaitUntilCommand(elevator::atSetpointExternalEnc))
                         .andThen(wrist.L4HoverPositionCommand())
                         .andThen(new RunCommand(() -> endEffector.setCoralSpeed(-0.15), endEffector).withTimeout(0.25))
                         .andThen(new InstantCommand(() -> endEffector.setCoralSpeed(0.0), endEffector))
@@ -320,14 +320,14 @@ public class RobotContainer {
     public Command complexProcessorCommand(elevatorPositions position) {
         return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
                 .andThen(new ElevatorToPosition(elevator, position))
-                .andThen(new WaitUntilCommand(elevator::atSetpoint))
+                .andThen(new WaitUntilCommand(elevator::atSetpointExternalEnc))
                 .andThen(wrist.ProcessorPositionCommand());
     }
 
     public Command complexLowAlgaeIntakeCommand(elevatorPositions position) {
         return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
                 .andThen((new ElevatorToPosition(elevator, position)))
-                .andThen(new WaitUntilCommand(elevator::atSetpoint))
+                .andThen(new WaitUntilCommand(elevator::atSetpointExternalEnc))
                 .andThen(wrist.LowAlgaePositionCommand())
                 .andThen(new WaitUntilCommand(wrist::atSetpoint));
     }
@@ -335,7 +335,7 @@ public class RobotContainer {
     public Command complexHighAlgaeIntakeCommand(elevatorPositions position) {
         return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
                 .andThen((new ElevatorToPosition(elevator, position)))
-                .andThen(new WaitUntilCommand(elevator::atSetpoint))
+                .andThen(new WaitUntilCommand(elevator::atSetpointExternalEnc))
                 .andThen(wrist.HighAlgaePositionCommand())
                 .andThen(new WaitUntilCommand(wrist::atSetpoint));
     }
@@ -343,7 +343,7 @@ public class RobotContainer {
     public Command complexIntakeCoral() {
         return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
                 .andThen(new ElevatorToPosition(elevator, elevatorPositions.STOW))
-                .andThen(new WaitUntilCommand(elevator::atSetpoint))
+                .andThen(new WaitUntilCommand(elevator::atSetpointExternalEnc))
                 .andThen(wrist.IntakePositionCommand())
                 .andThen(new WaitUntilCommand(wrist::atSetpoint))
                 .andThen(endEffector.intakeCoralCommand2())
@@ -354,7 +354,7 @@ public class RobotContainer {
 
     public Command autoComplexIntakeCommand() { // TODO: LP: check if elevator last pos was stow
         return new ElevatorToPosition(elevator, elevatorPositions.STOW)
-                .andThen(new WaitUntilCommand(elevator::atSetpoint))
+                .andThen(new WaitUntilCommand(elevator::atSetpointExternalEnc))
                 .andThen(wrist.IntakePositionCommand())
                 .andThen(new WaitUntilCommand(wrist::atSetpoint))
                 .andThen(endEffector.autoIntakeCoralCommand());
@@ -375,7 +375,7 @@ public class RobotContainer {
     private Command complexBargeCommand(elevatorPositions position) {
         return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
                 .andThen(new ElevatorToPosition(elevator, position))
-                .andThen(new WaitUntilCommand(elevator::atSetpoint))
+                .andThen(new WaitUntilCommand(elevator::atSetpointExternalEnc))
                 .andThen(wrist.StowPositionCommand());
     }
 
@@ -388,7 +388,7 @@ public class RobotContainer {
                 .withVelocityX(xLimiter.calculate(
                         -drivetrain.apply2dDynamicDeadband(driverController.getLeftY(), driverController.getLeftX(),
                                 STATIC_DEADBAND, KINETIC_DEADBAND, false) * MaxSpeed * maxSpeedPercent,
-                        INITIAL_LIMIT * Math.pow(LIMIT_SCALE_PER_INCH, elevator.getPositionInches()), TIME_TO_STOP)) // Drive
+                        INITIAL_LIMIT * Math.pow(LIMIT_SCALE_PER_INCH, elevator.getExternalPositionInches()), TIME_TO_STOP)) // Drive
                                                                                                                      // forward
                                                                                                                      // with
                                                                                                                      // negative
@@ -397,7 +397,7 @@ public class RobotContainer {
                 .withVelocityY(yLimiter.calculate(
                         -drivetrain.apply2dDynamicDeadband(driverController.getLeftX(), driverController.getLeftY(),
                                 STATIC_DEADBAND, KINETIC_DEADBAND, false) * MaxSpeed * maxSpeedPercent,
-                        INITIAL_LIMIT * Math.pow(LIMIT_SCALE_PER_INCH, elevator.getPositionInches()), TIME_TO_STOP)) // Drive
+                        INITIAL_LIMIT * Math.pow(LIMIT_SCALE_PER_INCH, elevator.getExternalPositionInches()), TIME_TO_STOP)) // Drive
                                                                                                                      // left
                                                                                                                      // with
                                                                                                                      // negative
@@ -447,13 +447,13 @@ public class RobotContainer {
                                         -drivetrain.apply2dDynamicDeadband(driverController.getLeftY(),
                                                 driverController.getLeftX(), STATIC_DEADBAND, KINETIC_DEADBAND, false)
                                                 * MaxSpeed * maxSpeedPercent,
-                                        INITIAL_LIMIT * Math.pow(LIMIT_SCALE_PER_INCH, elevator.getPositionInches()),
+                                        INITIAL_LIMIT * Math.pow(LIMIT_SCALE_PER_INCH, elevator.getExternalPositionInches()),
                                         TIME_TO_STOP)) // Drive forward with negative Y (forward)
                                 .withVelocityY(yLimiter.calculate(
                                         -drivetrain.apply2dDynamicDeadband(driverController.getLeftX(),
                                                 driverController.getLeftY(), STATIC_DEADBAND, KINETIC_DEADBAND, false)
                                                 * MaxSpeed * maxSpeedPercent,
-                                        INITIAL_LIMIT * Math.pow(LIMIT_SCALE_PER_INCH, elevator.getPositionInches()),
+                                        INITIAL_LIMIT * Math.pow(LIMIT_SCALE_PER_INCH, elevator.getExternalPositionInches()),
                                         TIME_TO_STOP)) // Drive left with negative X (left)
                                 .withRotationalRate(-MathUtil.applyDeadband(driverController.getRightX(),
                                         ROTATION_DEADBAND, maxAngularRatePercent) * MaxAngularRate), // Drive
@@ -474,7 +474,7 @@ public class RobotContainer {
     public double driveX() {
         return xLimiter.calculate(-driverController.getLeftY() * MaxSpeed,
                 DriveConstants.INITIAL_LIMIT
-                        * Math.pow(DriveConstants.LIMIT_SCALE_PER_INCH, elevator.getPositionInches()),
+                        * Math.pow(DriveConstants.LIMIT_SCALE_PER_INCH, elevator.getExternalPositionInches()),
                 DriveConstants.TIME_TO_STOP);
     }
 
@@ -493,7 +493,7 @@ public class RobotContainer {
     public double driveY() {
         return yLimiter.calculate(-driverController.getLeftX() * MaxSpeed,
                 DriveConstants.INITIAL_LIMIT
-                        * Math.pow(DriveConstants.LIMIT_SCALE_PER_INCH, elevator.getPositionInches()),
+                        * Math.pow(DriveConstants.LIMIT_SCALE_PER_INCH, elevator.getExternalPositionInches()),
                 DriveConstants.TIME_TO_STOP);
     }
 
