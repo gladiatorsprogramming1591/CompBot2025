@@ -24,7 +24,7 @@ public class AutoReefPoseCommand extends Command {
     // private RobotState state;
 
     private PIDController distanceController = new PIDController(2,0, 0.0);
-    private PIDController strafeController = new PIDController(6, 0, 0.0);
+    private PIDController strafeController = new PIDController(10, 0, 0.0);
     private PIDController angleController = new PIDController(0.5, 0, 0.02);
 
     private DoubleSupplier controllerX;
@@ -77,7 +77,7 @@ public class AutoReefPoseCommand extends Command {
             Pose2d goal = FieldConstants.toRobotRelative(currentPose, reefPose);
             
             distanceController.setSetpoint(0.095); 
-            strafeController.setSetpoint(position.get() == ReefSide.RIGHT ? -0.05: 0);
+            strafeController.setSetpoint(position.get() == ReefSide.RIGHT ? 0: 0);
             angleController.setSetpoint(position.get() == ReefSide.RIGHT ? -0.5 : -0.5);   
             
             double goalX = goal.getX();

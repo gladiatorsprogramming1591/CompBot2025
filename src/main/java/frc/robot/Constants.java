@@ -74,7 +74,7 @@ public class Constants {
         public static final double kL4 = 26.4;
         public static final double AUTO_L4 = 25.5;
         public static final double kPROCESSOR = 0.5;
-        public static final double kNET = 27;
+        public static final double kNET = 27.75;
         public static final double ALGAE_HIGH = 8.53;
         public static final double ALGAE_LOW = 2.75;
         public static final SparkFlexConfig MOTOR_CONFIG = new SparkFlexConfig() {
