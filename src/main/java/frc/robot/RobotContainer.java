@@ -42,7 +42,7 @@ import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.EndEffector;
 import frc.robot.subsystems.FlapServo;
 import frc.robot.subsystems.Wrist;
-import frc.robot.subsystems.Climber;
+// import frc.robot.subsystems.Climber;
 import frc.robot.utilities.DynamicRateLimiter;
 import frc.robot.utilities.FieldConstants;
 import frc.robot.utilities.FieldConstants.ReefSide;
@@ -55,7 +55,7 @@ public class RobotContainer {
     public final EndEffector endEffector = robotInitConstants.isCompBot ? new EndEffector() : null;
     private final Wrist wrist = robotInitConstants.isCompBot ? new Wrist() : null;
     public final ElevatorSubsystem elevator = robotInitConstants.isCompBot ? new ElevatorSubsystem() : null;
-    private final Climber climber = robotInitConstants.isCompBot ? new Climber(drivetrain) : null;
+//     private final Climber climber = robotInitConstants.isCompBot ? new Climber(drivetrain) : null;
     private final FlapServo flapServo = robotInitConstants.isCompBot ? new FlapServo() : null;    
     public PathPlannerPath startLineFCoralStartPath;
     
@@ -65,7 +65,7 @@ public class RobotContainer {
             : ChazTunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 1 1/2 of a rotation per second
                                                                                       // max angular velocity
-    private double maxSpeedPercent = 0.65;
+    private double maxSpeedPercent = 0.85;
     private double maxAngularRatePercent = 0.40;
     public static double kineticDeadband = KINETIC_DEADBAND;
 
@@ -101,12 +101,11 @@ public class RobotContainer {
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
 
     public RobotContainer() {
-        DataLogManager.start();
+        // DataLogManager.start();
         registerNamedCommands();
         autoChooser = AutoBuilder.buildAutoChooser(); // A default auto can be passed in as parameter.
         SmartDashboard.putData("Auto Mode", autoChooser);
         SmartDashboard.putData(drivetrain.getCurrentCommand());
-        SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime());
         SmartDashboard.putNumber("", DriverStation.getStickButtons(1));
 
         if (robotInitConstants.isCompBot)
@@ -200,9 +199,10 @@ public class RobotContainer {
 
         operatorController.a().toggleOnTrue(new RunCommand(()->  flapServo.setFlapServoAngle(ServoConstants.kServoUpAngle))
                 .handleInterrupt(()-> flapServo.setFlapServoAngle(ServoConstants.kServoDownAngle)));
-        climber.setDefaultCommand(climber.manualClimbMovement(
-                () -> MathUtil.applyDeadband(operatorController.getRightY(), STATIC_DEADBAND),
-                () -> MathUtil.applyDeadband(operatorController.getLeftY(), STATIC_DEADBAND)));
+        // climber.setDefaultCommand(climber.manualClimbMovement(
+        //         () -> MathUtil.applyDeadband(operatorController.getRightY(), STATIC_DEADBAND),
+        //         () -> MathUtil.applyDeadband(operatorController.getLeftY(), STATIC_DEADBAND)));
+        
 
         drivetrain.registerTelemetry(logger::telemeterize);
 

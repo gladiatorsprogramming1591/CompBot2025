@@ -87,9 +87,9 @@ public class Wrist extends SubsystemBase {
     public void setAngle(double angle)
     {
          if (getAngle() > Constants.WristConstants.GROUND_INTAKE + 5.0 || getAngle() >= 0 && getAngle() < Constants.WristConstants.WRIST_INTAKE / 2.0) {
-          setWristReverseSpeed(()-> 1.0);
-         } else if (getAngle() < Constants.WristConstants.WRIST_INTAKE && getAngle() > Constants.WristConstants.WRIST_INTAKE / 2.0) {
-          setWristForwardSpeed(()-> 1.0);
+          setWristReverseSpeed(()-> 0.5);
+     //     } else if (getAngle() < Constants.WristConstants.WRIST_INTAKE && getAngle() > Constants.WristConstants.WRIST_INTAKE / 2.0) {
+     //      setWristForwardSpeed(()-> 1.0);
          } else {
           holdAngle = angle;
           wristController.setReference(holdAngle, ControlType.kPosition);

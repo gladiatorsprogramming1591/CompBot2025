@@ -20,8 +20,8 @@ public class Constants {
 
         public static final double TIME_TO_STOP = 0.75;
         public static final double INITIAL_LIMIT = 10.0;
-        public static final double LIMIT_SCALE_PER_INCH = 0.945;
-        public static final double LIMIT_SCALE_PER_INCH_AUTO_ALIGN = 0.945;
+        public static final double LIMIT_SCALE_PER_INCH = 0.96;
+        public static final double LIMIT_SCALE_PER_INCH_AUTO_ALIGN = 0.96;
     }
 
     public static final class PathPlannerConstants {
@@ -188,7 +188,7 @@ public class Constants {
     }
 
     public class ClimberConstants {
-        public static final int CLIMB_ROLLER_CAN_ID = 50;
+        // public static final int CLIMB_ROLLER_CAN_ID = 50;
         public static final int CLIMB_ROLLER_CURRENT_LIMIT = 80;
         public static final boolean CLIMB_ROLLER_MOTOR_INVERTED = true;
         public static final double CLIMB_ROLLER_RAMP_RATE = 0.1;

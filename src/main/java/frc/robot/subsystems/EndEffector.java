@@ -6,6 +6,7 @@ import com.revrobotics.spark.SparkLimitSwitch;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -133,11 +134,10 @@ public class EndEffector extends SubsystemBase {
     }
 
     public Command homingSequenceCommand() {
-        return new SequentialCommandGroup(new RunCommand(() -> setCoralSpeed(EndEffectorConstants.CORAL_REVERSE_SPEED))
-                .until(this::coralArmed),
-                new RunCommand(() -> setCoralSpeed(0.1)).until(() -> {
-                    return !coralArmed();                }), new RunCommand(() -> setCoralSpeed(EndEffectorConstants.CORAL_REVERSE_SPEED)).withTimeout(0.1),
-                new InstantCommand(() -> setCoralSpeed(0)));
+        return new SequentialCommandGroup(
+            new RunCommand(() -> setCoralSpeed(EndEffectorConstants.CORAL_REVERSE_SPEED2))
+                .withTimeout(0.15),
+            new InstantCommand(() -> setCoralSpeed(0)));
     }
 
     public Command ejectCoralCommand() {
@@ -157,5 +157,6 @@ public class EndEffector extends SubsystemBase {
         SmartDashboard.putNumber("ee Motor Controller Voltage", intakeMotor.getBusVoltage());
         SmartDashboard.putBoolean("Rear Beam Broken?", isCoralRearBeamBroken());
         SmartDashboard.putBoolean("Front Beam Broken?", isCoralFrontBeamBroken());
+        SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime());
     }
 }
