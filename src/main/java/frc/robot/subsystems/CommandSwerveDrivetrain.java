@@ -388,12 +388,12 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 }
 
                 //est pose is very far from recorded robot pose
-                if (PhotonUtils.getDistanceToPose(currentPose, pose.get().estimatedPose.toPose2d()) > 1)
+                if (PhotonUtils.getDistanceToPose(currentPose, pose.get().estimatedPose.toPose2d()) > 0.5)
                 {
                     longDistangePoseEstimationCount++;
 
                     //if it calculates that were 10 meter away for more than 10 times in a row its probably right
-                    if (longDistangePoseEstimationCount < 10)
+                    if (longDistangePoseEstimationCount < 20)
                     {
                         return Optional.empty();
                     }

@@ -75,7 +75,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         zeroTrigger = new Trigger(this::isElevatorNotAtBottom);
         zeroTrigger.onFalse(zeroElevatorInternalEncCommand().alongWith(zeroElevatorInternalEncCommand()));
 
-        lastPos = 0.0;
+        lastPos = kSTOW;
 
         mapEnc.put(elevatorPositions.STOW, kSTOW);
         mapEnc.put(elevatorPositions.L1, kL1);
@@ -148,6 +148,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
     
     public void setPositionExternalRotations(double rotations) {
+        rotations *= (INCHES_PER_EXTERNAL_ROTATION/INCHES_PER_INTERNAL_ROTATION);
         if (rotations < getExternalPositionRotations()) {
             controller.setReference(rotations, ControlType.kMAXMotionPositionControl, ClosedLoopSlot.kSlot1, FF_DOWN);
         } else {
@@ -212,7 +213,6 @@ public class ElevatorSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Elevator inches (Internal Enc)", getInternalPositionInches());
         SmartDashboard.putNumber("Elevator inches (External Enc)", getExternalPositionInches());
         SmartDashboard.putNumber("Elevator current", leader.getOutputCurrent());
-        SmartDashboard.putNumber("LastPos", lastPos);
         SmartDashboard.putNumber("Elevator leader Vel", leadInternalEncoder.getVelocity());
         SmartDashboard.putNumber("Elevator Vel (External Enc)", externalEncoder.getVelocity());
         SmartDashboard.putNumber("Follower Output Current", follower.getOutputCurrent());
@@ -234,7 +234,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         if (bottomLimitSwitch.isPressed() && lastPos == kSTOW) {
             if (printBothEncZero == true) {
                 System.out.println("Zeroing Elevator encoders (Both External & Internal)");
-                printInternalEncZero = false;
+                printBothEncZero = false;
             }
             zeroElevatorBothEnc();
         } else {
