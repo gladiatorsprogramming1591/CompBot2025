@@ -35,7 +35,7 @@ public class Constants {
         public static final boolean LEADER_INVERTED = false;
         public static final boolean FOLLOWER_INVERTED_FROM_LEADER = true;
         public static final double RAMP_RATE = 0.001;
-        public static final int CURRENT_LIMIT = 60;
+        public static final int CURRENT_LIMIT = 70;
 
         public static final double OUTPUT_MAXIMUM = 1.0;
         public static final double OUTPUT_MINIMUM = -1.0;

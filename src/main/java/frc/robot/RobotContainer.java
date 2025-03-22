@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.robotInitConstants;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.ServoConstants;
 import frc.robot.Constants.WristConstants;
 import frc.robot.commands.AlignToReefCommand;
 import frc.robot.commands.AutoReefPoseCommand;
@@ -197,7 +198,8 @@ public class RobotContainer {
         
         //Deep Climb
 
-        operatorController.a().onTrue(flapServo.toggleFlapCommand());
+        operatorController.a().toggleOnTrue(new RunCommand(()->  flapServo.setFlapServoAngle(ServoConstants.kServoUpAngle))
+                .handleInterrupt(()-> flapServo.setFlapServoAngle(ServoConstants.kServoDownAngle)));
         climber.setDefaultCommand(climber.manualClimbMovement(
                 () -> MathUtil.applyDeadband(operatorController.getRightY(), STATIC_DEADBAND),
                 () -> MathUtil.applyDeadband(operatorController.getLeftY(), STATIC_DEADBAND)));
