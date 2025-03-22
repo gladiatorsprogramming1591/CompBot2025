@@ -160,11 +160,11 @@ public class RobotContainer {
                 .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(0), endEffector));
 
         driverController.x().whileTrue(new AutoReefPoseCommand(drivetrain, reefAlign, this::driveX, this::driveY,
-                this::driveT, () -> ReefSide.LEFT));
+                this::driveT, () -> ReefSide.LEFT, () -> elevator.getExternalPositionInches()));
         driverController.y().whileTrue(new AutoReefPoseCommand(drivetrain, reefAlign, this::driveX, this::driveY,
-                this::driveT, () -> ReefSide.RIGHT));
+                this::driveT, () -> ReefSide.RIGHT, () -> elevator.getExternalPositionInches()));
         driverController.a().whileTrue(new AutoReefPoseCommand(drivetrain, reefAlign, this::driveX, this::driveY,
-                this::driveT, () -> FieldConstants.getNearestReefSide(drivetrain.getState().Pose)));
+                this::driveT, () -> FieldConstants.getNearestReefSide(drivetrain.getState().Pose), () -> elevator.getExternalPositionInches()));
 
         driverController.b()
                 .onTrue(new ElevatorToPosition(elevator, elevatorPositions.NETSHOOT)
@@ -235,12 +235,12 @@ public class RobotContainer {
                 .onFalse(new InstantCommand(() -> slowMode(false)));
 
         driverController.x().whileTrue(new AutoReefPoseCommand(drivetrain, reefAlign, this::driveXChassis,
-                this::driveYChassis, this::driveT, () -> ReefSide.LEFT));
+                this::driveYChassis, this::driveT, () -> ReefSide.LEFT, () -> 0));
         driverController.y().whileTrue(new AutoReefPoseCommand(drivetrain, reefAlign, this::driveXChassis,
-                this::driveYChassis, this::driveT, () -> ReefSide.RIGHT));
+                this::driveYChassis, this::driveT, () -> ReefSide.RIGHT, () -> 0));
         driverController.a()
                 .whileTrue(new AutoReefPoseCommand(drivetrain, reefAlign, this::driveXChassis, this::driveYChassis,
-                        this::driveT, () -> FieldConstants.getNearestReefSide(drivetrain.getState().Pose)));
+                        this::driveT, () -> FieldConstants.getNearestReefSide(drivetrain.getState().Pose), () -> 0));
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }

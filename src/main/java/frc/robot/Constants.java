@@ -21,6 +21,7 @@ public class Constants {
         public static final double TIME_TO_STOP = 0.75;
         public static final double INITIAL_LIMIT = 10.0;
         public static final double LIMIT_SCALE_PER_INCH = 0.945;
+        public static final double LIMIT_SCALE_PER_INCH_AUTO_ALIGN = 0.945;
     }
 
     public static final class PathPlannerConstants {
