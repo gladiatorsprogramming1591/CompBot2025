@@ -43,6 +43,7 @@ import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.EndEffector;
 import frc.robot.subsystems.FlapServo;
 import frc.robot.subsystems.Wrist;
+import frc.robot.utilities.AutoManager;
 // import frc.robot.subsystems.Climber;
 import frc.robot.utilities.DynamicRateLimiter;
 import frc.robot.utilities.FieldConstants;
@@ -93,7 +94,9 @@ public class RobotContainer {
     private final CommandXboxController driverController = new CommandXboxController(0);
     private final CommandXboxController operatorController = new CommandXboxController(1);
 
-    private final SendableChooser<Command> autoChooser;
+    // private final SendableChooser<Command> autoChooser;
+    private final AutoManager autoManager;
+
     private boolean aligning = false;
     private final PIDController headingController = new PIDController(0.1, 0, 0);
     private final SwerveRequest.RobotCentric reefAlign = new SwerveRequest.RobotCentric()
@@ -104,8 +107,11 @@ public class RobotContainer {
     public RobotContainer() {
         // DataLogManager.start();
         registerNamedCommands();
-        autoChooser = AutoBuilder.buildAutoChooser(); // A default auto can be passed in as parameter.
-        SmartDashboard.putData("Auto Mode", autoChooser);
+        // autoChooser = AutoBuilder.buildAutoChooser(); // A default auto can be passed in as parameter.
+        // SmartDashboard.putData("Auto Mode", autoChooser);
+        autoManager = new AutoManager(drivetrain);
+        SmartDashboard.putData("Auto Mode", autoManager.getChooser());
+
         SmartDashboard.putData(drivetrain.getCurrentCommand());
         SmartDashboard.putNumber("", DriverStation.getStickButtons(1));
 
@@ -516,7 +522,8 @@ public class RobotContainer {
 
     // 2.3976 is the y postion of StartLineToF
     public Command getAutonomousCommand() {
-        return autoChooser.getSelected();
+        // return autoChooser.getSelected();
+        return autoManager.getChooser().getSelected();
     }
 
     public void registerNamedCommands() {
