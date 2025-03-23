@@ -175,12 +175,12 @@ public class RobotContainer {
 
         driverController.b()
                 .onTrue(new ParallelCommandGroup(
-                                new ElevatorToPosition(elevator, elevatorPositions.NETSHOOT),
-                                endEffector.holdTopAlgaeCommand().withTimeout(0.58)
-                                        .andThen(endEffector.ejectTopAlgaeCommand()).withTimeout(1.0)
-                                        .andThen(endEffector.stopIntakeCommand())
-                                        .andThen(new ElevatorToPosition(elevator, elevatorPositions.STOW))
-                        ));
+                        prepElevatorOnly(elevatorPositions.NETSHOOT),
+                        endEffector.holdTopAlgaeCommand().withTimeout(0.58 - 0.15)
+                                .andThen(endEffector.ejectTopAlgaeCommand()).withTimeout(1.0)
+                                .andThen(endEffector.stopIntakeCommand())
+                                .andThen(new ElevatorToPosition(elevator, elevatorPositions.STOW))
+                ));
         // ===================================== Operator Controls
         // =====================================
         // Elevator
@@ -284,6 +284,25 @@ public class RobotContainer {
             prepL4Finished = true;
         else
             prepL4Finished = false;
+    }
+
+    // Use only for L1-L3. L4 has different coral position. Wrist positions should be in an enum map.
+    public Command prepElevatorOnly(elevatorPositions position) {
+        System.out.println("Running complex score command");
+        return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
+                .andThen((new ElevatorToPosition(elevator, position)))
+                .andThen(new WaitUntilCommand(elevator::atSetpointExternalEnc));
+    }
+
+    // Use only for L1-L3. L4 has different coral position. Wrist positions should be in an enum map.
+    public Command prepElevatorScore(elevatorPositions position, double wristAngleConstant) {
+        System.out.println("Running complex score command");
+        return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
+                .andThen((new ElevatorToPosition(elevator, position)))
+                .andThen(new WaitUntilCommand(elevator::atSetpointExternalEnc))
+                .andThen(wrist.HoverPositionCommand(wristAngleConstant))
+                .andThen(new RunCommand(() -> endEffector.setCoralSpeed(-0.15), endEffector).withTimeout(0.10))
+                .andThen(new InstantCommand(() -> endEffector.setCoralSpeed(0.0), endEffector));
     }
 
     public Command prepElevatorScoreL1(elevatorPositions position) {

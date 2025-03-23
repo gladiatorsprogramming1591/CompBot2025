@@ -113,6 +113,9 @@ public class Wrist extends SubsystemBase {
           return new InstantCommand(()-> setAngle(WristConstants.WRIST_PROCESSOR)); 
     }
 
+    public Command HoverPositionCommand(double wristAngleConstant){
+          return new InstantCommand(()->setAngle(wristAngleConstant)); 
+     }
     public Command HoverPositionCommandL1(){
           return new InstantCommand(()->setAngle(WristConstants.WRIST_L1)); 
      }
