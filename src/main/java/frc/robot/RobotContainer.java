@@ -174,13 +174,14 @@ public class RobotContainer {
                 this::driveT, () -> FieldConstants.getNearestReefSide(drivetrain.getState().Pose), () -> elevator.getExternalPositionInches()));
 
         driverController.b()
-                .onTrue(new ParallelCommandGroup(
-                        prepElevatorOnly(elevatorPositions.NETSHOOT),
-                        endEffector.holdTopAlgaeCommand().withTimeout(0.58 - 0.15)
-                                .andThen(endEffector.ejectTopAlgaeCommand()).withTimeout(1.0)
-                                .andThen(endEffector.stopIntakeCommand())
-                                .andThen(new ElevatorToPosition(elevator, elevatorPositions.STOW))
-                ));
+                .onTrue(
+                        new ParallelCommandGroup(
+                                prepElevatorOnly(elevatorPositions.NETSHOOT),
+                                endEffector.holdTopAlgaeCommand().withTimeout(0.58 - 0.15)
+                                        .andThen(endEffector.ejectTopAlgaeCommand()).withTimeout(1.0)
+                                        .andThen(endEffector.stopIntakeCommand()))
+                        .andThen(complexElevatorStowCommand(elevatorPositions.STOW))
+                );
         // ===================================== Operator Controls
         // =====================================
         // Elevator
