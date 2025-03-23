@@ -177,9 +177,10 @@ public class RobotContainer {
                 .onTrue(
                         new ParallelCommandGroup(
                                 prepElevatorOnly(elevatorPositions.NETSHOOT),
-                                endEffector.holdTopAlgaeCommand().withTimeout(0.58 - 0.15)
+                                endEffector.holdTopAlgaeCommand().withTimeout(0.58)
                                         .andThen(endEffector.ejectTopAlgaeCommand()).withTimeout(1.0)
                                         .andThen(endEffector.stopIntakeCommand()))
+                        .andThen(new WaitUntilCommand(elevator::atSetpointExternalEnc))
                         .andThen(complexElevatorStowCommand(elevatorPositions.STOW))
                 );
         // ===================================== Operator Controls

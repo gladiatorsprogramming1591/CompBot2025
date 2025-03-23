@@ -114,7 +114,7 @@ public class Constants {
 
     public class EndEffectorConstants {
         public static final int EE_MOTOR_ID = 3;
-        public static final int INTAKE_CURRENT_LIMIT = 40;
+        public static final int INTAKE_CURRENT_LIMIT = 50;
         public static final double INTAKE_RAMP_RATE = 0.1;
         public static final boolean INTAKE_INVERTED = true;
 
@@ -132,8 +132,8 @@ public class Constants {
         public static final double ALGAE_HOLD_SPEED = 0.5;
         public static final double ALGAE_EJECT_SPEED = -1.0;
         
-        public static final double ALGAE_TOP_HOLD_SPEED = -0.5;
-        public static final double ALGAE_TOP_EJECT_SPEED = 1.0;
+        public static final double ALGAE_TOP_HOLD_SPEED = 0.5;
+        public static final double ALGAE_TOP_EJECT_SPEED = -1.0;
 
         public static final SparkFlexConfig MOTOR_CONFIG = new SparkFlexConfig() {
             {
