@@ -383,7 +383,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 //ambiguity to high dont use estimate
                 if (bestTargetAmbiguity > maximumAmbiguity)
                 {
-                    System.out.println("Ignoring pose on camera " + cameraIdx + " with ambiguity " + bestTargetAmbiguity);
+                    // System.out.println("Ignoring pose on camera " + cameraIdx + " with ambiguity " + bestTargetAmbiguity);
                     return Optional.empty();
                 }
 

@@ -182,10 +182,10 @@ public class RobotContainer {
         // =====================================
         // Elevator
         operatorController.back().onTrue(new InstantCommand(() -> elevator.zeroElevatorExternalEncCommand()));
-        operatorController.povDown().onTrue(prepElevatorScore(elevatorPositions.L1));
+        operatorController.povDown().onTrue(prepElevatorScoreL1(elevatorPositions.L1));
         operatorController.povLeft().onTrue(prepElevatorScoreL2(elevatorPositions.L2));
+        operatorController.povUp().onTrue(prepElevatorScoreL3(elevatorPositions.L3));
         operatorController.povRight().onTrue(prepElevatorScoreL4(elevatorPositions.L4));
-        operatorController.povUp().onTrue(prepElevatorScore(elevatorPositions.L3));
 
         operatorController.leftBumper().onTrue(complexElevatorStowCommand(elevatorPositions.STOW));
         operatorController.rightBumper().onTrue(complexBargeCommand(elevatorPositions.NETSHOOT)); 
@@ -195,8 +195,8 @@ public class RobotContainer {
         // Wrist
         operatorController.x().onTrue(new InstantCommand(() -> wrist.setAngle(WristConstants.GROUND_INTAKE)));
         operatorController.y().onTrue(new InstantCommand(() -> wrist.setAngle(WristConstants.WRIST_STOW)));
-        operatorController.leftTrigger().onTrue(complexLowAlgaeIntakeCommand(elevatorPositions.ALGAE_LOW));
-        operatorController.rightTrigger().onTrue(complexHighAlgaeIntakeCommand(elevatorPositions.ALGAE_HIGH));
+        // operatorController.leftTrigger().onTrue(complexLowAlgaeIntakeCommand(elevatorPositions.ALGAE_LOW));
+        // operatorController.rightTrigger().onTrue(complexHighAlgaeIntakeCommand(elevatorPositions.ALGAE_HIGH));
 
         operatorController.start().onTrue(new InstantCommand(() ->endEffector.setCoralSpeed(-1.0), endEffector))
                 .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(1.0), endEffector));
@@ -210,8 +210,12 @@ public class RobotContainer {
         // Manual Control
         // wrist.setDefaultCommand(new RunCommand(()-> wrist.setWristMotor(operatorController.getRightTriggerAxis() - operatorController.getLeftTriggerAxis() * 0.20), wrist)
         //         .handleInterrupt(()-> wrist.setWristMotor(0)));
-        // operatorController.rightStick().toggleOnTrue(new RunCommand(() -> elevator.setMotorSpeed(operatorController.getRightY() * 0.50), elevator)
-        //         .handleInterrupt(() -> elevator.setMotorSpeed(0)));
+        operatorController.rightStick().toggleOnTrue(new RunCommand(() -> elevator.setMotorSpeed((-MathUtil.applyDeadband(operatorController.getRightY(), 0.1) * 0.50) + 0.05), elevator)
+                .alongWith(new RunCommand(()-> wrist.setWristMotor(MathUtil.applyDeadband(operatorController.getRightTriggerAxis(), 0.1) - MathUtil.applyDeadband(operatorController.getLeftTriggerAxis(), 0.1) * 0.20), wrist))
+                .handleInterrupt(() -> {
+                        elevator.setMotorSpeed(0);
+                        wrist.setWristMotor(0);
+                }));
 
         drivetrain.registerTelemetry(logger::telemeterize);
 
@@ -279,12 +283,12 @@ public class RobotContainer {
             prepL4Finished = false;
     }
 
-    public Command prepElevatorScore(elevatorPositions position) {
+    public Command prepElevatorScoreL1(elevatorPositions position) {
         System.out.println("Running complex score command");
         return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
                 .andThen((new ElevatorToPosition(elevator, position)))
                 .andThen(new WaitUntilCommand(elevator::atSetpointExternalEnc))
-                .andThen(wrist.HoverPositionCommandL2())
+                .andThen(wrist.HoverPositionCommandL1())
                 .andThen(new RunCommand(() -> endEffector.setCoralSpeed(-0.15), endEffector).withTimeout(0.10))
                 .andThen(new InstantCommand(() -> endEffector.setCoralSpeed(0.0), endEffector));
     }
@@ -294,7 +298,16 @@ public class RobotContainer {
         return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
                 .andThen((new ElevatorToPosition(elevator, position)))
                 .andThen(new WaitUntilCommand(elevator::atSetpointExternalEnc))
-                .andThen(wrist.HoverPositionCommand())
+                .andThen(wrist.HoverPositionCommandL2())
+                .andThen(new RunCommand(() -> endEffector.setCoralSpeed(-0.15), endEffector).withTimeout(0.10))
+                .andThen(new InstantCommand(() -> endEffector.setCoralSpeed(0.0), endEffector));
+    }
+    public Command prepElevatorScoreL3(elevatorPositions position) {
+        System.out.println("Running complex score command");
+        return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
+                .andThen((new ElevatorToPosition(elevator, position)))
+                .andThen(new WaitUntilCommand(elevator::atSetpointExternalEnc))
+                .andThen(wrist.HoverPositionCommandL3())
                 .andThen(new RunCommand(() -> endEffector.setCoralSpeed(-0.15), endEffector).withTimeout(0.10))
                 .andThen(new InstantCommand(() -> endEffector.setCoralSpeed(0.0), endEffector));
     }
@@ -304,7 +317,7 @@ public class RobotContainer {
         return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
                 .andThen((new ElevatorToPosition(elevator, position)))
                 .andThen(new WaitUntilCommand(elevator::atSetpointExternalEnc))
-                .andThen(wrist.L4HoverPositionCommand())
+                .andThen(wrist.HoverPositionCommandL4())
                 .andThen(new RunCommand(() -> endEffector.setCoralSpeed(-0.15), endEffector).withTimeout(0.25)
                         .alongWith(new InstantCommand(() -> prepL4Finished(true))))
                 .andThen(new InstantCommand(() -> endEffector.setCoralSpeed(0.0), endEffector))
@@ -316,7 +329,7 @@ public class RobotContainer {
                 new InstantCommand(() -> prepL4Finished = false),
                 new ElevatorToPosition(elevator, position).onlyIf(() -> prepL4Finished)
                         .andThen(new WaitUntilCommand(elevator::atSetpointExternalEnc))
-                        .andThen(wrist.L4HoverPositionCommand())
+                        .andThen(wrist.HoverPositionCommandL4())
                         .andThen(new RunCommand(() -> endEffector.setCoralSpeed(-0.15), endEffector).withTimeout(0.25))
                         .andThen(new InstantCommand(() -> endEffector.setCoralSpeed(0.0), endEffector))
                         .andThen(new InstantCommand(() -> prepL4Finished(false))),
@@ -545,9 +558,9 @@ public class RobotContainer {
                             .handleInterrupt((() -> endEffector.setCoralSpeed(0)))
                             .andThen(() -> System.out.println("Confirm Prep Auto L4")));
             NamedCommands.registerCommand("Prep L3",
-                    prepElevatorScore(elevatorPositions.L3).andThen(() -> System.out.println("Prep L3")));
+                    prepElevatorScoreL1(elevatorPositions.L3).andThen(() -> System.out.println("Prep L3")));
             NamedCommands.registerCommand("Prep L2",
-                    prepElevatorScore(elevatorPositions.L2).andThen(() -> System.out.println("Prep L2")));
+                    prepElevatorScoreL1(elevatorPositions.L2).andThen(() -> System.out.println("Prep L2")));
             NamedCommands.registerCommand("Prep Algae High",
                     complexHighAlgaeIntakeCommand(elevatorPositions.ALGAE_HIGH));
             NamedCommands.registerCommand("Prep Algae Low", complexHighAlgaeIntakeCommand(elevatorPositions.ALGAE_LOW));

@@ -113,15 +113,19 @@ public class Wrist extends SubsystemBase {
           return new InstantCommand(()-> setAngle(WristConstants.WRIST_PROCESSOR)); 
     }
 
-    public Command HoverPositionCommandL2(){
-          return new InstantCommand(()->setAngle(WristConstants.WRIST_HOVER_L2)); 
-     }
-    public Command HoverPositionCommand(){
-          return new InstantCommand(()->setAngle(WristConstants.WRIST_HOVER)); 
+    public Command HoverPositionCommandL1(){
+          return new InstantCommand(()->setAngle(WristConstants.WRIST_L1)); 
      }
 
-     public Command L4HoverPositionCommand(){
-          return new InstantCommand(()->setAngle(WristConstants.WRIST_HOVER_L4)); 
+    public Command HoverPositionCommandL2(){
+          return new InstantCommand(()->setAngle(WristConstants.WRIST_L2)); 
+     }
+    public Command HoverPositionCommandL3(){
+          return new InstantCommand(()->setAngle(WristConstants.WRIST_L3)); 
+     }
+
+     public Command HoverPositionCommandL4(){
+          return new InstantCommand(()->setAngle(WristConstants.WRIST_L4)); 
      }
      public Command LowAlgaePositionCommand(){
           return new InstantCommand(()->setAngle(WristConstants.WRIST_ALGAE_LOW)); 
