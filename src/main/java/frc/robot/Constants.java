@@ -151,8 +151,8 @@ public class Constants {
         public static final double REEF_ACQUIRE_ANGLE = WRIST_INTAKE + 22.0;
         public static final double GROUND_INTAKE = WRIST_INTAKE + 70.0;
         public static final double WRIST_PROCESSOR = WRIST_INTAKE + 23.0;
-        public static final double WRIST_L1 = WRIST_INTAKE;
-        public static final double WRIST_L2 = WRIST_INTAKE + 39.0;
+        public static final double WRIST_L1 = WRIST_INTAKE + 16.0;
+        public static final double WRIST_L2 = WRIST_INTAKE + 31.2;
         public static final double WRIST_L3 = WRIST_INTAKE + 26.0;
         public static final double WRIST_L4 = WRIST_INTAKE + 46.0; // +39
         public static final double WRIST_DEFAULT = WRIST_L3;

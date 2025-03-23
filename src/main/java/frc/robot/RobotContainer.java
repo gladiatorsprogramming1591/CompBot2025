@@ -67,7 +67,7 @@ public class RobotContainer {
             : ChazTunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 1 1/2 of a rotation per second
                                                                                       // max angular velocity
-    private double maxSpeedPercent = 0.85;
+    private double maxSpeedPercent = 1.0;
     private double maxAngularRatePercent = 0.40;
     public static double kineticDeadband = KINETIC_DEADBAND;
 
