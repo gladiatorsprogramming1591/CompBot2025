@@ -176,7 +176,7 @@ public class RobotContainer {
         driverController.b()
                 .onTrue(new ParallelCommandGroup(
                                 new ElevatorToPosition(elevator, elevatorPositions.NETSHOOT),
-                                endEffector.holdAlgaeCommand().withTimeout(0.58)
+                                endEffector.holdTopAlgaeCommand().withTimeout(0.58)
                                         .andThen(endEffector.ejectTopAlgaeCommand()).withTimeout(1.0)
                                         .andThen(endEffector.stopIntakeCommand())
                                         .andThen(new ElevatorToPosition(elevator, elevatorPositions.STOW))

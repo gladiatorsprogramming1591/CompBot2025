@@ -127,10 +127,13 @@ public class Constants {
         public static final double L1_CORAL_EJECT_SPEED = 0.75;
 
         // Algae Constants
-        public static final double ALGAE_INTAKE_SPEED = 0.75;
         public static final double HAS_ALGAE_CURRENT = 30;
+        public static final double ALGAE_INTAKE_SPEED = 0.75;
+        public static final double ALGAE_HOLD_SPEED = 0.5;
         public static final double ALGAE_EJECT_SPEED = -1.0;
-        public static final double ALGAE_HOLD_SPEED = -0.5;
+        
+        public static final double ALGAE_TOP_HOLD_SPEED = -0.5;
+        public static final double ALGAE_TOP_EJECT_SPEED = 1.0;
 
         public static final SparkFlexConfig MOTOR_CONFIG = new SparkFlexConfig() {
             {

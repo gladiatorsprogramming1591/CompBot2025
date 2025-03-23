@@ -67,7 +67,7 @@ public class EndEffector extends SubsystemBase {
     }
 
     public void ejectTopAlgae() {
-        intakeMotor.set(-EndEffectorConstants.ALGAE_EJECT_SPEED);
+        intakeMotor.set(EndEffectorConstants.ALGAE_TOP_EJECT_SPEED);
     }
 
     /**
@@ -104,6 +104,10 @@ public class EndEffector extends SubsystemBase {
 
     public Command holdAlgaeCommand() {
         return new RunCommand(() -> setCoralSpeed(EndEffectorConstants.ALGAE_HOLD_SPEED));
+    }
+
+    public Command holdTopAlgaeCommand() {
+        return new RunCommand(() -> setCoralSpeed(EndEffectorConstants.ALGAE_TOP_HOLD_SPEED));
     }
 
     /**
