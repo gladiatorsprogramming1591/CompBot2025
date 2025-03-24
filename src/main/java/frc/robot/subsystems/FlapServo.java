@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -38,5 +39,15 @@ public class FlapServo extends SubsystemBase {
   
   public Command setFlapAngleCommand(DoubleSupplier angleSupplier) {
     return new RunCommand(()-> setFlapServoAngle(angleSupplier.getAsDouble() * 60 + 120),this);
+  }
+
+  public Command toggleFlapCommand() {
+    return new InstantCommand(()-> {
+      if(m_FlapServo.getAngle() == ServoConstants.kServoUpAngle){
+        setFlapServoAngle(ServoConstants.kServoDownAngle);
+      } else {
+        setFlapServoAngle(ServoConstants.kServoUpAngle);
+      }
+    },this);
   }
 }

@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.*;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -14,6 +15,10 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.path.GoalEndState;
+import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.path.Waypoint;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
@@ -25,6 +30,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
@@ -47,6 +53,7 @@ import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+import org.photonvision.PhotonUtils;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
@@ -58,6 +65,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private static final double kSimLoopPeriod = 0.005; // 5 ms
     private Notifier m_simNotifier = null;
     private double m_lastSimTime;
+    Pose2d currentPose;
     PowerDistribution m_pdh = robotInitConstants.isCompBot ? new PowerDistribution(1, ModuleType.kRev) : new PowerDistribution(21, ModuleType.kRev);
 
     /* Blue alliance sees forward as 0 degrees (toward red alliance wall) */
@@ -149,6 +157,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     PhotonPoseEstimator[] m_photonPoseEstimators;
     AprilTagFieldLayout fieldLayout;
         private PhotonTrackedTarget lastTarget;
+        private int longDistangePoseEstimationCount = 0;
+        private static final double maximumAmbiguity = 0.25;
     
         public static final Transform3d kFrontCameraLocation = new Transform3d(
                     new Translation3d(Units.inchesToMeters(11.007), Units.inchesToMeters(0.1875),
@@ -348,9 +358,56 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         public Command sysIdDynamic(SysIdRoutine.Direction direction) {
             return m_sysIdRoutineToApply.dynamic(direction);
         }
+                
+        /**
+         * Filter pose via the ambiguity and find best estimate between all of the camera's throwing out distances more than
+         * 10m for a short amount of time.
+         *
+         * @param pose Estimated robot pose.
+         * @return Could be empty if there isn't a good reading.
+         */
+        private Optional<EstimatedRobotPose> filterPose(Optional<EstimatedRobotPose> pose, int cameraIdx)
+        {
+            if (pose.isPresent())
+            {
+                double bestTargetAmbiguity = 1; // 1 is max ambiguity
+                for (PhotonTrackedTarget target : pose.get().targetsUsed)
+                {
+                    double ambiguity = target.getPoseAmbiguity();
+                    SmartDashboard.putNumber("Ambiguity " + target.getFiducialId() + "." + cameraIdx, ambiguity);
+                    if (ambiguity != -1 && ambiguity < bestTargetAmbiguity)
+                    {
+                        bestTargetAmbiguity = ambiguity;
+                    }
+                }
+                //ambiguity to high dont use estimate
+                if (bestTargetAmbiguity > maximumAmbiguity)
+                {
+                    // System.out.println("Ignoring pose on camera " + cameraIdx + " with ambiguity " + bestTargetAmbiguity);
+                    return Optional.empty();
+                }
+
+                //est pose is very far from recorded robot pose
+                if (PhotonUtils.getDistanceToPose(currentPose, pose.get().estimatedPose.toPose2d()) > 0.5)
+                {
+                    longDistangePoseEstimationCount++;
+
+                    //if it calculates that were 10 meter away for more than 10 times in a row its probably right
+                    if (longDistangePoseEstimationCount < 20)
+                    {
+                        return Optional.empty();
+                    }
+                } else
+                {
+                    longDistangePoseEstimationCount = 0;
+                }
+                return pose;
+            }
+            return Optional.empty();
+        }
     
         public void updatePoseEstimationWithFilter() {
-            Pose2d currentPose = getState().Pose;
+            currentPose = getState().Pose;
             for (int cameraIdx = 0; cameraIdx < MAX_CAMERAS; cameraIdx++) {
                 // TODO: need to find the camera associated with a pose estimator, hard coded to front
                 // var results = m_frontCamera.getAllUnreadResults();
@@ -375,6 +432,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                     double latencyThreshold = 12.0;
                     SmartDashboard.putBoolean("Vision Latency OK", latency > latencyThreshold);
                     pose = m_photonPoseEstimators[cameraIdx].update(result);
+                    if(pose != null) pose = filterPose(pose, cameraIdx);
                 }
                 if (pose != null && pose.isPresent()) {
                     Pose3d pose3d = pose.get().estimatedPose;
@@ -389,11 +447,24 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                     ) {
                         double sum = 0.0;
                         for (PhotonTrackedTarget target : pose.get().targetsUsed) {
-                            Optional<Pose3d> tagPose =
-                                fieldLayout.getTagPose(target.getFiducialId());
+                            int fiducialId = target.getFiducialId();
+                            switch(fiducialId){
+                                case 1:
+                                    continue;
+                                case 2:
+                                    continue;
+                                case 12:
+                                    continue;
+                                case 13:
+                                    continue;
+                            }
+                            Optional<Pose3d> tagPose = fieldLayout.getTagPose(fiducialId);
                             if (tagPose.isEmpty()) continue;
                             sum += currentPose.getTranslation().getDistance(tagPose.get().getTranslation().toTranslation2d());
                         }
+
+                        double estPoseOffset = currentPose.getTranslation().getDistance(pose2d.getTranslation());
+                        SmartDashboard.putNumber("estPoseOffset", estPoseOffset);
 
                         int tagCount = pose.get().targetsUsed.size();
                         double stdScale = Math.pow(sum / tagCount, 2.0) / tagCount;
@@ -549,4 +620,28 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                             .withRotationalRate(-MathUtil.applyDeadband(rotationalRateAxis, rotationDeadband, maxAngularRatePercent) * maxAngularRate) // Drive counterclockwise with negative X (left)
         );
     }
+
+    private void updateStartLineFCoralStartPath(PathPlannerPath startLineFCoralStartPath) {
+        Pose2d currentPose = getState().Pose;
+        
+        // The rotation component in these poses represents the direction of travel
+        Pose2d startPos = new Pose2d(currentPose.getTranslation(), new Rotation2d(Units.degreesToRadians(166.626)));
+        Pose2d endPos = new Pose2d(new Translation2d(5.158, 3.040), new Rotation2d(Units.degreesToRadians(142.879)));
+
+        List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(startPos, endPos);
+        startLineFCoralStartPath = new PathPlannerPath(
+            waypoints, 
+            new PathConstraints(
+            3.0, 2.5, 
+            Units.degreesToRadians(540.0), Units.degreesToRadians(720.0)
+            ),
+            null, // Ideal starting state can be null for on-the-fly paths
+            new GoalEndState(0.0, new Rotation2d(Units.degreesToRadians(120.0)))
+        );
+
+        // Prevent this path from being flipped on the red alliance, since the given positions are already correct
+        startLineFCoralStartPath.preventFlipping = true;
+    }
+
+
 }

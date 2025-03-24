@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.WristConstants;
 
 public class Wrist extends SubsystemBase {
@@ -85,14 +86,15 @@ public class Wrist extends SubsystemBase {
 
     public void setAngle(double angle)
     {
-         holdAngle = angle;
-         wristController.setReference(holdAngle, ControlType.kPosition);
+         if (getAngle() > Constants.WristConstants.GROUND_INTAKE + 5.0 || getAngle() >= 0 && getAngle() < Constants.WristConstants.WRIST_INTAKE / 2.0) {
+          setWristReverseSpeed(()-> 0.5);
+     //     } else if (getAngle() < Constants.WristConstants.WRIST_INTAKE && getAngle() > Constants.WristConstants.WRIST_INTAKE / 2.0) {
+     //      setWristForwardSpeed(()-> 1.0);
+         } else {
+          holdAngle = angle;
+          wristController.setReference(holdAngle, ControlType.kPosition);
+     }
     }  
-
-    public void setHoldAngle()
-    {
-         wristController.setReference(holdAngle, ControlType.kPosition);
-    }
 
     public boolean atSetpoint(){
      double tolerance = 6;
@@ -111,15 +113,22 @@ public class Wrist extends SubsystemBase {
           return new InstantCommand(()-> setAngle(WristConstants.WRIST_PROCESSOR)); 
     }
 
-    public Command HoverPositionCommandL2(){
-          return new InstantCommand(()->setAngle(WristConstants.WRIST_HOVER_L2)); 
+    public Command HoverPositionCommand(double wristAngleConstant){
+          return new InstantCommand(()->setAngle(wristAngleConstant)); 
      }
-    public Command HoverPositionCommand(){
-          return new InstantCommand(()->setAngle(WristConstants.WRIST_HOVER)); 
+    public Command HoverPositionCommandL1(){
+          return new InstantCommand(()->setAngle(WristConstants.WRIST_L1)); 
      }
 
-     public Command L4HoverPositionCommand(){
-          return new InstantCommand(()->setAngle(WristConstants.WRIST_HOVER_L4)); 
+    public Command HoverPositionCommandL2(){
+          return new InstantCommand(()->setAngle(WristConstants.WRIST_L2)); 
+     }
+    public Command HoverPositionCommandL3(){
+          return new InstantCommand(()->setAngle(WristConstants.WRIST_L3)); 
+     }
+
+     public Command HoverPositionCommandL4(){
+          return new InstantCommand(()->setAngle(WristConstants.WRIST_L4)); 
      }
      public Command LowAlgaePositionCommand(){
           return new InstantCommand(()->setAngle(WristConstants.WRIST_ALGAE_LOW)); 
@@ -127,11 +136,6 @@ public class Wrist extends SubsystemBase {
      public Command HighAlgaePositionCommand(){
           return new InstantCommand(()->setAngle(WristConstants.WRIST_ALGAE_HIGH)); 
      }
-
-    public Command HoldPositionCommand()
-    {
-         return new RunCommand(()->setHoldAngle(),this);
-    }
 
     public Command manualWristForwardMovement(DoubleSupplier speedSupplier){
         return new RunCommand(()-> setWristForwardSpeed(speedSupplier), this); 

@@ -6,6 +6,7 @@ import com.revrobotics.spark.SparkLimitSwitch;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -65,6 +66,10 @@ public class EndEffector extends SubsystemBase {
         intakeMotor.set(EndEffectorConstants.ALGAE_EJECT_SPEED);
     }
 
+    public void ejectTopAlgae() {
+        intakeMotor.set(EndEffectorConstants.ALGAE_TOP_EJECT_SPEED);
+    }
+
     /**
      * spins intake backwards to arm the coral
      */
@@ -101,6 +106,10 @@ public class EndEffector extends SubsystemBase {
         return new RunCommand(() -> setCoralSpeed(EndEffectorConstants.ALGAE_HOLD_SPEED));
     }
 
+    public Command holdTopAlgaeCommand() {
+        return new RunCommand(() -> setCoralSpeed(EndEffectorConstants.ALGAE_TOP_HOLD_SPEED));
+    }
+
     /**
      * Runs the intake until the robot has coral, slowing down as coral progresses
      * through the system
@@ -117,6 +126,14 @@ public class EndEffector extends SubsystemBase {
                 }), new InstantCommand(() -> setCoralSpeed(0)));
     }
 
+    public Command intakeCoralCommand2() {
+        return new SequentialCommandGroup(new RunCommand(() -> setCoralSpeed(EndEffectorConstants.CORAL_INTAKE_SPEED))
+                .until(this::hasCoral),
+                new RunCommand(() -> setCoralSpeed(EndEffectorConstants.CORAL_REVERSE_SPEED2))
+                        .withTimeout(0.15),
+                new InstantCommand(() -> setCoralSpeed(0)));
+    }
+
     public Command autoIntakeCoralCommand() {
         return new SequentialCommandGroup(new RunCommand(() -> setCoralSpeed(EndEffectorConstants.CORAL_INTAKE_SPEED)))
                 .onlyIf(() -> !isCoralFrontBeamBroken())
@@ -125,11 +142,10 @@ public class EndEffector extends SubsystemBase {
     }
 
     public Command homingSequenceCommand() {
-        return new SequentialCommandGroup(new RunCommand(() -> setCoralSpeed(EndEffectorConstants.CORAL_REVERSE_SPEED))
-                .until(this::coralArmed),
-                new RunCommand(() -> setCoralSpeed(0.1)).until(() -> {
-                    return !coralArmed();                }), new RunCommand(() -> setCoralSpeed(EndEffectorConstants.CORAL_REVERSE_SPEED)).withTimeout(0.1),
-                new InstantCommand(() -> setCoralSpeed(0)));
+        return new SequentialCommandGroup(
+            new RunCommand(() -> setCoralSpeed(EndEffectorConstants.CORAL_REVERSE_SPEED2))
+                .withTimeout(0.15),
+            new InstantCommand(() -> setCoralSpeed(0)));
     }
 
     public Command ejectCoralCommand() {
@@ -141,7 +157,16 @@ public class EndEffector extends SubsystemBase {
     public Command ejectAlgaeCommand() {
         return new InstantCommand(() -> ejectAlgae());
     }
+    
 
+    public Command ejectTopAlgaeCommand() {
+        return new RunCommand(() -> ejectTopAlgae());
+    }
+
+    public Command stopIntakeCommand() {
+        return new InstantCommand(()-> setCoralSpeed(0));
+    }
+    
     @Override
     public void periodic() {
         SmartDashboard.putBoolean("Has Algae?", hasAlgae());
@@ -149,5 +174,6 @@ public class EndEffector extends SubsystemBase {
         SmartDashboard.putNumber("ee Motor Controller Voltage", intakeMotor.getBusVoltage());
         SmartDashboard.putBoolean("Rear Beam Broken?", isCoralRearBeamBroken());
         SmartDashboard.putBoolean("Front Beam Broken?", isCoralFrontBeamBroken());
+        SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime());
     }
 }

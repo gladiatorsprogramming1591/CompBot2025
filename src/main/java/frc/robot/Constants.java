@@ -3,6 +3,7 @@ package frc.robot;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.MAXMotionConfig.MAXMotionPositionMode;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.AbsoluteEncoderConfig;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
@@ -19,7 +20,12 @@ public class Constants {
 
         public static final double TIME_TO_STOP = 0.75;
         public static final double INITIAL_LIMIT = 10.0;
-        public static final double LIMIT_SCALE_PER_INCH = 0.92;
+        public static final double LIMIT_SCALE_PER_INCH = 0.96;
+        public static final double LIMIT_SCALE_PER_INCH_AUTO_ALIGN = 0.96;
+    }
+
+    public static final class PathPlannerConstants {
+        
     }
 
     public class ElevatorConstants {
@@ -30,13 +36,13 @@ public class Constants {
         public static final boolean LEADER_INVERTED = false;
         public static final boolean FOLLOWER_INVERTED_FROM_LEADER = true;
         public static final double RAMP_RATE = 0.001;
-        public static final int CURRENT_LIMIT = 60;
+        public static final int CURRENT_LIMIT = 70;
 
         public static final double OUTPUT_MAXIMUM = 1.0;
         public static final double OUTPUT_MINIMUM = -1.0;
 
-        public static final double INCHES_PER_ROTATION = 22.0 / 9.0 / 4.0;
-        public static final double INCHES_PER_ABS_ROTATION = 0; // TODO: measure this
+        public static final double INCHES_PER_INTERNAL_ROTATION = 22.0 / 9.0 / 4.0;
+        public static final double INCHES_PER_EXTERNAL_ROTATION = (1.7576 / 2) * Math.PI; // TODO: measure this
         public static final double INITIAL_HEIGHT_INCHES = 0;
         public static final double TOLERANCE_INCHES = 0.5;
 
@@ -67,11 +73,10 @@ public class Constants {
         public static final double kL3 = 15.3;
         public static final double kL4 = 26.4;
         public static final double AUTO_L4 = 25.5;
-        public static final double kPROCESSOR = 0.2;
-        public static final double kNET = kL4;
-        public static final double ALGAE_HIGH = 15.75;
-        public static final double ALGAE_LOW = 9.8;
-
+        public static final double kPROCESSOR = 0.5;
+        public static final double kNET = 27.75;
+        public static final double ALGAE_HIGH = 8.53;
+        public static final double ALGAE_LOW = 2.75;
         public static final SparkFlexConfig MOTOR_CONFIG = new SparkFlexConfig() {
             {
                 idleMode(IdleMode.kBrake);
@@ -81,7 +86,7 @@ public class Constants {
                 limitSwitch.reverseLimitSwitchEnabled(false);
                 limitSwitch.forwardLimitSwitchEnabled(false);
 
-                closedLoop.outputRange(-1.0, OUTPUT_MAXIMUM, ClosedLoopSlot.kSlot0) // kslot 0 is up
+                closedLoop.outputRange(-0.5, OUTPUT_MAXIMUM, ClosedLoopSlot.kSlot0) // kslot 0 is up
                         .p(ElevatorConstants.P_UP, ClosedLoopSlot.kSlot0)
                         .i(ElevatorConstants.I_UP, ClosedLoopSlot.kSlot0)
                         .d(ElevatorConstants.D_UP, ClosedLoopSlot.kSlot0);
@@ -109,22 +114,26 @@ public class Constants {
 
     public class EndEffectorConstants {
         public static final int EE_MOTOR_ID = 3;
-        public static final int INTAKE_CURRENT_LIMIT = 60;
+        public static final int INTAKE_CURRENT_LIMIT = 50;
         public static final double INTAKE_RAMP_RATE = 0.1;
         public static final boolean INTAKE_INVERTED = true;
 
         // Coral Constants
         public static final double CORAL_INTAKE_SPEED = 0.2;
         public static final double CORAL_REVERSE_SPEED = -0.15;
+        public static final double CORAL_REVERSE_SPEED2 = -0.3;
         public static final double CORAL_EJECT_SPEED = 0.5;
         public static final double ARM_CORAL_SPEED = 0;
         public static final double L1_CORAL_EJECT_SPEED = 0.75;
 
         // Algae Constants
-        public static final double ALGAE_INTAKE_SPEED = -1;
         public static final double HAS_ALGAE_CURRENT = 30;
-        public static final double ALGAE_EJECT_SPEED = 1.0;
-        public static final double ALGAE_HOLD_SPEED = -0.5;
+        public static final double ALGAE_INTAKE_SPEED = 0.75;
+        public static final double ALGAE_HOLD_SPEED = 0.5;
+        public static final double ALGAE_EJECT_SPEED = -1.0;
+        
+        public static final double ALGAE_TOP_HOLD_SPEED = 0.5;
+        public static final double ALGAE_TOP_EJECT_SPEED = -1.0;
 
         public static final SparkFlexConfig MOTOR_CONFIG = new SparkFlexConfig() {
             {
@@ -145,13 +154,14 @@ public class Constants {
         public static final double REEF_ACQUIRE_ANGLE = WRIST_INTAKE + 22.0;
         public static final double GROUND_INTAKE = WRIST_INTAKE + 70.0;
         public static final double WRIST_PROCESSOR = WRIST_INTAKE + 23.0;
-        public static final double WRIST_HOVER = WRIST_INTAKE + 34.0;
-        public static final double WRIST_HOVER_L2 = WRIST_INTAKE + 39.0;
-        public static final double WRIST_HOVER_L4 = WRIST_INTAKE + 46.0; // +39
-        public static final double WRIST_ALGAE_LOW = WRIST_INTAKE + 41.0;
-        public static final double WRIST_ALGAE_HIGH = WRIST_INTAKE + 34.0;
+        public static final double WRIST_L1 = WRIST_INTAKE + 16.0;
+        public static final double WRIST_L2 = WRIST_INTAKE + 31.2;
+        public static final double WRIST_L3 = WRIST_INTAKE + 30.0;
+        public static final double WRIST_L4 = WRIST_INTAKE + 46.0; 
+        public static final double WRIST_DEFAULT = WRIST_L3;
+        public static final double WRIST_ALGAE_LOW = WRIST_INTAKE + 34.0;
+        public static final double WRIST_ALGAE_HIGH = WRIST_INTAKE + 33.0;
         public static final double WRIST_DUNK_CORAL = WRIST_INTAKE;
-        public static final double WRIST_L1 = WRIST_INTAKE;
 
         public static final int WRIST_CAN_ID = 4;
         public static final int WRIST_CURRENT_LIMIT = 30;
@@ -182,7 +192,7 @@ public class Constants {
     }
 
     public class ClimberConstants {
-        public static final int CLIMB_ROLLER_CAN_ID = 50;
+        // public static final int CLIMB_ROLLER_CAN_ID = 50;
         public static final int CLIMB_ROLLER_CURRENT_LIMIT = 80;
         public static final boolean CLIMB_ROLLER_MOTOR_INVERTED = true;
         public static final double CLIMB_ROLLER_RAMP_RATE = 0.1;

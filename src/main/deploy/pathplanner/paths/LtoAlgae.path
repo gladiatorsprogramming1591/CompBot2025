@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.128,
-        "y": 5.612
+        "x": 3.689,
+        "y": 4.944
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.537461268260132,
-        "y": 5.471596986089824
+        "x": 3.810687689682606,
+        "y": 5.162385224270576
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "L"
     },
     {
       "anchor": {
-        "x": 5.226639344262295,
-        "y": 4.966034836065573
+        "x": 3.8360655737704916,
+        "y": 5.0499487704918025
       },
       "prevControl": {
-        "x": 5.739343616935543,
-        "y": 5.354085514176815
+        "x": 3.6387275194264097,
+        "y": 4.896463617113072
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "I"
+      "linkedName": null
     }
   ],
   "rotationTargets": [],
@@ -33,34 +33,34 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "PrepAndScore",
-      "waypointRelativePos": 0.36,
+      "name": "Prep Algae Low",
+      "waypointRelativePos": 0,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
         "data": {
-          "name": "Prep L4"
+          "name": "Prep Algae Low"
         }
       }
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 3.0,
-    "maxAcceleration": 2.25,
+    "maxVelocity": 2.5,
+    "maxAcceleration": 1.5,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0.0,
-    "rotation": -119.99999999999999
+    "velocity": 0,
+    "rotation": -59.300277449185614
   },
   "reversed": false,
-  "folder": "StartLineICoral",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -119.99999999999999
+    "rotation": -54.0
   },
   "useDefaultConstraints": false
 }

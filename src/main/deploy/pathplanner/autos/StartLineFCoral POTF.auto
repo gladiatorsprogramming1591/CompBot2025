@@ -5,15 +5,22 @@
     "data": {
       "commands": [
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "StartLineToJ"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Confirm Prep L4"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "startLineFCoral Start Path"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Prep L4"
+                }
+              }
+            ]
           }
         },
         {
@@ -25,7 +32,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "IToCoralStationL"
+            "pathName": "FToCoralStationR"
           }
         },
         {
@@ -63,7 +70,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "CoralStationFarToK"
+            "pathName": "CoralStationRToD"
           }
         },
         {
@@ -81,7 +88,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "KToCoralStationL"
+            "pathName": "DToCoralStationR"
           }
         },
         {
@@ -119,7 +126,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "CoralStationLToA"
+            "pathName": "CoralStationRToC"
           }
         },
         {
@@ -135,9 +142,9 @@
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "LtoAlgae"
+            "name": "Stow"
           }
         }
       ]
