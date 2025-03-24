@@ -168,6 +168,7 @@ public class Constants {
         public static final double WRIST_ALGAE_LOW = WRIST_INTAKE + 34.0;
         public static final double WRIST_ALGAE_HIGH = WRIST_INTAKE + 33.0;
         public static final double WRIST_DUNK_CORAL = WRIST_INTAKE;
+        public static final double WRIST_NET_FLICK = WRIST_STOW + 5;
 
         public static final int WRIST_CAN_ID = 4;
         public static final int WRIST_CURRENT_LIMIT = 30;
