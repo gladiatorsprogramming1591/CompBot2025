@@ -58,6 +58,11 @@ public class AutoReefPoseCommand extends Command {
         }
     
         public void initialize() {
+            if(position.get() == ReefSide.RIGHT) {
+                CommandSwerveDrivetrain.onlyUseRightCamera();
+            } else{
+                CommandSwerveDrivetrain.onlyUseLeftCamera();
+            }
         }
     
         @Override
@@ -70,6 +75,7 @@ public class AutoReefPoseCommand extends Command {
             {
                 position = () -> FieldConstants.getNearestReefSide(drivetrain.getState().Pose);
             }
+            
             // boolean isCoral = state.getCurrentMode() == GamePiece.CORAL;
             Pose2d reefPose = FieldConstants.getNearestReefBranch(currentPose, position.get());
             // Need to uncomment below when we add RobotState or want to test ALGAE
@@ -140,6 +146,7 @@ public class AutoReefPoseCommand extends Command {
 
     // Called once after isFinished returns true
     protected void end() {
+        CommandSwerveDrivetrain.useBothCameras();
         // RobotContainer.candleSubsystem.setAnimate("Rainbow");
     }
 

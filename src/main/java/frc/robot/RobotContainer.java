@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.robotInitConstants;
@@ -178,7 +179,10 @@ public class RobotContainer {
                         new ParallelCommandGroup(
                                 prepElevatorOnly(elevatorPositions.NETSHOOT),
                                 endEffector.holdTopAlgaeCommand().withTimeout(0.58)
-                                        .andThen(endEffector.ejectTopAlgaeCommand()).withTimeout(1.0)
+                                        .andThen(endEffector.ejectTopAlgaeCommand()
+                                                .alongWith(new WaitCommand(0.25)
+                                                        .andThen(wrist.HoverPositionCommand(WristConstants.WRIST_NET_FLICK))))
+                                        .withTimeout(1.0)
                                         .andThen(endEffector.stopIntakeCommand()))
                         .andThen(new WaitUntilCommand(elevator::atSetpointExternalEnc))
                         .andThen(complexElevatorStowCommand(elevatorPositions.STOW))
