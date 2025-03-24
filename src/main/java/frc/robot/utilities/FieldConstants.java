@@ -26,8 +26,37 @@ public class FieldConstants {
     public static final Translation2d fieldCenter =
         new Translation2d(fieldLength / 2, fieldWidth / 2);
     public static final double startingLineX =
-        Units.inchesToMeters(299.438); // Measured from the inside of starting
-    // line
+        Units.inchesToMeters(299.438); // Measured from the inside of starting line
+
+    //Left Red Branches
+    public static final PropertyManager.DoubleProperty LEFT_RED_BRANCH_A = new PropertyManager.DoubleProperty("Left Red Branch A", 0);
+    public static final PropertyManager.DoubleProperty LEFT_RED_BRANCH_C = new PropertyManager.DoubleProperty("Left Red Branch C", 0);
+    public static final PropertyManager.DoubleProperty LEFT_RED_BRANCH_E = new PropertyManager.DoubleProperty("Left Red Branch E", 0);
+    public static final PropertyManager.DoubleProperty LEFT_RED_BRANCH_G = new PropertyManager.DoubleProperty("Left Red Branch G", 0.02);
+    public static final PropertyManager.DoubleProperty LEFT_RED_BRANCH_I = new PropertyManager.DoubleProperty("Left Red Branch I", 0);
+    public static final PropertyManager.DoubleProperty LEFT_RED_BRANCH_K = new PropertyManager.DoubleProperty("Left Red Branch K", 0);
+    //Left Blue Branches
+    public static final PropertyManager.DoubleProperty LEFT_BLUE_BRANCH_A = new PropertyManager.DoubleProperty("Left Blue Branch A", 0);
+    public static final PropertyManager.DoubleProperty LEFT_BLUE_BRANCH_C = new PropertyManager.DoubleProperty("Left Blue Branch C", 0);
+    public static final PropertyManager.DoubleProperty LEFT_BLUE_BRANCH_E = new PropertyManager.DoubleProperty("Left Blue Branch E", 0);
+    public static final PropertyManager.DoubleProperty LEFT_BLUE_BRANCH_G = new PropertyManager.DoubleProperty("Left Blue Branch G", 0);
+    public static final PropertyManager.DoubleProperty LEFT_BLUE_BRANCH_I = new PropertyManager.DoubleProperty("Left Blue Branch I", 0);
+    public static final PropertyManager.DoubleProperty LEFT_BLUE_BRANCH_K = new PropertyManager.DoubleProperty("Left Blue Branch K", 0);
+    //Right Red Branches
+    public static final PropertyManager.DoubleProperty RIGHT_RED_BRANCH_B = new PropertyManager.DoubleProperty("Right Red Branch B", 0.1);
+    public static final PropertyManager.DoubleProperty RIGHT_RED_BRANCH_D = new PropertyManager.DoubleProperty("Right Red Branch D", 0);
+    public static final PropertyManager.DoubleProperty RIGHT_RED_BRANCH_F = new PropertyManager.DoubleProperty("Right Red Branch F", 0.027);
+    public static final PropertyManager.DoubleProperty RIGHT_RED_BRANCH_H = new PropertyManager.DoubleProperty("Right Red Branch H", 0);
+    public static final PropertyManager.DoubleProperty RIGHT_RED_BRANCH_J = new PropertyManager.DoubleProperty("Right Red Branch J", 0);
+    public static final PropertyManager.DoubleProperty RIGHT_RED_BRANCH_L = new PropertyManager.DoubleProperty("Right Red Branch L", 0);
+    //Right Blue Branches
+    public static final PropertyManager.DoubleProperty RIGHT_BLUE_BRANCH_B = new PropertyManager.DoubleProperty("Right Blue Branch B", 0);
+    public static final PropertyManager.DoubleProperty RIGHT_BLUE_BRANCH_D = new PropertyManager.DoubleProperty("Right Blue Branch D", 0);
+    public static final PropertyManager.DoubleProperty RIGHT_BLUE_BRANCH_F = new PropertyManager.DoubleProperty("Right Blue Branch F", 0);
+    public static final PropertyManager.DoubleProperty RIGHT_BLUE_BRANCH_H = new PropertyManager.DoubleProperty("Right Blue Branch H", 0);
+    public static final PropertyManager.DoubleProperty RIGHT_BLUE_BRANCH_J = new PropertyManager.DoubleProperty("Right Blue Branch J", 0);
+    public static final PropertyManager.DoubleProperty RIGHT_BLUE_BRANCH_L = new PropertyManager.DoubleProperty("Right Blue Branch L", 0);
+    
 
     public static class Processor {
         public static final Pose2d centerFace =
@@ -58,6 +87,53 @@ public class FieldConstants {
                 Units.inchesToMeters(33.526),
                 Units.inchesToMeters(25.824),
                 Rotation2d.fromDegrees(144.011 - 90));
+    }
+
+    public static double getBranchFudgeFactor(int face, ReefSide side) {
+        double ff;
+        switch (side) {
+            case LEFT -> {
+                switch (face) {
+                    /* Red */
+                    case 0 -> {ff = LEFT_RED_BRANCH_A.getValue();} // A
+                    case 1 -> {ff = LEFT_RED_BRANCH_C.getValue();} // C
+                    case 2 -> {ff = LEFT_RED_BRANCH_E.getValue();} // E
+                    case 3 -> {ff = LEFT_RED_BRANCH_G.getValue();} // G
+                    case 4 -> {ff = LEFT_RED_BRANCH_I.getValue();} // I
+                    case 5 -> {ff = LEFT_RED_BRANCH_K.getValue();} // K
+                    /* Blue */
+                    case 6 -> {ff = LEFT_BLUE_BRANCH_A.getValue();} // A
+                    case 7 -> {ff = LEFT_BLUE_BRANCH_C.getValue();} // C
+                    case 8 -> {ff = LEFT_BLUE_BRANCH_E.getValue();} // E
+                    case 9 -> {ff = LEFT_BLUE_BRANCH_G.getValue();} // G
+                    case 10 -> {ff = LEFT_BLUE_BRANCH_I.getValue();} // I
+                    case 11 -> {ff = LEFT_BLUE_BRANCH_K.getValue();} // K
+                    default -> {ff = 0;}
+                }
+                return -ff;
+            }
+            case RIGHT -> {
+                switch (face) {
+                    /* Red */
+                    case 0 -> {ff = RIGHT_RED_BRANCH_B.getValue();} // B
+                    case 1 -> {ff = RIGHT_RED_BRANCH_D.getValue();} // D
+                    case 2 -> {ff = RIGHT_RED_BRANCH_F.getValue();} // F
+                    case 3 -> {ff = RIGHT_RED_BRANCH_H.getValue();} // H
+                    case 4 -> {ff = RIGHT_RED_BRANCH_J.getValue();} // J
+                    case 5 -> {ff = RIGHT_RED_BRANCH_L.getValue();} // L
+                    /* Blue */
+                    case 6 -> {ff = RIGHT_BLUE_BRANCH_B.getValue();} // B
+                    case 7 -> {ff = RIGHT_BLUE_BRANCH_D.getValue();} // D
+                    case 8 -> {ff = RIGHT_BLUE_BRANCH_F.getValue();} // F
+                    case 9 -> {ff = RIGHT_BLUE_BRANCH_H.getValue();} // H
+                    case 10 -> {ff = RIGHT_BLUE_BRANCH_J.getValue();} // J
+                    case 11 -> {ff = RIGHT_BLUE_BRANCH_L.getValue();} // L
+                    default -> {ff = 0;}
+                }
+                return ff;
+            }
+            default -> {return 0;}
+        }
     }
 
     public static class Reef {
@@ -142,11 +218,11 @@ public class FieldConstants {
                             new Translation3d(
                                 poseDirection
                                     .transformBy(
-                                        new Transform2d(adjustX, adjustY, new Rotation2d()))
+                                        new Transform2d(adjustX, adjustY + Units.inchesToMeters(getBranchFudgeFactor(face, ReefSide.RIGHT)), new Rotation2d()))
                                     .getX(),
                                 poseDirection
                                     .transformBy(
-                                        new Transform2d(adjustX, adjustY, new Rotation2d()))
+                                        new Transform2d(adjustX, adjustY + Units.inchesToMeters(getBranchFudgeFactor(face, ReefSide.RIGHT)), new Rotation2d()))
                                     .getY(),
                                 level.height),
                             new Rotation3d(
@@ -159,11 +235,11 @@ public class FieldConstants {
                             new Translation3d(
                                 poseDirection
                                     .transformBy(
-                                        new Transform2d(adjustX, -adjustY, new Rotation2d()))
+                                        new Transform2d(adjustX, -adjustY + Units.inchesToMeters(getBranchFudgeFactor(face, ReefSide.LEFT)), new Rotation2d()))
                                     .getX(),
                                 poseDirection
                                     .transformBy(
-                                        new Transform2d(adjustX, -adjustY, new Rotation2d()))
+                                        new Transform2d(adjustX, -adjustY + Units.inchesToMeters(getBranchFudgeFactor(face, ReefSide.LEFT)), new Rotation2d()))
                                     .getY(),
                                 level.height),
                             new Rotation3d(
