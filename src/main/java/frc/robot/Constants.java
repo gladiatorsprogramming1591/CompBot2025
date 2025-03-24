@@ -29,42 +29,50 @@ public class Constants {
     }
 
     public class ElevatorConstants {
-        public static final int ELEVATOR_LEADER_CAN_ID = 1; // Right
-        public static final int ELEVATOR_FOLLOWER_CAN_ID = 2; // Left
+        public static final int ELEVATOR_LEADER_LEFT_CAN_ID = 2; // Left (reads external encoder)
+        public static final int ELEVATOR_FOLLOWER_RIGHT_CAN_ID = 1; // Right (reads bottom limit switch)
         public static final double ABS_ENC_OFFSET = 0;
 
-        public static final boolean LEADER_INVERTED = false;
+        public static final boolean LEADER_INVERTED = true;
         public static final boolean FOLLOWER_INVERTED_FROM_LEADER = true;
-        public static final double RAMP_RATE = 0.001;
-        public static final int CURRENT_LIMIT = 70;
+        // public static final double RAMP_RATE = 0.001; // Not used.
+        public static final int CURRENT_LIMIT = 30;
 
         public static final double OUTPUT_MAXIMUM = 1.0;
         public static final double OUTPUT_MINIMUM = -1.0;
 
+        /**
+         * External rotations are measured from the through-bore encoder seperate from the motor,
+         * and internal rotations are measured from the encoder embedded within the motor.
+         * 1 external rotation = 4.51772 internal rotations
+         * 1 internal rotation = 0.22135 external rotation
+         */
         public static final double INCHES_PER_INTERNAL_ROTATION = 22.0 / 9.0 / 4.0;
-        public static final double INCHES_PER_EXTERNAL_ROTATION = (1.7576 / 2) * Math.PI; // TODO: measure this
+        public static final double UPPER_SPROCKET_CIRCUMFERENCE = 1.7576 * Math.PI; // 22 tooth sprocket
+        public static final double INCHES_PER_EXTERNAL_ROTATION = UPPER_SPROCKET_CIRCUMFERENCE / 2;
+        public static final double INTERNAL_ROTS_PER_EXTERNAL_ROT = INCHES_PER_EXTERNAL_ROTATION / INCHES_PER_INTERNAL_ROTATION;
         public static final double INITIAL_HEIGHT_INCHES = 0;
         public static final double TOLERANCE_INCHES = 0.5;
 
         // Constants for going up
-        public static final double P_UP = 0.1;
-        public static final double I_UP = 0;
-        public static final double D_UP = 0;
-        public static final double FF_UP = .623;
+        public static final double P_UP = 0.1 / INTERNAL_ROTS_PER_EXTERNAL_ROT;
+        public static final double I_UP = 0 / INTERNAL_ROTS_PER_EXTERNAL_ROT;
+        public static final double D_UP = 0 / INTERNAL_ROTS_PER_EXTERNAL_ROT;
+        public static final double FF_UP = .623 / INTERNAL_ROTS_PER_EXTERNAL_ROT;
 
-        public static final double MAX_VEL_UP = 4000;
-        public static final double MAX_ACCEL_UP = 3500;
-        public static final double ALLOWERD_ERR_UP = 0.08;
+        // public static final double MAX_VEL_UP = 4000 / INTERNAL_ROTS_PER_EXTERNAL_ROT; // We don't use maxMotion going up.
+        // public static final double MAX_ACCEL_UP = 3500 / INTERNAL_ROTS_PER_EXTERNAL_ROT;
+        // public static final double ALLOWERD_ERR_UP = 0.08 / INTERNAL_ROTS_PER_EXTERNAL_ROT;
 
         // Constants for going down
-        public static final double P_DOWN = 0.08;
-        public static final double I_DOWN = 0;
-        public static final double D_DOWN = 0;
-        public static final double FF_DOWN = 0.623;
+        public static final double P_DOWN = 0.08 / INTERNAL_ROTS_PER_EXTERNAL_ROT;
+        public static final double I_DOWN = 0 / INTERNAL_ROTS_PER_EXTERNAL_ROT;
+        public static final double D_DOWN = 0 / INTERNAL_ROTS_PER_EXTERNAL_ROT;
+        public static final double FF_DOWN = 0.623 / INTERNAL_ROTS_PER_EXTERNAL_ROT;
 
-        public static final double MAX_VEL_DOWN = 3500;
-        public static final double MAX_ACCEL_DOWN = 5400;
-        public static final double ALLOWERD_ERR_DOWN = 1.0;
+        public static final double MAX_VEL_DOWN = 3500 / INTERNAL_ROTS_PER_EXTERNAL_ROT;
+        public static final double MAX_ACCEL_DOWN = 5400 / INTERNAL_ROTS_PER_EXTERNAL_ROT;
+        public static final double ALLOWERD_ERR_DOWN = 1.0 / INTERNAL_ROTS_PER_EXTERNAL_ROT;
 
         // Elevator Positions
         public static final double kSTOW = 0.4;
@@ -77,39 +85,37 @@ public class Constants {
         public static final double kNET = 27.75;
         public static final double ALGAE_HIGH = 8.53;
         public static final double ALGAE_LOW = 2.75;
+
         public static final SparkFlexConfig MOTOR_CONFIG = new SparkFlexConfig() {
             {
                 idleMode(IdleMode.kBrake);
                 smartCurrentLimit(ElevatorConstants.CURRENT_LIMIT);
                 inverted(ElevatorConstants.LEADER_INVERTED);
-                // closedLoopRampRate(ElevatorConstants.RAMP_RATE);
+                // closedLoopRampRate(ElevatorConstants.RAMP_RATE); // Not used; negatively impacts deceleration while approaching hardstops.
                 limitSwitch.reverseLimitSwitchEnabled(false);
                 limitSwitch.forwardLimitSwitchEnabled(false);
 
-                closedLoop.outputRange(-0.5, OUTPUT_MAXIMUM, ClosedLoopSlot.kSlot0) // kslot 0 is up
+                closedLoop.outputRange(-1.0, OUTPUT_MAXIMUM, ClosedLoopSlot.kSlot0) // kslot 0 is up (only kPosition is used)
                         .p(ElevatorConstants.P_UP, ClosedLoopSlot.kSlot0)
                         .i(ElevatorConstants.I_UP, ClosedLoopSlot.kSlot0)
-                        .d(ElevatorConstants.D_UP, ClosedLoopSlot.kSlot0);
-                closedLoop.maxMotion.maxVelocity(MAX_VEL_UP, ClosedLoopSlot.kSlot0)
-                        .maxAcceleration(MAX_ACCEL_UP, ClosedLoopSlot.kSlot0)
-                        .allowedClosedLoopError(ALLOWERD_ERR_UP, ClosedLoopSlot.kSlot0)
-                        .positionMode(MAXMotionPositionMode.kMAXMotionTrapezoidal, ClosedLoopSlot.kSlot0);
+                        .d(ElevatorConstants.D_UP, ClosedLoopSlot.kSlot0)
+                        .feedbackSensor(FeedbackSensor.kAlternateOrExternalEncoder);
+                // closedLoop.maxMotion.maxVelocity(MAX_VEL_UP, ClosedLoopSlot.kSlot0) // We don't use maxMotion going up due to inconsistent results.
+                //         .maxAcceleration(MAX_ACCEL_UP, ClosedLoopSlot.kSlot0)
+                //         .allowedClosedLoopError(ALLOWERD_ERR_UP, ClosedLoopSlot.kSlot0)
+                //         .positionMode(MAXMotionPositionMode.kMAXMotionTrapezoidal, ClosedLoopSlot.kSlot0);
 
-                closedLoop.outputRange(OUTPUT_MINIMUM, 1, ClosedLoopSlot.kSlot1) // kslot 1 is down
+                closedLoop.outputRange(OUTPUT_MINIMUM, 1, ClosedLoopSlot.kSlot1) // kslot 1 is down (kMAXMotionPositionControl is used)
                         .p(ElevatorConstants.P_DOWN, ClosedLoopSlot.kSlot1)
                         .i(ElevatorConstants.I_DOWN, ClosedLoopSlot.kSlot1)
-                        .d(ElevatorConstants.D_DOWN, ClosedLoopSlot.kSlot1);
+                        .d(ElevatorConstants.D_DOWN, ClosedLoopSlot.kSlot1)
+                        .feedbackSensor(FeedbackSensor.kAlternateOrExternalEncoder);
                 closedLoop.maxMotion.maxVelocity(MAX_VEL_DOWN, ClosedLoopSlot.kSlot1)
                         .maxAcceleration(MAX_ACCEL_DOWN, ClosedLoopSlot.kSlot1)
                         .allowedClosedLoopError(ALLOWERD_ERR_DOWN, ClosedLoopSlot.kSlot1);
             }
         };
 
-        public static final AbsoluteEncoderConfig ABS_ENCODER_CONFIG = new AbsoluteEncoderConfig() {
-            {
-
-            }
-        };
     }
 
     public class EndEffectorConstants {
@@ -211,7 +217,7 @@ public class Constants {
                 // closedLoop.maxMotion.allowedClosedLoopError(3);
                 // closedLoop.maxMotion.maxAcceleration(100000);
                 // closedLoop.maxMotion.maxVelocity(120000);
-                closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
+                closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder); // TODO: Why is this on rollers? This would be a problem if we used this PID controller.
                 absoluteEncoder.positionConversionFactor(360);
             }
         };
