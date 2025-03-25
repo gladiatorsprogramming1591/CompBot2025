@@ -36,7 +36,7 @@ public class Constants {
         public static final boolean LEADER_INVERTED = true;
         public static final boolean FOLLOWER_INVERTED_FROM_LEADER = true;
         // public static final double RAMP_RATE = 0.001; // Not used.
-        public static final int CURRENT_LIMIT = 30;
+        public static final int CURRENT_LIMIT = 80;
 
         public static final double OUTPUT_MAXIMUM = 1.0;
         public static final double OUTPUT_MINIMUM = -1.0;
@@ -48,31 +48,32 @@ public class Constants {
          * 1 internal rotation = 0.22135 external rotation
          */
         public static final double INCHES_PER_INTERNAL_ROTATION = 22.0 / 9.0 / 4.0;
-        public static final double UPPER_SPROCKET_CIRCUMFERENCE = 1.7576 * Math.PI; // 22 tooth sprocket
+        // public static final double UPPER_SPROCKET_CIRCUMFERENCE_OLD = 1.7576 * Math.PI; // 22 tooth sprocket
+        public static final double UPPER_SPROCKET_CIRCUMFERENCE = 22.0 / 4.0; // 22 tooth sprocket
         public static final double INCHES_PER_EXTERNAL_ROTATION = UPPER_SPROCKET_CIRCUMFERENCE / 2;
         public static final double INTERNAL_ROTS_PER_EXTERNAL_ROT = INCHES_PER_EXTERNAL_ROTATION / INCHES_PER_INTERNAL_ROTATION;
         public static final double INITIAL_HEIGHT_INCHES = 0;
         public static final double TOLERANCE_INCHES = 0.5;
 
         // Constants for going up
-        public static final double P_UP = 0.1 / INTERNAL_ROTS_PER_EXTERNAL_ROT;
-        public static final double I_UP = 0 / INTERNAL_ROTS_PER_EXTERNAL_ROT;
-        public static final double D_UP = 0 / INTERNAL_ROTS_PER_EXTERNAL_ROT;
-        public static final double FF_UP = .623 / INTERNAL_ROTS_PER_EXTERNAL_ROT;
+        public static final double P_UP = 0.22;
+        public static final double I_UP = 0;
+        public static final double D_UP = 0;
+        public static final double FF_UP = .623;
 
         // public static final double MAX_VEL_UP = 4000 / INTERNAL_ROTS_PER_EXTERNAL_ROT; // We don't use maxMotion going up.
         // public static final double MAX_ACCEL_UP = 3500 / INTERNAL_ROTS_PER_EXTERNAL_ROT;
         // public static final double ALLOWERD_ERR_UP = 0.08 / INTERNAL_ROTS_PER_EXTERNAL_ROT;
 
         // Constants for going down
-        public static final double P_DOWN = 0.08 / INTERNAL_ROTS_PER_EXTERNAL_ROT;
-        public static final double I_DOWN = 0 / INTERNAL_ROTS_PER_EXTERNAL_ROT;
-        public static final double D_DOWN = 0 / INTERNAL_ROTS_PER_EXTERNAL_ROT;
-        public static final double FF_DOWN = 0.623 / INTERNAL_ROTS_PER_EXTERNAL_ROT;
+        public static final double P_DOWN = 0.2;
+        public static final double I_DOWN = 0;
+        public static final double D_DOWN = 0;
+        public static final double FF_DOWN = 0.623;
 
         public static final double MAX_VEL_DOWN = 3500 / INTERNAL_ROTS_PER_EXTERNAL_ROT;
-        public static final double MAX_ACCEL_DOWN = 5400 / INTERNAL_ROTS_PER_EXTERNAL_ROT;
-        public static final double ALLOWERD_ERR_DOWN = 1.0 / INTERNAL_ROTS_PER_EXTERNAL_ROT;
+        public static final double MAX_ACCEL_DOWN = 5400 / INTERNAL_ROTS_PER_EXTERNAL_ROT * 1.75;
+        public static final double ALLOWERD_ERR_DOWN = 1.0 / INTERNAL_ROTS_PER_EXTERNAL_ROT / 4;
 
         // Elevator Positions
         public static final double kSTOW = 0.4;

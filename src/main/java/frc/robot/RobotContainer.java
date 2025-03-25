@@ -181,7 +181,7 @@ public class RobotContainer {
                 .onTrue(
                         new ParallelCommandGroup(
                                 prepElevatorOnly(elevatorPositions.NETSHOOT),
-                                endEffector.holdTopAlgaeCommand().withTimeout(0.58)
+                                endEffector.holdTopAlgaeCommand().withTimeout(0.50)
                                         .andThen(endEffector.ejectTopAlgaeCommand()
                                                 .alongWith(new WaitCommand(0.25)
                                                         .andThen(wrist.HoverPositionCommand(WristConstants.WRIST_NET_FLICK))))

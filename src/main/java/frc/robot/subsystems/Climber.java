@@ -82,7 +82,7 @@ public class Climber extends SubsystemBase {
         //     SmartDashboard.putNumber("Winch Motor Speed", 0);
         //     winchMotor.set(0);
         // } else {
-        //     SmartDashboard.putNumber("Winch Motor Speed", speed);
+        SmartDashboard.putNumber("Winch Motor Speed", speed.getAsDouble());
         // }
         winchMotor.set(speed.getAsDouble());
 
