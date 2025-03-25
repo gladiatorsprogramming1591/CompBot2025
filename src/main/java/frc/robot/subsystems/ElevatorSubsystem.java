@@ -26,8 +26,8 @@ public class ElevatorSubsystem extends SubsystemBase {
     DigitalInput lowerLimit;
     Trigger zeroTrigger;
 
-    SparkFlex leader;
-    SparkFlex follower;
+    SparkFlex leaderLeft;
+    SparkFlex followerRight;
 
     RelativeEncoder leadInternalEncoder;
     RelativeEncoder followerInternalEncoder;
@@ -55,25 +55,25 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public ElevatorSubsystem() {
-        leader = new SparkFlex(ELEVATOR_LEADER_CAN_ID, MotorType.kBrushless);
-        follower = new SparkFlex(ELEVATOR_FOLLOWER_CAN_ID, MotorType.kBrushless);
-        leader.configure(MOTOR_CONFIG,
+        leaderLeft = new SparkFlex(ELEVATOR_LEADER_LEFT_CAN_ID, MotorType.kBrushless);
+        followerRight = new SparkFlex(ELEVATOR_FOLLOWER_RIGHT_CAN_ID, MotorType.kBrushless);
+        leaderLeft.configure(MOTOR_CONFIG,
                 ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
 
-        follower.configure(
-                MOTOR_CONFIG.follow(ELEVATOR_LEADER_CAN_ID, FOLLOWER_INVERTED_FROM_LEADER),
+        followerRight.configure(
+                MOTOR_CONFIG.follow(ELEVATOR_LEADER_LEFT_CAN_ID, FOLLOWER_INVERTED_FROM_LEADER),
                 SparkBase.ResetMode.kResetSafeParameters,
                 SparkBase.PersistMode.kPersistParameters);
 
-        leadInternalEncoder = leader.getEncoder();
-        followerInternalEncoder = follower.getEncoder();
-        externalEncoder = follower.getExternalEncoder();
-        controller = leader.getClosedLoopController();
+        leadInternalEncoder = leaderLeft.getEncoder();
+        followerInternalEncoder = followerRight.getEncoder();
+        externalEncoder = leaderLeft.getExternalEncoder();
+        controller = leaderLeft.getClosedLoopController();
 
-        bottomLimitSwitch = leader.getReverseLimitSwitch();
+        bottomLimitSwitch = followerRight.getReverseLimitSwitch();
         zeroTrigger = new Trigger(this::isElevatorNotAtBottom);
-        zeroTrigger.onFalse(zeroElevatorInternalEncCommand().alongWith(zeroElevatorInternalEncCommand()));
+        zeroTrigger.onFalse(zeroElevatorInternalEncCommand().alongWith(zeroElevatorExternalEncCommand()));
 
         lastPos = kSTOW;
 
@@ -98,11 +98,11 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public void setMotorSpeed(double motorSpeed) {
-        leader.set(motorSpeed);
+        leaderLeft.set(motorSpeed);
     }
 
     public void elevatorOff() {
-        leader.set(0);
+        leaderLeft.set(0);
     }
 
     public double getInternalPositionRotations() {
@@ -148,11 +148,12 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
     
     public void setPositionExternalRotations(double rotations) {
-        rotations *= (INCHES_PER_EXTERNAL_ROTATION/INCHES_PER_INTERNAL_ROTATION);
         if (rotations < getExternalPositionRotations()) {
             controller.setReference(rotations, ControlType.kMAXMotionPositionControl, ClosedLoopSlot.kSlot1, FF_DOWN);
+            System.out.println("Lowering Elevator using kSlot1. Reference set to: " + rotations);
         } else {
             controller.setReference(rotations, ControlType.kPosition, ClosedLoopSlot.kSlot0, FF_UP);
+            System.out.println("Raising Elevator using kSlot0. Reference set to:  " + rotations);
         }
     }
 
@@ -212,21 +213,21 @@ public class ElevatorSubsystem extends SubsystemBase {
         SmartDashboard.putBoolean("Elevator lowerLimit", bottomLimitSwitch.isPressed());
         SmartDashboard.putNumber("Elevator inches (Internal Enc)", getInternalPositionInches());
         SmartDashboard.putNumber("Elevator inches (External Enc)", getExternalPositionInches());
-        SmartDashboard.putNumber("Elevator current", leader.getOutputCurrent());
+        SmartDashboard.putNumber("Elevator current", leaderLeft.getOutputCurrent());
         SmartDashboard.putNumber("Elevator leader Vel", leadInternalEncoder.getVelocity());
         SmartDashboard.putNumber("Elevator Vel (External Enc)", externalEncoder.getVelocity());
-        SmartDashboard.putNumber("Follower Output Current", follower.getOutputCurrent());
+        SmartDashboard.putNumber("Follower Output Current", followerRight.getOutputCurrent());
         SmartDashboard.putNumber("Elevator follower vel", followerInternalEncoder.getVelocity());
         SmartDashboard.putNumber("Elevator lastPos", lastPos);
         SmartDashboard.putNumber("Elevator throgh-bore enc inches", getExternalPositionInches());
 
-        if ((lastPos == kSTOW) && (getInternalPositionInches() <= kSTOW + TOLERANCE_INCHES + 0.05)) {
+        if ((lastPos == kSTOW) && (getExternalPositionInches() <= kSTOW + TOLERANCE_INCHES + 0.7)) {
             if (printInternalEncZero == true) {
-                System.out.println("Zeroing Elevator internal encoder");
+                System.out.println("Zeroing Elevator Both encoder");
                 printInternalEncZero = false;
             }
-            leader.stopMotor();
-            zeroElevatorInternalEnc();
+            leaderLeft.stopMotor();
+            zeroElevatorBothEnc();
         } else {
             printInternalEncZero = true;
         }

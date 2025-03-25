@@ -7,6 +7,8 @@ package frc.robot;
 import static edu.wpi.first.units.Units.*;
 import static frc.robot.Constants.DriveConstants.*;
 
+import org.ejml.sparse.csc.mult.MatrixVectorMultWithSemiRing_DSCC;
+
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -26,6 +28,7 @@ import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.robotInitConstants;
@@ -39,6 +42,7 @@ import frc.robot.commands.DoNothing;
 import frc.robot.commands.ElevatorToPosition;
 import frc.robot.generated.TunerConstants;
 import frc.robot.generated.TunerConstants.*;
+import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.EndEffector;
@@ -58,7 +62,7 @@ public class RobotContainer {
     public final EndEffector endEffector = robotInitConstants.isCompBot ? new EndEffector() : null;
     private final Wrist wrist = robotInitConstants.isCompBot ? new Wrist() : null;
     public final ElevatorSubsystem elevator = robotInitConstants.isCompBot ? new ElevatorSubsystem() : null;
-//     private final Climber climber = robotInitConstants.isCompBot ? new Climber(drivetrain) : null;
+    private final Climber climber = robotInitConstants.isCompBot ? new Climber(drivetrain) : null;
     private final FlapServo flapServo = robotInitConstants.isCompBot ? new FlapServo() : null;    
     public PathPlannerPath startLineFCoralStartPath;
     
@@ -171,14 +175,17 @@ public class RobotContainer {
         driverController.y().whileTrue(new AutoReefPoseCommand(drivetrain, reefAlign, this::driveX, this::driveY,
                 this::driveT, () -> ReefSide.RIGHT, () -> elevator.getExternalPositionInches()));
         driverController.a().whileTrue(new AutoReefPoseCommand(drivetrain, reefAlign, this::driveX, this::driveY,
-                this::driveT, () -> FieldConstants.getNearestReefSide(drivetrain.getState().Pose), () -> elevator.getExternalPositionInches()));
+        this::driveT, () -> ReefSide.CENTER, () -> elevator.getExternalPositionInches()));
 
         driverController.b()
                 .onTrue(
                         new ParallelCommandGroup(
                                 prepElevatorOnly(elevatorPositions.NETSHOOT),
-                                endEffector.holdTopAlgaeCommand().withTimeout(0.58)
-                                        .andThen(endEffector.ejectTopAlgaeCommand()).withTimeout(1.0)
+                                endEffector.holdTopAlgaeCommand().withTimeout(0.50)
+                                        .andThen(endEffector.ejectTopAlgaeCommand()
+                                                .alongWith(new WaitCommand(0.25)
+                                                        .andThen(wrist.HoverPositionCommand(WristConstants.WRIST_NET_FLICK))))
+                                        .withTimeout(1.0)
                                         .andThen(endEffector.stopIntakeCommand()))
                         .andThen(new WaitUntilCommand(elevator::atSetpointExternalEnc))
                         .andThen(complexElevatorStowCommand(elevatorPositions.STOW))
@@ -191,36 +198,37 @@ public class RobotContainer {
         operatorController.povLeft().onTrue(prepElevatorScoreL2(elevatorPositions.L2));
         operatorController.povUp().onTrue(prepElevatorScoreL3(elevatorPositions.L3));
         operatorController.povRight().onTrue(prepElevatorScoreL4(elevatorPositions.L4));
-
+ 
         operatorController.leftBumper().onTrue(complexElevatorStowCommand(elevatorPositions.STOW));
         operatorController.rightBumper().onTrue(complexBargeCommand(elevatorPositions.NETSHOOT)); 
         operatorController.b().onTrue(complexProcessorCommand(elevatorPositions.PROCESSOR));
-        // operatorController.rightStick().onTrue(complexBargeCommand(elevatorPositions.NETSHOOT));
+
+        operatorController.leftTrigger().onTrue(complexLowAlgaeIntakeCommand(elevatorPositions.ALGAE_LOW));
+        operatorController.rightTrigger().onTrue(complexHighAlgaeIntakeCommand(elevatorPositions.ALGAE_HIGH));
 
         // Wrist
         operatorController.x().onTrue(new InstantCommand(() -> wrist.setAngle(WristConstants.GROUND_INTAKE)));
         operatorController.y().onTrue(new InstantCommand(() -> wrist.setAngle(WristConstants.WRIST_STOW)));
-        operatorController.leftTrigger().onTrue(complexLowAlgaeIntakeCommand(elevatorPositions.ALGAE_LOW));
-        operatorController.rightTrigger().onTrue(complexHighAlgaeIntakeCommand(elevatorPositions.ALGAE_HIGH));
 
         operatorController.start().onTrue(new InstantCommand(() ->endEffector.setCoralSpeed(-1.0), endEffector))
                 .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(1.0), endEffector));
 
         
         //Deep Climb
-
         operatorController.a().toggleOnTrue(new RunCommand(()->  flapServo.setFlapServoAngle(ServoConstants.kServoUpAngle))
                 .handleInterrupt(()-> flapServo.setFlapServoAngle(ServoConstants.kServoDownAngle)));
+        // climber.setDefaultCommand(climber.manualClimbMovement(()-> MathUtil.applyDeadband(operatorController.getLeftY(), STATIC_DEADBAND)));
+        operatorController.leftStick().toggleOnTrue(new RunCommand(()->climber.setWinchSpeed(()-> MathUtil.applyDeadband(operatorController.getLeftY(), STATIC_DEADBAND)), climber));
        
         // Manual Control
         // wrist.setDefaultCommand(new RunCommand(()-> wrist.setWristMotor(operatorController.getRightTriggerAxis() - operatorController.getLeftTriggerAxis() * 0.20), wrist)
         //         .handleInterrupt(()-> wrist.setWristMotor(0)));
-        operatorController.rightStick().toggleOnTrue(new RunCommand(() -> elevator.setMotorSpeed((-MathUtil.applyDeadband(operatorController.getRightY(), 0.1) * 0.50) + 0.05), elevator)
-                .alongWith(new RunCommand(()-> wrist.setWristMotor(MathUtil.applyDeadband(operatorController.getRightTriggerAxis(), 0.1) - MathUtil.applyDeadband(operatorController.getLeftTriggerAxis(), 0.1) * 0.20), wrist))
-                .handleInterrupt(() -> {
-                        elevator.setMotorSpeed(0);
-                        wrist.setWristMotor(0);
-                }));
+        // operatorController.rightStick().toggleOnTrue(new RunCommand(() -> elevator.setMotorSpeed((-MathUtil.applyDeadband(operatorController.getRightY(), 0.1) * 0.50) + 0.05), elevator)
+        //         .alongWith(new RunCommand(()-> wrist.setWristMotor(MathUtil.applyDeadband(operatorController.getRightTriggerAxis(), 0.1) - MathUtil.applyDeadband(operatorController.getLeftTriggerAxis(), 0.1) * 0.20), wrist))
+        //         .handleInterrupt(() -> {
+        //                 elevator.setMotorSpeed(0);
+        //                 wrist.setWristMotor(0);
+        //         }));
 
         drivetrain.registerTelemetry(logger::telemeterize);
 
@@ -555,6 +563,46 @@ public class RobotContainer {
     public double driveT() {
         return MathUtil.applyDeadband(-driverController.getRightX(), STATIC_DEADBAND, maxAngularRatePercent)
                 * MaxAngularRate;
+    }
+
+    public void AutoIntakeAlign() {
+        SwerveRequest.FieldCentric teleopDrive = drive.withVelocityX(xLimiter.calculate(-driverController.getLeftY() * MaxSpeed, DriveConstants.INITIAL_LIMIT * Math.pow(DriveConstants.LIMIT_SCALE_PER_INCH, elevator.getExternalPositionInches()), DriveConstants.TIME_TO_STOP)) // Drive forward with negative Y (forward)
+                .withVelocityY(yLimiter.calculate(-driverController.getLeftX() * MaxSpeed, DriveConstants.INITIAL_LIMIT * Math.pow(DriveConstants.LIMIT_SCALE_PER_INCH, elevator.getExternalPositionInches()), DriveConstants.TIME_TO_STOP)) // Drive left with negative X (left)
+                .withRotationalRate(-driverController.getRightX() * MaxAngularRate);
+        boolean isTeleopActive = DriverStation.isTeleopEnabled();
+        // Get the current robot pose.
+        Pose2d currentPose = drivetrain.getState().Pose;
+        double desiredHeading = 0;
+        double commandedX = 0;
+        double commandedY = 0;
+        double rotationCmd = 0;
+        Pose2d nearestFace = FieldConstants.getNearestReefFace(currentPose);
+        double distanceToReef = currentPose.getTranslation().getDistance(nearestFace.getTranslation());
+        SmartDashboard.putNumber("Distance to Reef", distanceToReef);
+        if (isTeleopActive) {
+            // While driving, use teleop translation.
+            commandedX = teleopDrive.VelocityX;
+            commandedY = teleopDrive.VelocityY;
+            // "Look at the reef": use the nearest reef face as reference.
+            // Option 1: Use the rotation defined for the reef face.
+            // Alternatively, you could compute the direction vector:
+            // desiredHeading = nearestFace.getTranslation().minus(currentPose.getTranslation()).getAngle().getDegrees();
+            double currentYaw = currentPose.getRotation().getDegrees();
+            if (teleopDrive.RotationalRate < teleopDrive.Deadband) {
+                if (!endEffector.hasCoral() && !endEffector.isCoralInFunnel()) {
+                    desiredHeading = FieldConstants.getNearestCoralStation(currentPose).getRotation().getDegrees();
+                } else {
+                    desiredHeading = currentYaw;
+                }
+                rotationCmd = headingController.calculate(currentYaw, desiredHeading);
+                // Command teleop translation plus the rotation correction.
+                drivetrain.setControl(
+                        teleopDrive.withVelocityX(commandedX)
+                                .withVelocityY(commandedY)
+                                .withRotationalRate(rotationCmd * 0.5)
+                );
+            }
+        }
     }
 
     // 2.3976 is the y postion of StartLineToF

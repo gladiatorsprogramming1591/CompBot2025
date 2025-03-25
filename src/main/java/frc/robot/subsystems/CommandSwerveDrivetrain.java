@@ -151,7 +151,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private SysIdRoutine m_sysIdRoutineToApply = m_sysIdRoutineSteer;
 
     // PhotonCamera m_frontCamera;
-    private static int MAX_CAMERAS = 2; 
+    private static int maxCameras = 2; 
+    private static int cameraIdx = 0;
+    private static final int LEFT_CAMERA_IDX = 0; 
+    private static final int RIGHT_CAMERA_IDX = 1; 
     PhotonCamera[] cameras;
     // PhotonCamera m_rightCamera;
     PhotonPoseEstimator[] m_photonPoseEstimators;
@@ -314,7 +317,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                         krightCameraLocation)
                 };
             } else {
-                MAX_CAMERAS = 1;
+                maxCameras = 1;
                 cameras = new PhotonCamera[] {
                     new PhotonCamera("Front"),
                 };
@@ -325,6 +328,29 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                         kFrontCameraLocation)
                 };
             }    
+        }
+
+        public static void setCameraIdx(int cameraIdx) {
+            CommandSwerveDrivetrain.cameraIdx = cameraIdx;
+        }
+
+        public static void setMaxCameras(int maxCameras) {
+            CommandSwerveDrivetrain.maxCameras = maxCameras;
+        }
+
+        public static void onlyUseLeftCamera() {
+            setCameraIdx(LEFT_CAMERA_IDX);
+            setMaxCameras(1);
+        }
+
+        public static void onlyUseRightCamera() {
+            setCameraIdx(RIGHT_CAMERA_IDX);
+            setMaxCameras(2);
+        }
+
+        public static void useBothCameras() {
+            setCameraIdx(0);
+            setMaxCameras(2);
         }
         
         /**
@@ -408,7 +434,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     
         public void updatePoseEstimationWithFilter() {
             currentPose = getState().Pose;
-            for (int cameraIdx = 0; cameraIdx < MAX_CAMERAS; cameraIdx++) {
+            for (int cameraIdx = CommandSwerveDrivetrain.cameraIdx; cameraIdx < maxCameras; cameraIdx++) {
                 // TODO: need to find the camera associated with a pose estimator, hard coded to front
                 // var results = m_frontCamera.getAllUnreadResults();
                 // if (m_photonPoseEstimators[0].equals(poseEstimator)) {
@@ -448,16 +474,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                         double sum = 0.0;
                         for (PhotonTrackedTarget target : pose.get().targetsUsed) {
                             int fiducialId = target.getFiducialId();
-                            switch(fiducialId){
-                                case 1:
-                                    continue;
-                                case 2:
-                                    continue;
-                                case 12:
-                                    continue;
-                                case 13:
-                                    continue;
-                            }
+                            ignoredTags(fiducialId);
                             Optional<Pose3d> tagPose = fieldLayout.getTagPose(fiducialId);
                             if (tagPose.isEmpty()) continue;
                             sum += currentPose.getTranslation().getDistance(tagPose.get().getTranslation().toTranslation2d());
@@ -491,6 +508,31 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                         continue;
                     }
                 }
+            }
+        }
+
+        private void ignoredTags(int fiducialId) {
+            switch(fiducialId){
+                case 1:
+                    return;
+                case 2:
+                    return;
+                case 3:
+                    return;
+                case 4:
+                    return;
+                case 5:
+                    return;
+                case 12:
+                    return;
+                case 13:
+                    return;
+                case 14:
+                    return;
+                case 15:
+                    return;
+                case 16:
+                    return;
             }
         }
 

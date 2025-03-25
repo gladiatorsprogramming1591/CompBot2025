@@ -11,6 +11,7 @@ import java.util.function.Supplier;
 
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -57,6 +58,11 @@ public class AutoReefPoseCommand extends Command {
         }
     
         public void initialize() {
+            if(position.get() == ReefSide.RIGHT) {
+                CommandSwerveDrivetrain.onlyUseRightCamera();
+            } else{
+                CommandSwerveDrivetrain.onlyUseLeftCamera();
+            }
         }
     
         @Override
@@ -69,6 +75,7 @@ public class AutoReefPoseCommand extends Command {
             {
                 position = () -> FieldConstants.getNearestReefSide(drivetrain.getState().Pose);
             }
+            
             // boolean isCoral = state.getCurrentMode() == GamePiece.CORAL;
             Pose2d reefPose = FieldConstants.getNearestReefBranch(currentPose, position.get());
             // Need to uncomment below when we add RobotState or want to test ALGAE
@@ -97,9 +104,10 @@ public class AutoReefPoseCommand extends Command {
                 rotationVal = 0;
     
             /* Drive */
-            double velocityX = controllerX.getAsDouble() + strafeVal;
-            double velocityY = controllerY.getAsDouble() - distanceVal;
-            double rotationalRate = controllerT.getAsDouble() - rotationVal;
+            double deadband = 0.05;
+            double velocityX = controllerX.getAsDouble() + MathUtil.applyDeadband(strafeVal, deadband);
+            double velocityY = controllerY.getAsDouble() - MathUtil.applyDeadband(distanceVal, deadband);
+            double rotationalRate = controllerT.getAsDouble() - MathUtil.applyDeadband(rotationVal, deadband);
 
             double velocityXSign = velocityX / Math.abs(velocityX);
             double velocityYSign = velocityY / Math.abs(velocityY);
@@ -138,6 +146,7 @@ public class AutoReefPoseCommand extends Command {
 
     // Called once after isFinished returns true
     protected void end() {
+        CommandSwerveDrivetrain.useBothCameras();
         // RobotContainer.candleSubsystem.setAnimate("Rainbow");
     }
 
