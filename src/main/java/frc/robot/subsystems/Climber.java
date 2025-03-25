@@ -78,7 +78,7 @@ public class Climber extends SubsystemBase {
     public void setWinchSpeed(double speed)
     {
         final double MAX_VELOCITY_SCALE = 1.0;
-        if ((getWinchVelocity() < 0) && (getAngle() < 109.0)) { //Does completely stop motor, but is satisfactory for now. Overshoots by 5 degrees under no load
+        if ((getWinchVelocity() < 0) && (getAngle() < 253.0)) { //Does completely stop motor, but is satisfactory for now. Overshoots by 5 degrees under no load
             SmartDashboard.putNumber("Winch Motor Speed", 0);
             winchMotor.set(0);
         } else {
@@ -104,6 +104,6 @@ public class Climber extends SubsystemBase {
     }
 
     public Command manualClimbMovement(DoubleSupplier winchSupplier){
-        return new DefaultCommand(null, winchSupplier);
+        return new DefaultCommand(this, winchSupplier);
     }
 }
