@@ -75,16 +75,17 @@ public class Climber extends SubsystemBase {
             
     }
 
-    public void setWinchSpeed(double speed)
+    public void setWinchSpeed(DoubleSupplier speed)
     {
         final double MAX_VELOCITY_SCALE = 1.0;
-        if ((getWinchVelocity() < 0) && (getAngle() < 253.0)) { //Does completely stop motor, but is satisfactory for now. Overshoots by 5 degrees under no load
-            SmartDashboard.putNumber("Winch Motor Speed", 0);
-            winchMotor.set(0);
-        } else {
-            SmartDashboard.putNumber("Winch Motor Speed", speed);
-            winchMotor.set(speed*MAX_VELOCITY_SCALE);
-        }
+        // if ((getWinchVelocity() < 0) && (getAngle() < 253.0)) { //Does completely stop motor, but is satisfactory for now. Overshoots by 5 degrees under no load
+        //     SmartDashboard.putNumber("Winch Motor Speed", 0);
+        //     winchMotor.set(0);
+        // } else {
+        //     SmartDashboard.putNumber("Winch Motor Speed", speed);
+        // }
+        winchMotor.set(speed.getAsDouble());
+
     }
 
     public double getWinchVelocity() {
@@ -96,7 +97,7 @@ public class Climber extends SubsystemBase {
         public DefaultCommand(Climber climber, DoubleSupplier winchSupplier) {
             addRequirements(climber);
             addCommands(
-                new RunCommand(()-> climber.setWinchSpeed(winchSupplier.getAsDouble()))
+                new RunCommand(()-> climber.setWinchSpeed(winchSupplier))
                     // .until(()-> (getWinchVelocity() > 0) ? getAngle() > 105.0 : true)
                     // .andThen(()->climber.setWinchSpeed(0)),
             );
