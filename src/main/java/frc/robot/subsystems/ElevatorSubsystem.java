@@ -221,13 +221,13 @@ public class ElevatorSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Elevator lastPos", lastPos);
         SmartDashboard.putNumber("Elevator throgh-bore enc inches", getExternalPositionInches());
 
-        if ((lastPos == kSTOW) && (getInternalPositionInches() <= kSTOW + TOLERANCE_INCHES + 0.05)) {
+        if ((lastPos == kSTOW) && (getExternalPositionInches() <= kSTOW + TOLERANCE_INCHES + 0.7)) {
             if (printInternalEncZero == true) {
-                System.out.println("Zeroing Elevator internal encoder");
+                System.out.println("Zeroing Elevator Both encoder");
                 printInternalEncZero = false;
             }
             leaderLeft.stopMotor();
-            zeroElevatorInternalEnc();
+            zeroElevatorBothEnc();
         } else {
             printInternalEncZero = true;
         }

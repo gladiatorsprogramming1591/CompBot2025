@@ -7,6 +7,8 @@ package frc.robot;
 import static edu.wpi.first.units.Units.*;
 import static frc.robot.Constants.DriveConstants.*;
 
+import org.ejml.sparse.csc.mult.MatrixVectorMultWithSemiRing_DSCC;
+
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -40,6 +42,7 @@ import frc.robot.commands.DoNothing;
 import frc.robot.commands.ElevatorToPosition;
 import frc.robot.generated.TunerConstants;
 import frc.robot.generated.TunerConstants.*;
+import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.EndEffector;
@@ -59,7 +62,7 @@ public class RobotContainer {
     public final EndEffector endEffector = robotInitConstants.isCompBot ? new EndEffector() : null;
     private final Wrist wrist = robotInitConstants.isCompBot ? new Wrist() : null;
     public final ElevatorSubsystem elevator = robotInitConstants.isCompBot ? new ElevatorSubsystem() : null;
-//     private final Climber climber = robotInitConstants.isCompBot ? new Climber(drivetrain) : null;
+    private final Climber climber = robotInitConstants.isCompBot ? new Climber(drivetrain) : null;
     private final FlapServo flapServo = robotInitConstants.isCompBot ? new FlapServo() : null;    
     public PathPlannerPath startLineFCoralStartPath;
     
@@ -178,7 +181,7 @@ public class RobotContainer {
                 .onTrue(
                         new ParallelCommandGroup(
                                 prepElevatorOnly(elevatorPositions.NETSHOOT),
-                                endEffector.holdTopAlgaeCommand().withTimeout(0.58)
+                                endEffector.holdTopAlgaeCommand().withTimeout(0.50)
                                         .andThen(endEffector.ejectTopAlgaeCommand()
                                                 .alongWith(new WaitCommand(0.25)
                                                         .andThen(wrist.HoverPositionCommand(WristConstants.WRIST_NET_FLICK))))
@@ -214,16 +217,18 @@ public class RobotContainer {
         //Deep Climb
         operatorController.a().toggleOnTrue(new RunCommand(()->  flapServo.setFlapServoAngle(ServoConstants.kServoUpAngle))
                 .handleInterrupt(()-> flapServo.setFlapServoAngle(ServoConstants.kServoDownAngle)));
+        // climber.setDefaultCommand(climber.manualClimbMovement(()-> MathUtil.applyDeadband(operatorController.getLeftY(), STATIC_DEADBAND)));
+        operatorController.leftStick().toggleOnTrue(new RunCommand(()->climber.setWinchSpeed(()-> MathUtil.applyDeadband(operatorController.getLeftY(), STATIC_DEADBAND)), climber));
        
         // Manual Control
         // wrist.setDefaultCommand(new RunCommand(()-> wrist.setWristMotor(operatorController.getRightTriggerAxis() - operatorController.getLeftTriggerAxis() * 0.20), wrist)
         //         .handleInterrupt(()-> wrist.setWristMotor(0)));
-        operatorController.rightStick().toggleOnTrue(new RunCommand(() -> elevator.setMotorSpeed((-MathUtil.applyDeadband(operatorController.getRightY(), 0.1) * 0.50) + 0.05), elevator)
-                .alongWith(new RunCommand(()-> wrist.setWristMotor(MathUtil.applyDeadband(operatorController.getRightTriggerAxis(), 0.1) - MathUtil.applyDeadband(operatorController.getLeftTriggerAxis(), 0.1) * 0.20), wrist))
-                .handleInterrupt(() -> {
-                        elevator.setMotorSpeed(0);
-                        wrist.setWristMotor(0);
-                }));
+        // operatorController.rightStick().toggleOnTrue(new RunCommand(() -> elevator.setMotorSpeed((-MathUtil.applyDeadband(operatorController.getRightY(), 0.1) * 0.50) + 0.05), elevator)
+        //         .alongWith(new RunCommand(()-> wrist.setWristMotor(MathUtil.applyDeadband(operatorController.getRightTriggerAxis(), 0.1) - MathUtil.applyDeadband(operatorController.getLeftTriggerAxis(), 0.1) * 0.20), wrist))
+        //         .handleInterrupt(() -> {
+        //                 elevator.setMotorSpeed(0);
+        //                 wrist.setWristMotor(0);
+        //         }));
 
         drivetrain.registerTelemetry(logger::telemeterize);
 
