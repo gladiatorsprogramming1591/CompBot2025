@@ -217,7 +217,7 @@ public class RobotContainer {
         //Deep Climb
         operatorController.a().toggleOnTrue(new RunCommand(()->  flapServo.setFlapServoAngle(ServoConstants.kServoUpAngle))
                 .handleInterrupt(()-> flapServo.setFlapServoAngle(ServoConstants.kServoDownAngle)));
-        climber.setDefaultCommand(climber.manualClimbMovement(()-> MathUtil.applyDeadband(operatorController.getLeftY(), STATIC_DEADBAND), ()-> MathUtil.applyDeadband(operatorController.getLeftY(), STATIC_DEADBAND)));
+        climber.setDefaultCommand(climber.manualClimbMovement(()-> MathUtil.applyDeadband(operatorController.getRightY(), STATIC_DEADBAND), ()-> MathUtil.applyDeadband(operatorController.getLeftY(), STATIC_DEADBAND)));
         // operatorController.leftStick().toggleOnTrue(new RunCommand(()->climber.setWinchSpeed(()-> MathUtil.applyDeadband(operatorController.getLeftY(), STATIC_DEADBAND), ()-> MathUtil.applyDeadband(operatorController.getLeftY(), STATIC_DEADBAND)), climber);
        
         // Manual Control
