@@ -48,6 +48,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.robotInitConstants;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
 import frc.robot.utilities.DynamicRateLimiter;
+import frc.robot.utilities.FieldConstants;
 
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
@@ -451,7 +452,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                     // Camera processed a new frame since last
                     // Get the last one in the list.
                     result = results.get(results.size() - 1);    
-                    if(!result.hasTargets()) continue;
+                    boolean hasTargets = result.hasTargets();
+                    SmartDashboard.putBoolean("Vision Has Targets", hasTargets);
+                    if(!hasTargets) continue;
                     lastTarget = result.getBestTarget();
                     double latency = result.metadata.getLatencyMillis();  
                     SmartDashboard.putNumber("Vision Latency", latency); 
@@ -587,6 +590,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         SmartDashboard.putNumber("Swerve States", getState().ModuleStates.length);
         // SmartDashboard.putNumber("Vision Current", m_pdh.getCurrent(15));
         SmartDashboard.putBoolean("DIO channel 0", robotInitConstants.dIO_port.get());
+        Pose2d nearestFace = FieldConstants.getNearestReefFace(currentPose);
+        double distanceToReef = currentPose.getTranslation().getDistance(nearestFace.getTranslation());
+        SmartDashboard.putNumber("Distance to Reef", distanceToReef);
+
     }
 
     /*

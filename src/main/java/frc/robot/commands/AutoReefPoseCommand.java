@@ -58,11 +58,11 @@ public class AutoReefPoseCommand extends Command {
         }
     
         public void initialize() {
-            if(position.get() == ReefSide.RIGHT) {
-                CommandSwerveDrivetrain.onlyUseRightCamera();
-            } else{
-                CommandSwerveDrivetrain.onlyUseLeftCamera();
-            }
+            // if(position.get() == ReefSide.RIGHT) {
+            //     CommandSwerveDrivetrain.onlyUseRightCamera();
+            // } else{
+            //     CommandSwerveDrivetrain.onlyUseLeftCamera();
+            // }
         }
     
         @Override
@@ -104,7 +104,7 @@ public class AutoReefPoseCommand extends Command {
                 rotationVal = 0;
     
             /* Drive */
-            double deadband = 0.05;
+            double deadband = 0.00;
             double velocityX = controllerX.getAsDouble() + MathUtil.applyDeadband(strafeVal, deadband);
             double velocityY = controllerY.getAsDouble() - MathUtil.applyDeadband(distanceVal, deadband);
             double rotationalRate = controllerT.getAsDouble() - MathUtil.applyDeadband(rotationVal, deadband);
@@ -146,7 +146,7 @@ public class AutoReefPoseCommand extends Command {
 
     // Called once after isFinished returns true
     protected void end() {
-        CommandSwerveDrivetrain.useBothCameras();
+        // CommandSwerveDrivetrain.useBothCameras();
         // RobotContainer.candleSubsystem.setAnimate("Rainbow");
     }
 
