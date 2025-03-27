@@ -121,7 +121,7 @@ public class Constants {
 
     public class EndEffectorConstants {
         public static final int EE_MOTOR_ID = 3;
-        public static final int INTAKE_CURRENT_LIMIT = 45;
+        public static final int INTAKE_CURRENT_LIMIT = 60;
         public static final double INTAKE_RAMP_RATE = 0.1;
         public static final boolean INTAKE_INVERTED = true;
 
@@ -233,7 +233,7 @@ public class Constants {
         public static final double WINCH_D = 0.04;
 
         public static final double WINCH_IN_LIMIT = 350.0;
-        public static final double WINCH_OUT_LIMIT = 112.0;
+        public static final double WINCH_OUT_LIMIT = 109.0;
         public static final SparkMaxConfig WINCH_MOTOR_CONFIG = new SparkMaxConfig() {
             {
                 idleMode(IdleMode.kBrake);

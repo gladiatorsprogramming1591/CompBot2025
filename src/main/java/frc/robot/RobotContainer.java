@@ -49,7 +49,7 @@ import frc.robot.subsystems.EndEffector;
 import frc.robot.subsystems.FlapServo;
 import frc.robot.subsystems.Wrist;
 import frc.robot.utilities.AutoManager;
-// import frc.robot.subsystems.Climber;
+import frc.robot.subsystems.Climber;
 import frc.robot.utilities.DynamicRateLimiter;
 import frc.robot.utilities.FieldConstants;
 import frc.robot.utilities.FieldConstants.ReefSide;
@@ -164,7 +164,7 @@ public class RobotContainer {
         driverController.rightBumper().whileTrue(endEffector.ejectAlgaeCommand()) // Algae Eject Speed = -1.0
                 .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(0), endEffector));
 
-        driverController.leftBumper().whileTrue(endEffector.intakeAlgaeCommand()) // Algae Intake Speed = 1.0 for barge 
+        driverController.leftBumper().whileTrue(endEffector.intakeTopHatCommand()) // Algae Intake Speed = 1.0 for barge 
                 .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(0), endEffector));
 
         driverController.rightTrigger().onTrue(ejectCoralAndStow()) // Coral Eject Speed = 0.5
@@ -218,8 +218,7 @@ public class RobotContainer {
         //Deep Climb
         operatorController.a().toggleOnTrue(new RunCommand(()->  flapServo.setFlapServoAngle(ServoConstants.kServoUpAngle))
                 .handleInterrupt(()-> flapServo.setFlapServoAngle(ServoConstants.kServoDownAngle)));
-        // climber.setDefaultCommand(climber.manualClimbMovement(()-> MathUtil.applyDeadband(operatorController.getRightY(), STATIC_DEADBAND), ()-> MathUtil.applyDeadband(operatorController.getLeftY(), STATIC_DEADBAND)));
-        // operatorController.leftStick().toggleOnTrue(new RunCommand(()->climber.setWinchSpeed(()-> MathUtil.applyDeadband(operatorController.getLeftY(), STATIC_DEADBAND), ()-> MathUtil.applyDeadband(operatorController.getLeftY(), STATIC_DEADBAND)), climber);
+        climber.setDefaultCommand(climber.manualClimbMovement(()-> MathUtil.applyDeadband(operatorController.getRightY(), STATIC_DEADBAND), ()-> MathUtil.applyDeadband(operatorController.getLeftY(), STATIC_DEADBAND)));
        
         // Manual Control
         // wrist.setDefaultCommand(new RunCommand(()-> wrist.setWristMotor(operatorController.getRightTriggerAxis() - operatorController.getLeftTriggerAxis() * 0.20), wrist)
@@ -425,7 +424,7 @@ public class RobotContainer {
     }
 
     public Command complexIntakeAlgae() {
-        return endEffector.intakeAlgaeCommand().until(() -> endEffector.hasAlgae())
+        return endEffector.intakeTopHatCommand().until(() -> endEffector.hasAlgae())
                 .andThen(endEffector.holdAlgaeCommand());// TODO: Verify if this can be interupted
     }
 
