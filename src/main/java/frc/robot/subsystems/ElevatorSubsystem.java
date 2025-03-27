@@ -221,7 +221,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Elevator lastPos", lastPos);
         SmartDashboard.putNumber("Elevator throgh-bore enc inches", getExternalPositionInches());
 
-        if ((lastPos == kSTOW) && (getExternalPositionInches() <= kSTOW + TOLERANCE_INCHES + 0.15)) {
+        if ((lastPos == kSTOW) && (getExternalPositionInches() <= kSTOW + TOLERANCE_INCHES + 0.4)) {
             if (printInternalEncZero == true) {
                 System.out.println("Zeroing Elevator Both encoder");
                 printInternalEncZero = false;

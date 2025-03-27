@@ -172,7 +172,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         private static final Transform3d kleftCameraLocation = new Transform3d(
             new Translation3d(Units.inchesToMeters(7.8), Units.inchesToMeters(12.45),
                 Units.inchesToMeters(7.9)),
-            new Rotation3d(0.0, Math.toRadians(-12.0 - 1.0), Math.toRadians(-29.0)));
+            new Rotation3d(0.0, Math.toRadians(-12.0), Math.toRadians(-29.0)));
 
         private static final Transform3d krightCameraLocation = new Transform3d(
             new Translation3d(Units.inchesToMeters(7.8), Units.inchesToMeters(-12.45),

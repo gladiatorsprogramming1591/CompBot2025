@@ -42,7 +42,7 @@ import frc.robot.commands.DoNothing;
 import frc.robot.commands.ElevatorToPosition;
 import frc.robot.generated.TunerConstants;
 import frc.robot.generated.TunerConstants.*;
-import frc.robot.subsystems.Climber;
+// import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.EndEffector;
@@ -62,7 +62,7 @@ public class RobotContainer {
     public final EndEffector endEffector = robotInitConstants.isCompBot ? new EndEffector() : null;
     private final Wrist wrist = robotInitConstants.isCompBot ? new Wrist() : null;
     public final ElevatorSubsystem elevator = robotInitConstants.isCompBot ? new ElevatorSubsystem() : null;
-    private final Climber climber = robotInitConstants.isCompBot ? new Climber(drivetrain) : null;
+//     private final Climber climber = robotInitConstants.isCompBot ? new Climber(drivetrain) : null;
     private final FlapServo flapServo = robotInitConstants.isCompBot ? new FlapServo() : null;    
     public PathPlannerPath startLineFCoralStartPath;
     
@@ -110,7 +110,7 @@ public class RobotContainer {
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
 
     public RobotContainer() {
-        // DataLogManager.start();
+        DataLogManager.start();
         registerNamedCommands();
         // autoChooser = AutoBuilder.buildAutoChooser(); // A default auto can be passed in as parameter.
         // SmartDashboard.putData("Auto Mode", autoChooser);
@@ -162,7 +162,7 @@ public class RobotContainer {
                 .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(0), endEffector));
 
         driverController.rightBumper().whileTrue(endEffector.ejectAlgaeCommand()) // Algae Eject Speed = -1.0
-                .onFalse(new InstantCommand(() -> wrist.setWristMotor(0)));
+                .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(0), endEffector));
 
         driverController.leftBumper().whileTrue(endEffector.intakeAlgaeCommand()) // Algae Intake Speed = 1.0 for barge 
                 .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(0), endEffector));
@@ -203,12 +203,13 @@ public class RobotContainer {
         operatorController.rightBumper().onTrue(complexBargeCommand(elevatorPositions.NETSHOOT)); 
         operatorController.b().onTrue(complexProcessorCommand(elevatorPositions.PROCESSOR));
 
-        // operatorController.leftTrigger().onTrue(complexLowAlgaeIntakeCommand(elevatorPositions.ALGAE_LOW));
-        // operatorController.rightTrigger().onTrue(complexHighAlgaeIntakeCommand(elevatorPositions.ALGAE_HIGH));
-
-        // Wrist
         operatorController.x().onTrue(new InstantCommand(() -> wrist.setAngle(WristConstants.GROUND_INTAKE)));
         operatorController.y().onTrue(new InstantCommand(() -> wrist.setAngle(WristConstants.WRIST_STOW)));
+
+        operatorController.leftTrigger().onTrue(complexLowAlgaeIntakeCommand(elevatorPositions.ALGAE_LOW));
+        operatorController.rightTrigger().onTrue(complexHighAlgaeIntakeCommand(elevatorPositions.ALGAE_HIGH));
+
+        // Wrist
 
         operatorController.start().onTrue(new InstantCommand(() ->endEffector.setCoralSpeed(-1.0), endEffector))
                 .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(1.0), endEffector));
@@ -217,18 +218,18 @@ public class RobotContainer {
         //Deep Climb
         operatorController.a().toggleOnTrue(new RunCommand(()->  flapServo.setFlapServoAngle(ServoConstants.kServoUpAngle))
                 .handleInterrupt(()-> flapServo.setFlapServoAngle(ServoConstants.kServoDownAngle)));
-        climber.setDefaultCommand(climber.manualClimbMovement(()-> MathUtil.applyDeadband(operatorController.getRightY(), STATIC_DEADBAND), ()-> MathUtil.applyDeadband(operatorController.getLeftY(), STATIC_DEADBAND)));
+        // climber.setDefaultCommand(climber.manualClimbMovement(()-> MathUtil.applyDeadband(operatorController.getRightY(), STATIC_DEADBAND), ()-> MathUtil.applyDeadband(operatorController.getLeftY(), STATIC_DEADBAND)));
         // operatorController.leftStick().toggleOnTrue(new RunCommand(()->climber.setWinchSpeed(()-> MathUtil.applyDeadband(operatorController.getLeftY(), STATIC_DEADBAND), ()-> MathUtil.applyDeadband(operatorController.getLeftY(), STATIC_DEADBAND)), climber);
        
         // Manual Control
         // wrist.setDefaultCommand(new RunCommand(()-> wrist.setWristMotor(operatorController.getRightTriggerAxis() - operatorController.getLeftTriggerAxis() * 0.20), wrist)
         //         .handleInterrupt(()-> wrist.setWristMotor(0)));
-        operatorController.rightStick().toggleOnTrue(new RunCommand(() -> elevator.setMotorSpeed((-MathUtil.applyDeadband(operatorController.getRightY(), 0.1) * 0.50) + 0.05), elevator)
-                .alongWith(new RunCommand(()-> wrist.setWristMotor(MathUtil.applyDeadband(operatorController.getRightTriggerAxis(), 0.1) - MathUtil.applyDeadband(operatorController.getLeftTriggerAxis(), 0.1) * 0.20), wrist))
-                .handleInterrupt(() -> {
-                        elevator.setMotorSpeed(0);
-                        wrist.setWristMotor(0);
-                }));
+        // operatorController.rightStick().toggleOnTrue(new RunCommand(() -> elevator.setMotorSpeed((-MathUtil.applyDeadband(operatorController.getRightY(), 0.1) * 0.50) + 0.05), elevator)
+        //         .alongWith(new RunCommand(()-> wrist.setWristMotor(MathUtil.applyDeadband(operatorController.getRightTriggerAxis(), 0.1) - MathUtil.applyDeadband(operatorController.getLeftTriggerAxis(), 0.1) * 0.20), wrist))
+        //         .handleInterrupt(() -> {
+        //                 elevator.setMotorSpeed(0);
+        //                 wrist.setWristMotor(0);
+        //         }));
 
         drivetrain.registerTelemetry(logger::telemeterize);
 
