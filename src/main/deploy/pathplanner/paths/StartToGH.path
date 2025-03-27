@@ -34,7 +34,7 @@
   "eventMarkers": [
     {
       "name": "Prep L4",
-      "waypointRelativePos": 0.5233812949640287,
+      "waypointRelativePos": 0.2872744539411157,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
@@ -42,22 +42,11 @@
           "name": "Prep L4"
         }
       }
-    },
-    {
-      "name": "Score Coral",
-      "waypointRelativePos": 1.0,
-      "endWaypointRelativePos": null,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "Score Coral"
-        }
-      }
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 3.5,
-    "maxAcceleration": 3.0,
+    "maxVelocity": 2.5,
+    "maxAcceleration": 2.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
@@ -73,5 +62,5 @@
     "velocity": 0,
     "rotation": 180.0
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }

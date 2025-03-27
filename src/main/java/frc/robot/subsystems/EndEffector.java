@@ -98,7 +98,7 @@ public class EndEffector extends SubsystemBase {
         } // Multiple loop check routine
     }
 
-    public Command intakeAlgaeCommand() {
+    public Command intakeTopHatCommand() {
         return new RunCommand(() -> setCoralSpeed(EndEffectorConstants.ALGAE_INTAKE_SPEED));
     }
 
@@ -155,12 +155,13 @@ public class EndEffector extends SubsystemBase {
     }
 
     public Command ejectAlgaeCommand() {
-        return new InstantCommand(() -> ejectAlgae());
+        return new InstantCommand(() -> ejectAlgae());// -1.0 speed
+
     }
     
 
     public Command ejectTopAlgaeCommand() {
-        return new RunCommand(() -> ejectTopAlgae());
+        return new RunCommand(() -> ejectTopAlgae()); // -1.0 speed
     }
 
     public Command stopIntakeCommand() {

@@ -42,14 +42,14 @@ import frc.robot.commands.DoNothing;
 import frc.robot.commands.ElevatorToPosition;
 import frc.robot.generated.TunerConstants;
 import frc.robot.generated.TunerConstants.*;
-import frc.robot.subsystems.Climber;
+// import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.EndEffector;
 import frc.robot.subsystems.FlapServo;
 import frc.robot.subsystems.Wrist;
 import frc.robot.utilities.AutoManager;
-// import frc.robot.subsystems.Climber;
+import frc.robot.subsystems.Climber;
 import frc.robot.utilities.DynamicRateLimiter;
 import frc.robot.utilities.FieldConstants;
 import frc.robot.utilities.FieldConstants.ReefSide;
@@ -110,7 +110,7 @@ public class RobotContainer {
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
 
     public RobotContainer() {
-        // DataLogManager.start();
+        DataLogManager.start();
         registerNamedCommands();
         // autoChooser = AutoBuilder.buildAutoChooser(); // A default auto can be passed in as parameter.
         // SmartDashboard.putData("Auto Mode", autoChooser);
@@ -162,9 +162,9 @@ public class RobotContainer {
                 .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(0), endEffector));
 
         driverController.rightBumper().whileTrue(endEffector.ejectAlgaeCommand()) // Algae Eject Speed = -1.0
-                .onFalse(new InstantCommand(() -> wrist.setWristMotor(0)));
+                .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(0), endEffector));
 
-        driverController.leftBumper().whileTrue(endEffector.intakeAlgaeCommand()) // Algae Intake Speed = 1.0 for barge 
+        driverController.leftBumper().whileTrue(endEffector.intakeTopHatCommand()) // Algae Intake Speed = 1.0 for barge 
                 .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(0), endEffector));
 
         driverController.rightTrigger().onTrue(ejectCoralAndStow()) // Coral Eject Speed = 0.5
@@ -203,12 +203,13 @@ public class RobotContainer {
         operatorController.rightBumper().onTrue(complexBargeCommand(elevatorPositions.NETSHOOT)); 
         operatorController.b().onTrue(complexProcessorCommand(elevatorPositions.PROCESSOR));
 
+        operatorController.x().onTrue(new InstantCommand(() -> wrist.setAngle(WristConstants.GROUND_INTAKE)));
+        operatorController.y().onTrue(new InstantCommand(() -> wrist.setAngle(WristConstants.WRIST_STOW)));
+
         operatorController.leftTrigger().onTrue(complexLowAlgaeIntakeCommand(elevatorPositions.ALGAE_LOW));
         operatorController.rightTrigger().onTrue(complexHighAlgaeIntakeCommand(elevatorPositions.ALGAE_HIGH));
 
         // Wrist
-        operatorController.x().onTrue(new InstantCommand(() -> wrist.setAngle(WristConstants.GROUND_INTAKE)));
-        operatorController.y().onTrue(new InstantCommand(() -> wrist.setAngle(WristConstants.WRIST_STOW)));
 
         operatorController.start().onTrue(new InstantCommand(() ->endEffector.setCoralSpeed(-1.0), endEffector))
                 .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(1.0), endEffector));
@@ -217,8 +218,7 @@ public class RobotContainer {
         //Deep Climb
         operatorController.a().toggleOnTrue(new RunCommand(()->  flapServo.setFlapServoAngle(ServoConstants.kServoUpAngle))
                 .handleInterrupt(()-> flapServo.setFlapServoAngle(ServoConstants.kServoDownAngle)));
-        // climber.setDefaultCommand(climber.manualClimbMovement(()-> MathUtil.applyDeadband(operatorController.getLeftY(), STATIC_DEADBAND)));
-        operatorController.leftStick().toggleOnTrue(new RunCommand(()->climber.setWinchSpeed(()-> MathUtil.applyDeadband(operatorController.getLeftY(), STATIC_DEADBAND)), climber));
+        climber.setDefaultCommand(climber.manualClimbMovement(()-> MathUtil.applyDeadband(operatorController.getRightY(), STATIC_DEADBAND), ()-> MathUtil.applyDeadband(operatorController.getLeftY(), STATIC_DEADBAND)));
        
         // Manual Control
         // wrist.setDefaultCommand(new RunCommand(()-> wrist.setWristMotor(operatorController.getRightTriggerAxis() - operatorController.getLeftTriggerAxis() * 0.20), wrist)
@@ -424,7 +424,7 @@ public class RobotContainer {
     }
 
     public Command complexIntakeAlgae() {
-        return endEffector.intakeAlgaeCommand().until(() -> endEffector.hasAlgae())
+        return endEffector.intakeTopHatCommand().until(() -> endEffector.hasAlgae())
                 .andThen(endEffector.holdAlgaeCommand());// TODO: Verify if this can be interupted
     }
 

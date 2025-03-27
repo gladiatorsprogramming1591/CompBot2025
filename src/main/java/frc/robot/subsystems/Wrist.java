@@ -104,6 +104,9 @@ public class Wrist extends SubsystemBase {
     public Command StowPositionCommand(){
          return new InstantCommand(()->setAngle(WristConstants.WRIST_STOW)); 
     }
+    public Command GroundIntakePositionCommand(){
+         return new InstantCommand(()->setAngle(WristConstants.GROUND_INTAKE)); 
+    }
 
     public Command IntakePositionCommand(){
          return new InstantCommand(()->setAngle(WristConstants.WRIST_INTAKE)); 

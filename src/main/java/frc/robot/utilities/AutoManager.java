@@ -22,9 +22,7 @@ public class AutoManager {
 
         autos = new SendableChooser<>();
         autos.addOption("Left L4 3 Piece", wrapAutoWithPose(new PathPlannerAuto(leftSide3PieceName)));
-        autos.addOption("Mirrored Left L4 3 Piece", wrapAutoWithPose(new PathPlannerAuto(leftSide3PieceName, true)));
-        autos.addOption("Right L4 3 Piece", wrapAutoWithPose(new PathPlannerAuto(rightSide3PieceName)));
-        autos.addOption("Mirrored Right L4 3 Piece", wrapAutoWithPose(new PathPlannerAuto(rightSide3PieceName, true)));
+        autos.addOption("Right L4 3 Piece", wrapAutoWithPose(new PathPlannerAuto(leftSide3PieceName, true)));
     }
 
     private Command wrapAutoWithPose(PathPlannerAuto autoCommand) {

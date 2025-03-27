@@ -36,7 +36,7 @@ public class Constants {
         public static final boolean LEADER_INVERTED = true;
         public static final boolean FOLLOWER_INVERTED_FROM_LEADER = true;
         // public static final double RAMP_RATE = 0.001; // Not used.
-        public static final int CURRENT_LIMIT = 80;
+        public static final int CURRENT_LIMIT = 75;
 
         public static final double OUTPUT_MAXIMUM = 1.0;
         public static final double OUTPUT_MINIMUM = -1.0;
@@ -66,7 +66,7 @@ public class Constants {
         // public static final double ALLOWERD_ERR_UP = 0.08 / INTERNAL_ROTS_PER_EXTERNAL_ROT;
 
         // Constants for going down
-        public static final double P_DOWN = 0.2;
+        public static final double P_DOWN = 0.18;
         public static final double I_DOWN = 0;
         public static final double D_DOWN = 0;
         public static final double FF_DOWN = 0.623;
@@ -121,14 +121,14 @@ public class Constants {
 
     public class EndEffectorConstants {
         public static final int EE_MOTOR_ID = 3;
-        public static final int INTAKE_CURRENT_LIMIT = 50;
+        public static final int INTAKE_CURRENT_LIMIT = 60;
         public static final double INTAKE_RAMP_RATE = 0.1;
         public static final boolean INTAKE_INVERTED = true;
 
         // Coral Constants
         public static final double CORAL_INTAKE_SPEED = 0.2;
         public static final double CORAL_REVERSE_SPEED = -0.15;
-        public static final double CORAL_REVERSE_SPEED2 = -0.3;
+        public static final double CORAL_REVERSE_SPEED2 = -0.25;
         public static final double CORAL_EJECT_SPEED = 0.5;
         public static final double ARM_CORAL_SPEED = 0;
         public static final double L1_CORAL_EJECT_SPEED = 0.75;
@@ -163,7 +163,7 @@ public class Constants {
         public static final double WRIST_PROCESSOR = WRIST_INTAKE + 23.0;
         public static final double WRIST_L1 = WRIST_INTAKE + 16.0;
         public static final double WRIST_L2 = WRIST_INTAKE + 31.2;
-        public static final double WRIST_L3 = WRIST_INTAKE + 30.0;
+        public static final double WRIST_L3 = WRIST_INTAKE + 22.8;
         public static final double WRIST_L4 = WRIST_INTAKE + 46.0; 
         public static final double WRIST_DEFAULT = WRIST_L3;
         public static final double WRIST_ALGAE_LOW = WRIST_INTAKE + 34.0;
@@ -200,7 +200,7 @@ public class Constants {
     }
 
     public class ClimberConstants {
-        // public static final int CLIMB_ROLLER_CAN_ID = 50;
+        public static final int CLIMB_ROLLER_CAN_ID = 50;
         public static final int CLIMB_ROLLER_CURRENT_LIMIT = 80;
         public static final boolean CLIMB_ROLLER_MOTOR_INVERTED = true;
         public static final double CLIMB_ROLLER_RAMP_RATE = 0.1;
@@ -231,6 +231,9 @@ public class Constants {
         public static final double WINCH_P = 0.025;
         public static final double WINCH_I = 0;
         public static final double WINCH_D = 0.04;
+
+        public static final double WINCH_IN_LIMIT = 350.0;
+        public static final double WINCH_OUT_LIMIT = 109.0;
         public static final SparkMaxConfig WINCH_MOTOR_CONFIG = new SparkMaxConfig() {
             {
                 idleMode(IdleMode.kBrake);
