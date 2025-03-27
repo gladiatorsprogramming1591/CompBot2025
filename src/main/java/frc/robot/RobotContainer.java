@@ -62,7 +62,7 @@ public class RobotContainer {
     public final EndEffector endEffector = robotInitConstants.isCompBot ? new EndEffector() : null;
     private final Wrist wrist = robotInitConstants.isCompBot ? new Wrist() : null;
     public final ElevatorSubsystem elevator = robotInitConstants.isCompBot ? new ElevatorSubsystem() : null;
-//     private final Climber climber = robotInitConstants.isCompBot ? new Climber(drivetrain) : null;
+    private final Climber climber = robotInitConstants.isCompBot ? new Climber(drivetrain) : null;
     private final FlapServo flapServo = robotInitConstants.isCompBot ? new FlapServo() : null;    
     public PathPlannerPath startLineFCoralStartPath;
     
