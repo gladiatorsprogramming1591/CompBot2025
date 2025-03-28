@@ -183,6 +183,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         public static final double VISION_FIELD_MARGIN = 0.5;
         public static final double VISION_Z_MARGIN = 0.75;
         public static final double VISION_STD_XY_SCALE = 0.04;
+        // public static final double VISION_STD_XY_SCALE = 0.08;
         public static final double VISION_STD_ROT_SCALE = 0.035;
         public static final double FIELD_LENGTH = 16.5417;
         public static final double FIELD_WIDTH = 8.0136;

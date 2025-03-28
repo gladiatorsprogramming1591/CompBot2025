@@ -13,7 +13,19 @@
         {
           "type": "named",
           "data": {
+            "name": "Confirm Prep L4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
             "name": "Score Coral"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Stow"
           }
         }
       ]

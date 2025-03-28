@@ -99,7 +99,7 @@ public class EndEffector extends SubsystemBase {
     }
 
     public Command intakeTopHatCommand() {
-        return new RunCommand(() -> setCoralSpeed(EndEffectorConstants.ALGAE_INTAKE_SPEED));
+        return new RunCommand(() -> setCoralSpeed(EndEffectorConstants.ALGAE_INTAKE_SPEED), this);
     }
 
     public Command holdAlgaeCommand() {
@@ -143,8 +143,8 @@ public class EndEffector extends SubsystemBase {
 
     public Command homingSequenceCommand() {
         return new SequentialCommandGroup(
-            new RunCommand(() -> setCoralSpeed(EndEffectorConstants.CORAL_REVERSE_SPEED2))
-                .withTimeout(0.15),
+            new RunCommand(() -> setCoralSpeed(EndEffectorConstants.CORAL_REVERSE_SPEED2 / 2))
+                .until(this::coralArmed),
             new InstantCommand(() -> setCoralSpeed(0)));
     }
 
@@ -155,13 +155,13 @@ public class EndEffector extends SubsystemBase {
     }
 
     public Command ejectAlgaeCommand() {
-        return new InstantCommand(() -> ejectAlgae());// -1.0 speed
+        return new RunCommand(() -> ejectAlgae(), this);// -1.0 speed
 
     }
     
 
     public Command ejectTopAlgaeCommand() {
-        return new RunCommand(() -> ejectTopAlgae()); // -1.0 speed
+        return new RunCommand(() -> ejectTopAlgae(), this); // -1.0 speed
     }
 
     public Command stopIntakeCommand() {

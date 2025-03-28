@@ -78,13 +78,13 @@ public class Constants {
         // Elevator Positions
         public static final double kSTOW = 0.4;
         public static final double kL1 = 2.75;
-        public static final double kL2 = 7.04;
-        public static final double kL3 = 15.3;
+        public static final double kL2 = 7.79;
+        public static final double kL3 = 16.3;
         public static final double kL4 = 26.4;
         public static final double AUTO_L4 = 25.5;
         public static final double kPROCESSOR = 0.5;
         public static final double kNET = 27.75;
-        public static final double ALGAE_HIGH = 8.53;
+        public static final double ALGAE_HIGH = 10.53;
         public static final double ALGAE_LOW = 2.75;
 
         public static final SparkFlexConfig MOTOR_CONFIG = new SparkFlexConfig() {
@@ -157,19 +157,21 @@ public class Constants {
     public class WristConstants {
         // Wrist Position
         public static final double WRIST_INTAKE = 255.0; // 254
-        public static final double WRIST_STOW = WRIST_INTAKE + 12;
+        public static final double WRIST_STOW = WRIST_INTAKE + 12 + 4;
         public static final double REEF_ACQUIRE_ANGLE = WRIST_INTAKE + 22.0;
         public static final double GROUND_INTAKE = WRIST_INTAKE + 70.0;
         public static final double WRIST_PROCESSOR = WRIST_INTAKE + 23.0;
         public static final double WRIST_L1 = WRIST_INTAKE + 16.0;
-        public static final double WRIST_L2 = WRIST_INTAKE + 31.2;
-        public static final double WRIST_L3 = WRIST_INTAKE + 22.8;
+        // public static final double WRIST_L2 = WRIST_INTAKE + 31.2;
+        public static final double WRIST_L2 = WRIST_STOW + 1.0;
+        // public static final double WRIST_L3 = WRIST_INTAKE + 22.8;
+        public static final double WRIST_L3 = WRIST_STOW + 0.0;
         public static final double WRIST_L4 = WRIST_INTAKE + 46.0; 
-        public static final double WRIST_DEFAULT = WRIST_L3;
+        // public static final double WRIST_DEFAULT = WRIST_L3;
         public static final double WRIST_ALGAE_LOW = WRIST_INTAKE + 34.0;
         public static final double WRIST_ALGAE_HIGH = WRIST_INTAKE + 33.0;
         public static final double WRIST_DUNK_CORAL = WRIST_INTAKE;
-        public static final double WRIST_NET_FLICK = WRIST_STOW + 5;
+        public static final double WRIST_NET_FLICK = (WRIST_INTAKE + 12) + 5;
 
         public static final int WRIST_CAN_ID = 4;
         public static final int WRIST_CURRENT_LIMIT = 30;

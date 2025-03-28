@@ -33,6 +33,17 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
+      "name": "Stow wrist only",
+      "waypointRelativePos": 0,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Stow wrist only"
+        }
+      }
+    },
+    {
       "name": "PrepAndScore",
       "waypointRelativePos": 0.44871794871794135,
       "endWaypointRelativePos": null,

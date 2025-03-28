@@ -167,8 +167,12 @@ public class RobotContainer {
         driverController.leftBumper().whileTrue(endEffector.intakeTopHatCommand()) // Algae Intake Speed = 1.0 for barge 
                 .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(0), endEffector));
 
-        driverController.rightTrigger().onTrue(ejectCoralAndStow()) // Coral Eject Speed = 0.5
-                .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(0), endEffector));
+        // driverController.rightBumper().and(driverController.leftBumper())
+        //         .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(0), endEffector));
+
+        driverController.rightTrigger().onTrue(ejectCoralAndStowWrist()) // Coral Eject Speed = 0.5
+                .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(0), endEffector)
+                .alongWith(stowElevatorOnly()));
 
         driverController.x().whileTrue(new AutoReefPoseCommand(drivetrain, reefAlign, this::driveX, this::driveY,
                 this::driveT, () -> ReefSide.LEFT, () -> elevator.getExternalPositionInches()));
@@ -330,8 +334,8 @@ public class RobotContainer {
         return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
                 .andThen((new ElevatorToPosition(elevator, position)))
                 .andThen(new WaitUntilCommand(elevator::atSetpointExternalEnc))
-                .andThen(wrist.HoverPositionCommandL2())
-                .andThen(new RunCommand(() -> endEffector.setCoralSpeed(-0.15), endEffector).withTimeout(0.10))
+                .andThen(wrist.HoverPositionCommand(WristConstants.WRIST_L2))
+                // .andThen(new RunCommand(() -> endEffector.setCoralSpeed(-0.15), endEffector).withTimeout(0.10))
                 .andThen(new InstantCommand(() -> endEffector.setCoralSpeed(0.0), endEffector));
     }
     public Command prepElevatorScoreL3(elevatorPositions position) {
@@ -339,8 +343,8 @@ public class RobotContainer {
         return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
                 .andThen((new ElevatorToPosition(elevator, position)))
                 .andThen(new WaitUntilCommand(elevator::atSetpointExternalEnc))
-                .andThen(wrist.HoverPositionCommandL3())
-                .andThen(new RunCommand(() -> endEffector.setCoralSpeed(-0.15), endEffector).withTimeout(0.10))
+                .andThen(wrist.HoverPositionCommand(WristConstants.WRIST_L3))
+                // .andThen(new RunCommand(() -> endEffector.setCoralSpeed(-0.15), endEffector).withTimeout(0.10))
                 .andThen(new InstantCommand(() -> endEffector.setCoralSpeed(0.0), endEffector));
     }
 
@@ -416,12 +420,21 @@ public class RobotContainer {
                 .andThen(endEffector.autoIntakeCoralCommand());
     }
 
-    public Command ejectCoralAndStow() {
+    public Command ejectCoralAndStowEntirely() {
         return endEffector.ejectCoralCommand()
                 .andThen(wrist.StowPositionCommand())
                 .andThen(new WaitUntilCommand(wrist::atSetpoint))
                 .andThen(new ElevatorToPosition(elevator, elevatorPositions.STOW));
     }
+    public Command ejectCoralAndStowWrist() {
+        return endEffector.ejectCoralCommand()
+                .andThen(wrist.StowPositionCommand())
+                .andThen(new WaitUntilCommand(wrist::atSetpoint));
+    }
+    public Command stowElevatorOnly() {
+        return new WaitUntilCommand(wrist::atSetpoint)
+        .andThen(new ElevatorToPosition(elevator, elevatorPositions.STOW));
+}
 
     public Command complexIntakeAlgae() {
         return endEffector.intakeTopHatCommand().until(() -> endEffector.hasAlgae())
@@ -645,6 +658,7 @@ public class RobotContainer {
             NamedCommands.registerCommand("Funnel Beam Break",
                     new WaitUntilCommand(() -> endEffector.isCoralInFunnel()));
             NamedCommands.registerCommand("Stop intake", new InstantCommand(() -> endEffector.setCoralSpeed(0)));
+            NamedCommands.registerCommand("Stow wrist only", new InstantCommand(() -> wrist.setAngle(WristConstants.WRIST_STOW)));
         }
     }
 }
