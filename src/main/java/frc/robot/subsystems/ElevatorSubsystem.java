@@ -82,7 +82,6 @@ public class ElevatorSubsystem extends SubsystemBase {
         mapEnc.put(elevatorPositions.L2, kL2);
         mapEnc.put(elevatorPositions.L3, kL3);
         mapEnc.put(elevatorPositions.L4, kL4);
-        mapEnc.put(elevatorPositions.AUTO_L4, AUTO_L4);
         mapEnc.put(elevatorPositions.PROCESSOR, kPROCESSOR);
         mapEnc.put(elevatorPositions.NETSHOOT, kNET);
         mapEnc.put(elevatorPositions.ALGAE_HIGH, ALGAE_HIGH);
