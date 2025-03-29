@@ -198,7 +198,7 @@ public class RobotContainer {
         // =====================================
         // Elevator
         operatorController.back().onTrue(new InstantCommand(() -> elevator.zeroElevatorExternalEncCommand()));
-        operatorController.povDown().onTrue(prepElevatorScoreL1(elevatorPositions.L1));
+        // operatorController.povDown().onTrue(prepElevatorScoreL1(elevatorPositions.L1));
         operatorController.povLeft().onTrue(prepElevatorScoreL2(elevatorPositions.L2));
         operatorController.povUp().onTrue(prepElevatorScoreL3(elevatorPositions.L3));
         operatorController.povRight().onTrue(prepElevatorScoreL4(elevatorPositions.L4));
