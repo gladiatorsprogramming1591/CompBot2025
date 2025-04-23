@@ -187,6 +187,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         public static final double VISION_STD_ROT_SCALE = 0.035;
         public static final double FIELD_LENGTH = 16.5417;
         public static final double FIELD_WIDTH = 8.0136;
+
+        boolean robotIsDisabled = DriverStation.isDisabled();
         
         /**
          * Constructs a CTRE SwerveDrivetrain using the specified constants.
@@ -433,9 +435,27 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             }
             return Optional.empty();
         }
+        
+        public Optional<Pose2d> chooseBestPose(Pose2d leftPose, Pose2d rightPose, Pose2d previousLeftPose2d, Pose2d previousrightPose2d) {
+            Pose2d correctionPose = null;
+            Pose2d robotAtCorrectionPose = null;
+            if (leftPose != null && rightPose != null) {
+                Pose2d leftToRightDiff = leftPose.relativeTo(rightPose);
+                if (leftToRightDiff.getTranslation().getNorm() < 0.3 //TODO: Temporary value
+                    && Math.abs(leftToRightDiff.getRotation().getDegrees()) < 15);
+                correctionPose = leftPose.interpolate(rightPose, 0.5);
+            }
+            return Optional.empty();
+        }
     
         public void updatePoseEstimationWithFilter() {
             currentPose = getState().Pose;
+            Optional<EstimatedRobotPose> pose = Optional.empty();
+            Pose2d pose2d = null;
+            double xyStd = 100;
+            double rotStd = 100;
+            Pose2d previousLeftPose2d = null;
+            Pose2d previousRightPose2d = null;
             for (int cameraIdx = CommandSwerveDrivetrain.cameraIdx; cameraIdx < maxCameras; cameraIdx++) {
                 // TODO: need to find the camera associated with a pose estimator, hard coded to front
                 // var results = m_frontCamera.getAllUnreadResults();
@@ -448,7 +468,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 // }
                 var results = cameras[cameraIdx].getAllUnreadResults();
                 PhotonPipelineResult result;
-                Optional<EstimatedRobotPose> pose = null;
                 if (!results.isEmpty()) {
                     // Camera processed a new frame since last
                     // Get the last one in the list.
@@ -466,7 +485,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 }
                 if (pose != null && pose.isPresent()) {
                     Pose3d pose3d = pose.get().estimatedPose;
-                    Pose2d pose2d = pose3d.toPose2d();
+                    pose2d = pose3d.toPose2d();
                     if (
                         pose3d.getX() >= -VISION_FIELD_MARGIN &&
                         pose3d.getX() <= FIELD_LENGTH + VISION_FIELD_MARGIN &&
@@ -489,8 +508,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
                         int tagCount = pose.get().targetsUsed.size();
                         double stdScale = Math.pow(sum / tagCount, 2.0) / tagCount;
-                        double xyStd = VISION_STD_XY_SCALE * stdScale;
-                        double rotStd = VISION_STD_ROT_SCALE * stdScale;
+                        xyStd = VISION_STD_XY_SCALE * stdScale;
+                        rotStd = VISION_STD_ROT_SCALE * stdScale;
                         //time this as well
                         SmartDashboard.putNumber("Vision x", pose2d.getX());
                         SmartDashboard.putNumber("Vision y", pose2d.getY());
@@ -499,19 +518,21 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                         SmartDashboard.putNumber("Robot ts", Utils.getCurrentTimeSeconds());
                         SmartDashboard.putNumber("Vision xyStd", xyStd);
                         SmartDashboard.putNumber("Vision rotStd", rotStd);
-                        addVisionMeasurement(pose2d, Utils.fpgaToCurrentTime(pose.get().timestampSeconds), VecBuilder.fill(xyStd, xyStd, rotStd));
-                        if(!m_hasAppliedVisionPose) {
-                            resetPose(pose2d);
-                            m_hasAppliedVisionPose = true;
-                        }
-
                         // if(xyStd < 0.15){
                         //     addVisionMeasurement(pose2d, Utils.fpgaToCurrentTime(pose.get().timestampSeconds));
                         // }
 
                         continue;
-                    }
+                    }              
                 }
+            }
+            if(pose2d != null) {
+                addVisionMeasurement(pose2d, Utils.fpgaToCurrentTime(pose.get().timestampSeconds), VecBuilder.fill(xyStd, xyStd, rotStd));
+                if(!m_hasAppliedVisionPose) {
+                    resetPose(pose2d);
+                    m_hasAppliedVisionPose = true;
+                }
+            //TODO: Update previous pose
             }
         }
 
