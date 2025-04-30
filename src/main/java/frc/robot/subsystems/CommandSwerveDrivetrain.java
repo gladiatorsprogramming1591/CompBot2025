@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.SignalLogger;
@@ -32,6 +33,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
@@ -436,16 +438,64 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             return Optional.empty();
         }
         
-        public Optional<Pose2d> chooseBestPose(Pose2d leftPose, Pose2d rightPose, Pose2d previousLeftPose2d, Pose2d previousrightPose2d) {
+        public Optional<Pose2d> chooseBestPose(Pose2d leftPose, Pose2d rightPose, Pose2d previousLeftPose2d, Pose2d previousRightPose2d) {
             Pose2d correctionPose = null;
             Pose2d robotAtCorrectionPose = null;
             if (leftPose != null && rightPose != null) {
                 Pose2d leftToRightDiff = leftPose.relativeTo(rightPose);
                 if (leftToRightDiff.getTranslation().getNorm() < 0.3 //TODO: Temporary value
-                    && Math.abs(leftToRightDiff.getRotation().getDegrees()) < 15);
+                    && (Math.abs(leftToRightDiff.getRotation().getDegrees()) < 15)) {
                 correctionPose = leftPose.interpolate(rightPose, 0.5);
-            }
+            } else {
+                Pose2d leftDiff = leftPose.relativeTo(previousLeftPose2d);
+                Pose2d rightDiff = rightPose.relativeTo(previousRightPose2d);
+                double leftDist = leftDiff.getTranslation().getNorm();
+                double rightDist = rightDiff.getTranslation().getNorm();
+                if ((leftDist < 2.0 || robotIsDisabled) && leftDist <= rightDist) {
+                    if (robotIsDisabled || Math.abs(leftDiff.getRotation().getDegrees()) < 15) {
+                        correctionPose = leftPose;
+                    }
+                } else if ((rightDist < 2.0 || robotIsDisabled) && rightDist <= leftDist) {
+                    if (robotIsDisabled || Math.abs(rightDiff.getRotation().getDegrees()) < 15) {
+                        correctionPose = rightPose;
+                    }
+                }
+            } else if (leftPose != null) {
+                Pose2d leftDiff = leftPose.relativeTo(previousLeftPose2d);
+                double leftDist = leftDiff.getTranslation().getNorm();
+                if (leftDist < 2.0 || robotIsDisabled) {
+                    if (robotIsDisabled || Math.abs(leftDiff.getRotation().getDegrees()) < 15) {
+                        correctionPose = leftPose;
+                    }
+                }
             return Optional.empty();
+            }
+        } else if (leftPose != null) {
+            Pose2d leftDiff = leftPose.relativeTo(previousLeftPose2d);
+            double leftDist = leftDiff.getTranslation().getNorm();
+            if (leftDist < 2.0 || robotIsDisabled) {
+                if (robotIsDisabled || Math.abs(leftDiff.getRotation().getDegrees()) < 15) {
+                    correctionPose = leftPose;
+                }
+            }
+        } else if (rightPose != null) {
+            Pose2d rightDiff = rightPose.relativeTo(previousRightPose2d);
+            double rightDist = rightDiff.getTranslation().getNorm();
+            if (rightDist < 2.0 || robotIsDisabled) {
+                if (robotIsDisabled || Math.abs(rightDiff.getRotation().getDegrees()) < 15) {
+                    correctionPose = rightPose;
+                }
+            }
+        } if (correctionPose != null) {
+            ChassisSpeeds currentSpeeds = getState().Speeds;
+            boolean isMoving = Math.abs(currentSpeeds.vxMetersPerSecond) > 0.1
+                || Math.abs(currentSpeeds.vyMetersPerSecond) > 0.1
+                || Math.abs(currentSpeeds.omegaRadiansPerSecond) > 0.1;
+            boolean allowYawCorrection = (DriverStation.isDisabled() || !isMoving);
+            Pose2d visionMeasurement = allowYawCorrection
+                ? correctionPose
+                : new Pose2d(correctionPose.getTranslation(), getState().Pose.getRotation());
+            addVisionMeasurement(visionMeasurement, Utils.getSystemTimeSeconds());
         }
     
         public void updatePoseEstimationWithFilter() {
