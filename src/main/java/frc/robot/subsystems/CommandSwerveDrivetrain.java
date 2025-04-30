@@ -445,22 +445,25 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 Pose2d leftToRightDiff = leftPose.relativeTo(rightPose);
                 if (leftToRightDiff.getTranslation().getNorm() < 0.3 //TODO: Temporary value
                     && (Math.abs(leftToRightDiff.getRotation().getDegrees()) < 15)) {
-                correctionPose = leftPose.interpolate(rightPose, 0.5);
-            } else {
-                Pose2d leftDiff = leftPose.relativeTo(previousLeftPose2d);
-                Pose2d rightDiff = rightPose.relativeTo(previousRightPose2d);
-                double leftDist = leftDiff.getTranslation().getNorm();
-                double rightDist = rightDiff.getTranslation().getNorm();
-                if ((leftDist < 2.0 || robotIsDisabled) && leftDist <= rightDist) {
-                    if (robotIsDisabled || Math.abs(leftDiff.getRotation().getDegrees()) < 15) {
-                        correctionPose = leftPose;
+                    correctionPose = leftPose.interpolate(rightPose, 0.5);
+                } 
+                else {
+                    Pose2d leftDiff = leftPose.relativeTo(previousLeftPose2d);
+                    Pose2d rightDiff = rightPose.relativeTo(previousRightPose2d);
+                    double leftDist = leftDiff.getTranslation().getNorm();
+                    double rightDist = rightDiff.getTranslation().getNorm();
+                    if ((leftDist < 2.0 || robotIsDisabled) && leftDist <= rightDist) {
+                        if (robotIsDisabled || Math.abs(leftDiff.getRotation().getDegrees()) < 15) {
+                            correctionPose = leftPose;
+                        }
+                    } else if ((rightDist < 2.0 || robotIsDisabled) && rightDist <= leftDist) {
+                        if (robotIsDisabled || Math.abs(rightDiff.getRotation().getDegrees()) < 15) {
+                            correctionPose = rightPose;
+                        }
                     }
-                } else if ((rightDist < 2.0 || robotIsDisabled) && rightDist <= leftDist) {
-                    if (robotIsDisabled || Math.abs(rightDiff.getRotation().getDegrees()) < 15) {
-                        correctionPose = rightPose;
-                    }
-                }
-            } else if (leftPose != null) {
+                } 
+            }
+            else if (leftPose != null) {
                 Pose2d leftDiff = leftPose.relativeTo(previousLeftPose2d);
                 double leftDist = leftDiff.getTranslation().getNorm();
                 if (leftDist < 2.0 || robotIsDisabled) {
@@ -468,34 +471,27 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                         correctionPose = leftPose;
                     }
                 }
+            } else if (rightPose != null) {
+                Pose2d rightDiff = rightPose.relativeTo(previousRightPose2d);
+                double rightDist = rightDiff.getTranslation().getNorm();
+                if (rightDist < 2.0 || robotIsDisabled) {
+                    if (robotIsDisabled || Math.abs(rightDiff.getRotation().getDegrees()) < 15) {
+                        correctionPose = rightPose;
+                    }
+                }
+            } 
+            if (correctionPose != null) {
+                ChassisSpeeds currentSpeeds = getState().Speeds;
+                boolean isMoving = Math.abs(currentSpeeds.vxMetersPerSecond) > 0.1
+                    || Math.abs(currentSpeeds.vyMetersPerSecond) > 0.1
+                    || Math.abs(currentSpeeds.omegaRadiansPerSecond) > 0.1;
+                boolean allowYawCorrection = (DriverStation.isDisabled() || !isMoving);
+                Pose2d visionMeasurement = allowYawCorrection
+                    ? correctionPose
+                    : new Pose2d(correctionPose.getTranslation(), getState().Pose.getRotation());
+                return Optional.of(visionMeasurement);
+            }
             return Optional.empty();
-            }
-        } else if (leftPose != null) {
-            Pose2d leftDiff = leftPose.relativeTo(previousLeftPose2d);
-            double leftDist = leftDiff.getTranslation().getNorm();
-            if (leftDist < 2.0 || robotIsDisabled) {
-                if (robotIsDisabled || Math.abs(leftDiff.getRotation().getDegrees()) < 15) {
-                    correctionPose = leftPose;
-                }
-            }
-        } else if (rightPose != null) {
-            Pose2d rightDiff = rightPose.relativeTo(previousRightPose2d);
-            double rightDist = rightDiff.getTranslation().getNorm();
-            if (rightDist < 2.0 || robotIsDisabled) {
-                if (robotIsDisabled || Math.abs(rightDiff.getRotation().getDegrees()) < 15) {
-                    correctionPose = rightPose;
-                }
-            }
-        } if (correctionPose != null) {
-            ChassisSpeeds currentSpeeds = getState().Speeds;
-            boolean isMoving = Math.abs(currentSpeeds.vxMetersPerSecond) > 0.1
-                || Math.abs(currentSpeeds.vyMetersPerSecond) > 0.1
-                || Math.abs(currentSpeeds.omegaRadiansPerSecond) > 0.1;
-            boolean allowYawCorrection = (DriverStation.isDisabled() || !isMoving);
-            Pose2d visionMeasurement = allowYawCorrection
-                ? correctionPose
-                : new Pose2d(correctionPose.getTranslation(), getState().Pose.getRotation());
-            addVisionMeasurement(visionMeasurement, Utils.getSystemTimeSeconds());
         }
     
         public void updatePoseEstimationWithFilter() {
