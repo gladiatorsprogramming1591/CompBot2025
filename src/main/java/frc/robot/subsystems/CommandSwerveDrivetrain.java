@@ -44,13 +44,16 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.Constants.VisionConstants;
 import frc.robot.Constants.robotInitConstants;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
 import frc.robot.utilities.DynamicRateLimiter;
 import frc.robot.utilities.FieldConstants;
+import frc.robot.utilities.RobotPoseLookup;
 
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
@@ -153,42 +156,18 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     /* The SysId routine to test */
     private SysIdRoutine m_sysIdRoutineToApply = m_sysIdRoutineSteer;
 
+    Pose2d previousLeftPose2d = null;
+    Pose2d previousRightPose2d = null;
+    public RobotPoseLookup poseLookup = new RobotPoseLookup();
     // PhotonCamera m_frontCamera;
     private static int maxCameras = 2; 
-    private static int cameraIdx = 0;
-    private static final int LEFT_CAMERA_IDX = 0; 
-    private static final int RIGHT_CAMERA_IDX = 1; 
+    private static int cameraIdx = 0; 
     PhotonCamera[] cameras;
     // PhotonCamera m_rightCamera;
     PhotonPoseEstimator[] m_photonPoseEstimators;
     AprilTagFieldLayout fieldLayout;
         private PhotonTrackedTarget lastTarget;
         private int longDistangePoseEstimationCount = 0;
-        private static final double maximumAmbiguity = 0.25;
-    
-        public static final Transform3d kFrontCameraLocation = new Transform3d(
-                    new Translation3d(Units.inchesToMeters(11.007), Units.inchesToMeters(0.1875),
-                    Units.inchesToMeters(5.789)),
-                new Rotation3d(0.0, Math.toRadians(-20.0), Math.toRadians(0.0)));
-
-        private static final Transform3d kleftCameraLocation = new Transform3d(
-            new Translation3d(Units.inchesToMeters(7.8), Units.inchesToMeters(12.45),
-                Units.inchesToMeters(7.9)),
-            new Rotation3d(0.0, Math.toRadians(-12.0), Math.toRadians(-29.0)));
-
-        private static final Transform3d krightCameraLocation = new Transform3d(
-            new Translation3d(Units.inchesToMeters(7.8), Units.inchesToMeters(-12.45),
-                Units.inchesToMeters(7.9)),
-            new Rotation3d(0.0, Math.toRadians(-12), Math.toRadians(29.0)));
-
-    
-        public static final double VISION_FIELD_MARGIN = 0.5;
-        public static final double VISION_Z_MARGIN = 0.75;
-        public static final double VISION_STD_XY_SCALE = 0.04;
-        // public static final double VISION_STD_XY_SCALE = 0.08;
-        public static final double VISION_STD_ROT_SCALE = 0.035;
-        public static final double FIELD_LENGTH = 16.5417;
-        public static final double FIELD_WIDTH = 8.0136;
 
         boolean robotIsDisabled = DriverStation.isDisabled();
         
@@ -316,11 +295,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                     new PhotonPoseEstimator(
                         fieldLayout,
                         PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-                        kleftCameraLocation),
+                        VisionConstants.kleftCameraLocation),
                     new PhotonPoseEstimator(
                         fieldLayout,
                         PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-                        krightCameraLocation)
+                        VisionConstants.krightCameraLocation)
                 };
             } else {
                 maxCameras = 1;
@@ -331,7 +310,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                     new PhotonPoseEstimator(
                         fieldLayout,
                         PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-                        kFrontCameraLocation)
+                        VisionConstants.kFrontCameraLocation)
                 };
             }    
         }
@@ -345,12 +324,12 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         }
 
         public static void onlyUseLeftCamera() {
-            setCameraIdx(LEFT_CAMERA_IDX);
+            setCameraIdx(VisionConstants.LEFT_CAMERA_IDX);
             setMaxCameras(1);
         }
 
         public static void onlyUseRightCamera() {
-            setCameraIdx(RIGHT_CAMERA_IDX);
+            setCameraIdx(VisionConstants.RIGHT_CAMERA_IDX);
             setMaxCameras(2);
         }
 
@@ -413,7 +392,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                     }
                 }
                 //ambiguity to high dont use estimate
-                if (bestTargetAmbiguity > maximumAmbiguity)
+                if (bestTargetAmbiguity > VisionConstants.maximumAmbiguity)
                 {
                     // System.out.println("Ignoring pose on camera " + cameraIdx + " with ambiguity " + bestTargetAmbiguity);
                     return Optional.empty();
@@ -440,7 +419,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         
         public Optional<Pose2d> chooseBestPose(Pose2d leftPose, Pose2d rightPose, Pose2d previousLeftPose2d, Pose2d previousRightPose2d) {
             Pose2d correctionPose = null;
-            Pose2d robotAtCorrectionPose = null;
             if (leftPose != null && rightPose != null) {
                 Pose2d leftToRightDiff = leftPose.relativeTo(rightPose);
                 if (leftToRightDiff.getTranslation().getNorm() < 0.3 //TODO: Temporary value
@@ -494,24 +472,18 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             return Optional.empty();
         }
     
-        public void updatePoseEstimationWithFilter() {
+        public void updatePoseEstimation() {
             currentPose = getState().Pose;
             Optional<EstimatedRobotPose> pose = Optional.empty();
             Pose2d pose2d = null;
             double xyStd = 100;
             double rotStd = 100;
-            Pose2d previousLeftPose2d = null;
-            Pose2d previousRightPose2d = null;
+            Pose2d leftPose = null;
+            Pose2d rightPose = null;
+            double time = Timer.getFPGATimestamp();
+            double leftPoseTimestamp;
+            double rightPoseTimestamp;
             for (int cameraIdx = CommandSwerveDrivetrain.cameraIdx; cameraIdx < maxCameras; cameraIdx++) {
-                // TODO: need to find the camera associated with a pose estimator, hard coded to front
-                // var results = m_frontCamera.getAllUnreadResults();
-                // if (m_photonPoseEstimators[0].equals(poseEstimator)) {
-                //     List<PhotonPipelineResult> results = m_leftCamera.getAllUnreadResults();
-                // } else if (m_photonPoseEstimators[1].equals(poseEstimator)) {
-                //     List<PhotonPipelineResult> results = m_rightCamera.getAllUnreadResults();
-                // } else {
-                //     continue;
-                // }
                 var results = cameras[cameraIdx].getAllUnreadResults();
                 PhotonPipelineResult result;
                 if (!results.isEmpty()) {
@@ -527,18 +499,36 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                     double latencyThreshold = 12.0;
                     SmartDashboard.putBoolean("Vision Latency OK", latency > latencyThreshold);
                     pose = m_photonPoseEstimators[cameraIdx].update(result);
-                    if(pose != null) pose = filterPose(pose, cameraIdx);
+                    if (pose != null) {
+                        pose = filterPose(pose, cameraIdx);
+                        if (cameraIdx == VisionConstants.LEFT_CAMERA_IDX) {
+                            leftPoseTimestamp = (result.getTimestampSeconds());
+                        }
+                        else if (cameraIdx == VisionConstants.RIGHT_CAMERA_IDX) {
+                            rightPoseTimestamp = (result.getTimestampSeconds());
+                            // TODO: This may need to be averaged once a best pose is averaged/chosen
+                        }
+                    }    
                 }
                 if (pose != null && pose.isPresent()) {
                     Pose3d pose3d = pose.get().estimatedPose;
                     pose2d = pose3d.toPose2d();
+                    if (cameraIdx == VisionConstants.LEFT_CAMERA_IDX) {
+                        leftPose = pose2d;
+                    }
+                    else if (cameraIdx == VisionConstants.RIGHT_CAMERA_IDX) {
+                        rightPose = pose2d;
+                    }
+                    else {
+                        System.out.println("Too many cameras");
+                    }
                     if (
-                        pose3d.getX() >= -VISION_FIELD_MARGIN &&
-                        pose3d.getX() <= FIELD_LENGTH + VISION_FIELD_MARGIN &&
-                        pose3d.getY() >= -VISION_FIELD_MARGIN &&
-                        pose3d.getY() <= FIELD_WIDTH + VISION_FIELD_MARGIN &&
-                        pose3d.getZ() >= -VISION_Z_MARGIN &&
-                        pose3d.getZ() <= VISION_Z_MARGIN
+                        pose3d.getX() >= -VisionConstants.VISION_FIELD_MARGIN &&
+                        pose3d.getX() <= VisionConstants.FIELD_LENGTH + VisionConstants.VISION_FIELD_MARGIN &&
+                        pose3d.getY() >= -VisionConstants.VISION_FIELD_MARGIN &&
+                        pose3d.getY() <= VisionConstants.FIELD_WIDTH + VisionConstants.VISION_FIELD_MARGIN &&
+                        pose3d.getZ() >= -VisionConstants.VISION_Z_MARGIN &&
+                        pose3d.getZ() <= VisionConstants.VISION_Z_MARGIN
                     ) {
                         double sum = 0.0;
                         for (PhotonTrackedTarget target : pose.get().targetsUsed) {
@@ -554,8 +544,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
                         int tagCount = pose.get().targetsUsed.size();
                         double stdScale = Math.pow(sum / tagCount, 2.0) / tagCount;
-                        xyStd = VISION_STD_XY_SCALE * stdScale;
-                        rotStd = VISION_STD_ROT_SCALE * stdScale;
+                        xyStd = VisionConstants.VISION_STD_XY_SCALE * stdScale;
+                        rotStd = VisionConstants.VISION_STD_ROT_SCALE * stdScale;
                         //time this as well
                         SmartDashboard.putNumber("Vision x", pose2d.getX());
                         SmartDashboard.putNumber("Vision y", pose2d.getY());
@@ -573,12 +563,15 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 }
             }
             if(pose2d != null) {
+                // TODO: Move this to chooseBestPose method (do we need stds after best pose is averaged/chosen)
                 addVisionMeasurement(pose2d, Utils.fpgaToCurrentTime(pose.get().timestampSeconds), VecBuilder.fill(xyStd, xyStd, rotStd));
                 if(!m_hasAppliedVisionPose) {
                     resetPose(pose2d);
                     m_hasAppliedVisionPose = true;
                 }
-            //TODO: Update previous pose
+            // Updated previous poses to current pose before next call
+            previousLeftPose2d = leftPose;
+            previousRightPose2d = rightPose;
             }
         }
 
@@ -613,7 +606,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     @Override
     public void periodic() {
-        updatePoseEstimationWithFilter();
+        poseLookup.addPose(getState().Pose);
+        updatePoseEstimation();
         
         // SmartDashboard.putBoolean("FrontConnected", m_frontCamera.isConnected());
         SmartDashboard.putBoolean("LeftConnected", cameras[0].isConnected());

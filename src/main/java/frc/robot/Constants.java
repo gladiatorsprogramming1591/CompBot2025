@@ -8,6 +8,10 @@ import com.revrobotics.spark.config.AbsoluteEncoderConfig;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DigitalInput;
 
 public class Constants {
@@ -279,6 +283,34 @@ public class Constants {
     }
 
     public class VisionConstants {
+        public static final int LEFT_CAMERA_IDX = 0; 
+        public static final int RIGHT_CAMERA_IDX = 1; 
+
+        public static final double maximumAmbiguity = 0.25;
+
+        public static final double VISION_FIELD_MARGIN = 0.5;
+        public static final double VISION_Z_MARGIN = 0.75;
+        public static final double VISION_STD_XY_SCALE = 0.04;
+        // Improves jitter at close range at the expense of slower convergence at long range
+        // public static final double VISION_STD_XY_SCALE = 0.08;
+        public static final double VISION_STD_ROT_SCALE = 0.035;
+        public static final double FIELD_LENGTH = 16.5417;
+        public static final double FIELD_WIDTH = 8.0136;
+
+        public static final Transform3d kFrontCameraLocation = new Transform3d(
+                    new Translation3d(Units.inchesToMeters(11.007), Units.inchesToMeters(0.1875),
+                    Units.inchesToMeters(5.789)),
+                new Rotation3d(0.0, Math.toRadians(-20.0), Math.toRadians(0.0)));
+
+        public static final Transform3d kleftCameraLocation = new Transform3d(
+            new Translation3d(Units.inchesToMeters(7.8), Units.inchesToMeters(12.45),
+                Units.inchesToMeters(7.9)),
+            new Rotation3d(0.0, Math.toRadians(-12.0), Math.toRadians(-29.0)));
+
+        public static final Transform3d krightCameraLocation = new Transform3d(
+            new Translation3d(Units.inchesToMeters(7.8), Units.inchesToMeters(-12.45),
+                Units.inchesToMeters(7.9)),
+            new Rotation3d(0.0, Math.toRadians(-12), Math.toRadians(29.0)));
     }
 
     public class robotInitConstants {
