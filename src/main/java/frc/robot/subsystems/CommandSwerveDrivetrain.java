@@ -156,8 +156,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     /* The SysId routine to test */
     private SysIdRoutine m_sysIdRoutineToApply = m_sysIdRoutineSteer;
 
-    Pose2d previousLeftPose2d = null;
-    Pose2d previousRightPose2d = null;
+    Pose2d previousLeftPose2d = getState().Pose;
+    Pose2d previousRightPose2d = getState().Pose;
     public RobotPoseLookup poseLookup = new RobotPoseLookup();
     // PhotonCamera m_frontCamera;
     private static int maxCameras = 2; 
@@ -476,8 +476,12 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             currentPose = getState().Pose;
             Optional<EstimatedRobotPose> pose = Optional.empty();
             Pose2d pose2d = null;
-            double xyStd = 100;
-            double rotStd = 100;
+            double xyStd = VisionConstants.MAX_STD;
+            double rotStd = VisionConstants.MAX_STD;
+            double leftxyStd = VisionConstants.MAX_STD;
+            double leftrotStd = VisionConstants.MAX_STD;
+            double rightxyStd = VisionConstants.MAX_STD;
+            double rightrotStd = VisionConstants.MAX_STD;
             Pose2d leftPose = null;
             Pose2d rightPose = null;
             double time = Timer.getFPGATimestamp();
@@ -546,6 +550,16 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                         double stdScale = Math.pow(sum / tagCount, 2.0) / tagCount;
                         xyStd = VisionConstants.VISION_STD_XY_SCALE * stdScale;
                         rotStd = VisionConstants.VISION_STD_ROT_SCALE * stdScale;
+
+                        if (cameraIdx == VisionConstants.LEFT_CAMERA_IDX) {
+                            leftxyStd = xyStd;
+                            leftrotStd = rotStd;
+                        }
+                        else if (cameraIdx == VisionConstants.RIGHT_CAMERA_IDX) {
+                            rightxyStd = xyStd;
+                            rightrotStd = rotStd;
+                        }
+    
                         //time this as well
                         SmartDashboard.putNumber("Vision x", pose2d.getX());
                         SmartDashboard.putNumber("Vision y", pose2d.getY());
@@ -562,9 +576,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                     }              
                 }
             }
-            if(pose2d != null) {
+            
+            Optional<Pose2d> finalPose = chooseBestPose(leftPose, rightPose, previousLeftPose2d, previousRightPose2d);
+            if(finalPose.isPresent()) {
                 // TODO: Move this to chooseBestPose method (do we need stds after best pose is averaged/chosen)
-                addVisionMeasurement(pose2d, Utils.fpgaToCurrentTime(pose.get().timestampSeconds), VecBuilder.fill(xyStd, xyStd, rotStd));
+                addVisionMeasurement(finalPose.get(), Utils.fpgaToCurrentTime(pose.get().timestampSeconds), VecBuilder.fill(xyStd, xyStd, rotStd));
                 if(!m_hasAppliedVisionPose) {
                     resetPose(pose2d);
                     m_hasAppliedVisionPose = true;

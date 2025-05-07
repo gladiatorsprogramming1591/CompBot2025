@@ -297,6 +297,8 @@ public class Constants {
         public static final double FIELD_LENGTH = 16.5417;
         public static final double FIELD_WIDTH = 8.0136;
 
+        public static final double MAX_STD = 100;
+
         public static final Transform3d kFrontCameraLocation = new Transform3d(
                     new Translation3d(Units.inchesToMeters(11.007), Units.inchesToMeters(0.1875),
                     Units.inchesToMeters(5.789)),
