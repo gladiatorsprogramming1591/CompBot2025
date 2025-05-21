@@ -592,9 +592,26 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                         //time this as well
                         SmartDashboard.putNumber("Vision x", pose2d.getX());
                         SmartDashboard.putNumber("Vision y", pose2d.getY());
+                        if (rightPose != null)
+                        {
+                            SmartDashboard.putNumber("right pose X", rightPose.getX());
+                            SmartDashboard.putNumber("right pose Y", rightPose.getY());
+                        }
+                        if (leftPose != null)
+                        {
+                            SmartDashboard.putNumber("left pose X", leftPose.getX());
+                            SmartDashboard.putNumber("left pose Y", leftPose.getY());
+                        }
                         SmartDashboard.putNumber("Vision rot", pose2d.getRotation().getDegrees());
-                        SmartDashboard.putNumber("Vision ts", pose.get().timestampSeconds); // getting timestamp from left & right cameras would be more useful (if needed)
-                        SmartDashboard.putNumber("Robot ts", Utils.getCurrentTimeSeconds());
+                        // Timestamps
+                        SmartDashboard.putNumber("pose timestamp", pose.get().timestampSeconds);
+                        SmartDashboard.putNumber("FPGA timestamp", Timer.getFPGATimestamp());
+                        SmartDashboard.putNumber("FPGA converted timestamp", Utils.fpgaToCurrentTime(Timer.getFPGATimestamp()));
+                        SmartDashboard.putNumber("right pose timestamp", rightPoseTimestamp);
+                        SmartDashboard.putNumber("left pose timestamp", leftPoseTimestamp);
+                        SmartDashboard.putNumber("right pose converted timestamp", Utils.fpgaToCurrentTime(rightPoseTimestamp));
+                        SmartDashboard.putNumber("left pose converted timestamp", Utils.fpgaToCurrentTime(leftPoseTimestamp));
+                        SmartDashboard.putNumber("Utils current timestamp", Utils.getCurrentTimeSeconds());
                         SmartDashboard.putNumber("Vision xyStd", xyStd);
                         SmartDashboard.putNumber("Vision rotStd", rotStd);
                         // if(xyStd < 0.15){
