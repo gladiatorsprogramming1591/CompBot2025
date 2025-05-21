@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.*;
 
+import java.security.Timestamp;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -311,11 +312,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 m_photonPoseEstimators = new PhotonPoseEstimator[] {
                     new PhotonPoseEstimator(
                         fieldLayout,
-                        PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
+                        PoseStrategy.PNP_DISTANCE_TRIG_SOLVE,
                         kleftCameraLocation),
                     new PhotonPoseEstimator(
                         fieldLayout,
-                        PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
+                        PoseStrategy.PNP_DISTANCE_TRIG_SOLVE,
                         krightCameraLocation)
                 };
             } else {
@@ -326,10 +327,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 m_photonPoseEstimators = new PhotonPoseEstimator[] {
                     new PhotonPoseEstimator(
                         fieldLayout,
-                        PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
+                        PoseStrategy.PNP_DISTANCE_TRIG_SOLVE,
                         kFrontCameraLocation)
                 };
-            }    
+            }   
+            
         }
 
         public static void setCameraIdx(int cameraIdx) {
@@ -449,6 +451,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 var results = cameras[cameraIdx].getAllUnreadResults();
                 PhotonPipelineResult result;
                 Optional<EstimatedRobotPose> pose = null;
+                m_photonPoseEstimators[cameraIdx].addHeadingData(getState().Timestamp, new Rotation3d(new Rotation2d(getHeading())));
                 if (!results.isEmpty()) {
                     // Camera processed a new frame since last
                     // Get the last one in the list.
