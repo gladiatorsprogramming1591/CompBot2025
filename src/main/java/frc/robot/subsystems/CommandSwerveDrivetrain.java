@@ -55,6 +55,7 @@ import frc.robot.utilities.DynamicRateLimiter;
 import frc.robot.utilities.FieldConstants;
 import frc.robot.utilities.RobotPoseLookup;
 
+import org.ejml.ops.MatrixIO;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
@@ -417,13 +418,21 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             return Optional.empty();
         }
         
-        public Optional<Pose2d> chooseBestPose(Pose2d leftPose, Pose2d rightPose, Pose2d previousLeftPose2d, Pose2d previousRightPose2d) {
+        public Optional<Pose2d> chooseBestPose(Pose2d leftPose, Pose2d rightPose, Pose2d previousLeftPose2d, Pose2d previousRightPose2d, 
+                                               double leftxyStd, double leftrotStd, double rightxyStd, double rightrotStd, 
+                                               double leftPoseTimestamp, double rightPoseTimestamp) {
             Pose2d correctionPose = null;
+            double xyStd = VisionConstants.MAX_STD;
+            double rotStd = VisionConstants.MAX_STD;
+            double timestamp = 0;
             if (leftPose != null && rightPose != null) {
                 Pose2d leftToRightDiff = leftPose.relativeTo(rightPose);
                 if (leftToRightDiff.getTranslation().getNorm() < 0.3 //TODO: Temporary value
                     && (Math.abs(leftToRightDiff.getRotation().getDegrees()) < 15)) {
                     correctionPose = leftPose.interpolate(rightPose, 0.5);
+                    xyStd = MathUtil.interpolate(leftxyStd, rightxyStd, 0.5);
+                    rotStd = MathUtil.interpolate(leftrotStd, rightrotStd, 0.5);
+                    timestamp = MathUtil.interpolate(leftPoseTimestamp, rightPoseTimestamp, 0.5);
                 } 
                 else {
                     Pose2d leftDiff = leftPose.relativeTo(previousLeftPose2d);
@@ -433,10 +442,16 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                     if ((leftDist < 2.0 || robotIsDisabled) && leftDist <= rightDist) {
                         if (robotIsDisabled || Math.abs(leftDiff.getRotation().getDegrees()) < 15) {
                             correctionPose = leftPose;
+                            xyStd = leftxyStd;
+                            rotStd = leftrotStd;
+                            timestamp = leftPoseTimestamp;
                         }
                     } else if ((rightDist < 2.0 || robotIsDisabled) && rightDist <= leftDist) {
                         if (robotIsDisabled || Math.abs(rightDiff.getRotation().getDegrees()) < 15) {
                             correctionPose = rightPose;
+                            xyStd = rightxyStd;
+                            rotStd = rightrotStd;
+                            timestamp = rightPoseTimestamp;
                         }
                     }
                 } 
@@ -447,6 +462,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 if (leftDist < 2.0 || robotIsDisabled) {
                     if (robotIsDisabled || Math.abs(leftDiff.getRotation().getDegrees()) < 15) {
                         correctionPose = leftPose;
+                        xyStd = leftxyStd;
+                        rotStd = leftrotStd;
+                        timestamp = leftPoseTimestamp;
                     }
                 }
             } else if (rightPose != null) {
@@ -455,6 +473,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 if (rightDist < 2.0 || robotIsDisabled) {
                     if (robotIsDisabled || Math.abs(rightDiff.getRotation().getDegrees()) < 15) {
                         correctionPose = rightPose;
+                        xyStd = rightxyStd;
+                        rotStd = rightrotStd;
+                        timestamp = rightPoseTimestamp;
                     }
                 }
             } 
@@ -467,6 +488,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 Pose2d visionMeasurement = allowYawCorrection
                     ? correctionPose
                     : new Pose2d(correctionPose.getTranslation(), getState().Pose.getRotation());
+                addVisionMeasurement(correctionPose, Utils.fpgaToCurrentTime(timestamp), VecBuilder.fill(xyStd, xyStd, rotStd));
+
                 return Optional.of(visionMeasurement);
             }
             return Optional.empty();
@@ -484,9 +507,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             double rightrotStd = VisionConstants.MAX_STD;
             Pose2d leftPose = null;
             Pose2d rightPose = null;
-            double time = Timer.getFPGATimestamp();
-            double leftPoseTimestamp;
-            double rightPoseTimestamp;
+            double leftPoseTimestamp = 0;
+            double rightPoseTimestamp = 0;
             for (int cameraIdx = CommandSwerveDrivetrain.cameraIdx; cameraIdx < maxCameras; cameraIdx++) {
                 var results = cameras[cameraIdx].getAllUnreadResults();
                 PhotonPipelineResult result;
@@ -577,17 +599,19 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 }
             }
             
-            Optional<Pose2d> finalPose = chooseBestPose(leftPose, rightPose, previousLeftPose2d, previousRightPose2d);
+            Optional<Pose2d> finalPose = chooseBestPose(leftPose, rightPose, previousLeftPose2d, previousRightPose2d, 
+                                                        leftxyStd, leftrotStd, rightxyStd, rightrotStd, 
+                                                        leftPoseTimestamp, rightPoseTimestamp);
             if(finalPose.isPresent()) {
-                // TODO: Move this to chooseBestPose method (do we need stds after best pose is averaged/chosen)
-                addVisionMeasurement(finalPose.get(), Utils.fpgaToCurrentTime(pose.get().timestampSeconds), VecBuilder.fill(xyStd, xyStd, rotStd));
-                if(!m_hasAppliedVisionPose) {
-                    resetPose(pose2d);
-                    m_hasAppliedVisionPose = true;
-                }
-            // Updated previous poses to current pose before next call
-            previousLeftPose2d = leftPose;
-            previousRightPose2d = rightPose;
+            //     // TODO: Move this to chooseBestPose method (do we need stds after best pose is averaged/chosen)
+            //     addVisionMeasurement(finalPose.get(), Utils.fpgaToCurrentTime(pose.get().timestampSeconds), VecBuilder.fill(xyStd, xyStd, rotStd));
+            //     if(!m_hasAppliedVisionPose) {
+            //         resetPose(pose2d);
+            //         m_hasAppliedVisionPose = true;
+            //     }
+                // Updated previous poses to current pose before next call
+                previousLeftPose2d = leftPose;
+                previousRightPose2d = rightPose;
             }
         }
 
