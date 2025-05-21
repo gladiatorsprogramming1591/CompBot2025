@@ -252,8 +252,8 @@ public class Constants {
         public static final double WINCH_I = 0;
         public static final double WINCH_D = 0.04;
 
-        public static final double WINCH_IN_LIMIT = 350.0;
-        public static final double WINCH_OUT_LIMIT = 109.0;
+        public static final double WINCH_IN_LIMIT = 290.0;
+        public static final double WINCH_OUT_LIMIT = 38.0;
         public static final SparkMaxConfig WINCH_MOTOR_CONFIG = new SparkMaxConfig() {
             {
                 idleMode(IdleMode.kBrake);
