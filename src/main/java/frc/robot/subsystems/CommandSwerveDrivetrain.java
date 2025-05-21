@@ -418,6 +418,13 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             return Optional.empty();
         }
         
+        public Optional<Pose2d> chooseBestPose(Pose2d leftPose, Pose2d rightPose,
+                                               double leftxyStd, double leftrotStd, double rightxyStd, double rightrotStd, 
+                                               double leftPoseTimestamp, double rightPoseTimestamp) {
+            previousRightPose2d = poseLookup.lookup(rightPoseTimestamp);
+            previousLeftPose2d = poseLookup.lookup(leftPoseTimestamp);
+            return chooseBestPose(leftPose, rightPose, previousLeftPose2d, previousRightPose2d, leftxyStd, leftrotStd, rightxyStd, rightrotStd, leftPoseTimestamp, rightPoseTimestamp);
+        }
         public Optional<Pose2d> chooseBestPose(Pose2d leftPose, Pose2d rightPose, Pose2d previousLeftPose2d, Pose2d previousRightPose2d, 
                                                double leftxyStd, double leftrotStd, double rightxyStd, double rightrotStd, 
                                                double leftPoseTimestamp, double rightPoseTimestamp) {
@@ -599,7 +606,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 }
             }
             
-            Optional<Pose2d> finalPose = chooseBestPose(leftPose, rightPose, previousLeftPose2d, previousRightPose2d, 
+            // Optional<Pose2d> finalPose = chooseBestPose(leftPose, rightPose, previousLeftPose2d, previousRightPose2d, 
+            //                                             leftxyStd, leftrotStd, rightxyStd, rightrotStd, 
+            //                                             leftPoseTimestamp, rightPoseTimestamp); // used when NOT using poseLookUp
+            Optional<Pose2d> finalPose = chooseBestPose(leftPose, rightPose,
                                                         leftxyStd, leftrotStd, rightxyStd, rightrotStd, 
                                                         leftPoseTimestamp, rightPoseTimestamp);
             if(finalPose.isPresent()) {
@@ -607,9 +617,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                     resetPose(finalPose.get());
                     m_hasAppliedVisionPose = true;
                 }
-                // Updated previous poses to current pose before next call
-                if (leftPose != null) previousLeftPose2d = leftPose;
-                if (rightPose != null) previousRightPose2d = rightPose;
+                // // Updated previous poses to current pose before next call (When NOT using poseLookUp)
+                // if (leftPose != null) previousLeftPose2d = leftPose;
+                // if (rightPose != null) previousRightPose2d = rightPose;
             }
         }
 
