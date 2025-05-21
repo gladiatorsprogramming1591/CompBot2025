@@ -586,7 +586,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                         SmartDashboard.putNumber("Vision x", pose2d.getX());
                         SmartDashboard.putNumber("Vision y", pose2d.getY());
                         SmartDashboard.putNumber("Vision rot", pose2d.getRotation().getDegrees());
-                        SmartDashboard.putNumber("Vision ts", pose.get().timestampSeconds);
+                        SmartDashboard.putNumber("Vision ts", pose.get().timestampSeconds); // getting timestamp from left & right cameras would be more useful (if needed)
                         SmartDashboard.putNumber("Robot ts", Utils.getCurrentTimeSeconds());
                         SmartDashboard.putNumber("Vision xyStd", xyStd);
                         SmartDashboard.putNumber("Vision rotStd", rotStd);
@@ -603,15 +603,13 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                                                         leftxyStd, leftrotStd, rightxyStd, rightrotStd, 
                                                         leftPoseTimestamp, rightPoseTimestamp);
             if(finalPose.isPresent()) {
-            //     // TODO: Move this to chooseBestPose method (do we need stds after best pose is averaged/chosen)
-            //     addVisionMeasurement(finalPose.get(), Utils.fpgaToCurrentTime(pose.get().timestampSeconds), VecBuilder.fill(xyStd, xyStd, rotStd));
-            //     if(!m_hasAppliedVisionPose) {
-            //         resetPose(pose2d);
-            //         m_hasAppliedVisionPose = true;
-            //     }
+                if(!m_hasAppliedVisionPose) {
+                    resetPose(finalPose.get());
+                    m_hasAppliedVisionPose = true;
+                }
                 // Updated previous poses to current pose before next call
-                previousLeftPose2d = leftPose;
-                previousRightPose2d = rightPose;
+                if (leftPose != null) previousLeftPose2d = leftPose;
+                if (rightPose != null) previousRightPose2d = rightPose;
             }
         }
 
