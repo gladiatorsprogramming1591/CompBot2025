@@ -436,7 +436,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 Pose2d leftToRightDiff = leftPose.relativeTo(rightPose);
                 if (leftToRightDiff.getTranslation().getNorm() < 0.3 //TODO: Temporary value
                     && (Math.abs(leftToRightDiff.getRotation().getDegrees()) < 15)) {
-                    correctionPose = leftPose.interpolate(rightPose, 0.5);
+                    correctionPose = leftPose.interpolate(rightPose, 0.5); // TODO: Idea: bias interpolation towards pose with least standard deviation
                     xyStd = MathUtil.interpolate(leftxyStd, rightxyStd, 0.5);
                     rotStd = MathUtil.interpolate(leftrotStd, rightrotStd, 0.5);
                     timestamp = MathUtil.interpolate(leftPoseTimestamp, rightPoseTimestamp, 0.5);
@@ -495,7 +495,13 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 Pose2d visionMeasurement = allowYawCorrection
                     ? correctionPose
                     : new Pose2d(correctionPose.getTranslation(), getState().Pose.getRotation());
-                addVisionMeasurement(visionMeasurement, Utils.fpgaToCurrentTime(timestamp), VecBuilder.fill(xyStd, xyStd, rotStd));
+                // Only use standard deviations if less than MAX_STD.
+                if ((xyStd + rotStd) >= VisionConstants.MAX_STD * 2)
+                {
+                    addVisionMeasurement(visionMeasurement, Utils.fpgaToCurrentTime(timestamp));
+                } else {
+                    addVisionMeasurement(visionMeasurement, Utils.fpgaToCurrentTime(timestamp), VecBuilder.fill(xyStd, xyStd, rotStd));
+                }
 
                 return Optional.of(visionMeasurement);
             }
@@ -539,7 +545,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                         }
                         else if (cameraIdx == VisionConstants.RIGHT_CAMERA_IDX) {
                             rightPoseTimestamp = (result.getTimestampSeconds());
-                            // TODO: This may need to be averaged once a best pose is averaged/chosen
                         }
                     }    
                 }
