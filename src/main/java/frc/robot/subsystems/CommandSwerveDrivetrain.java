@@ -495,7 +495,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 Pose2d visionMeasurement = allowYawCorrection
                     ? correctionPose
                     : new Pose2d(correctionPose.getTranslation(), getState().Pose.getRotation());
-                addVisionMeasurement(correctionPose, Utils.fpgaToCurrentTime(timestamp), VecBuilder.fill(xyStd, xyStd, rotStd));
+                addVisionMeasurement(visionMeasurement, Utils.fpgaToCurrentTime(timestamp), VecBuilder.fill(xyStd, xyStd, rotStd));
 
                 return Optional.of(visionMeasurement);
             }
