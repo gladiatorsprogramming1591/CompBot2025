@@ -6,6 +6,8 @@ package frc.robot;
 
 import java.util.List;
 
+import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.path.GoalEndState;
@@ -79,7 +81,11 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void disabledExit() {}
+  public void disabledExit() {
+    m_robotContainer.drivetrain.m_photonPoseEstimators[0].setPrimaryStrategy(PoseStrategy.PNP_DISTANCE_TRIG_SOLVE);
+    m_robotContainer.drivetrain.m_photonPoseEstimators[1].setPrimaryStrategy(PoseStrategy.PNP_DISTANCE_TRIG_SOLVE);
+
+  }
 
   @Override
   public void autonomousInit() {

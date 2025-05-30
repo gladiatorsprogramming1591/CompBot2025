@@ -159,7 +159,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private static final int RIGHT_CAMERA_IDX = 1; 
     PhotonCamera[] cameras;
     // PhotonCamera m_rightCamera;
-    PhotonPoseEstimator[] m_photonPoseEstimators;
+    public PhotonPoseEstimator[] m_photonPoseEstimators;
     AprilTagFieldLayout fieldLayout;
         private PhotonTrackedTarget lastTarget;
         private int longDistangePoseEstimationCount = 0;
@@ -312,11 +312,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 m_photonPoseEstimators = new PhotonPoseEstimator[] {
                     new PhotonPoseEstimator(
                         fieldLayout,
-                        PoseStrategy.PNP_DISTANCE_TRIG_SOLVE,
+                        PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
                         kleftCameraLocation),
                     new PhotonPoseEstimator(
                         fieldLayout,
-                        PoseStrategy.PNP_DISTANCE_TRIG_SOLVE,
+                        PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
                         krightCameraLocation)
                 };
             } else {
@@ -502,6 +502,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                         SmartDashboard.putNumber("Robot ts", Utils.getCurrentTimeSeconds());
                         SmartDashboard.putNumber("Vision xyStd", xyStd);
                         SmartDashboard.putNumber("Vision rotStd", rotStd);
+                        SmartDashboard.putNumber("getHeading", getHeading());
                         addVisionMeasurement(pose2d, Utils.fpgaToCurrentTime(pose.get().timestampSeconds), VecBuilder.fill(xyStd, xyStd, rotStd));
                         if(!m_hasAppliedVisionPose) {
                             resetPose(pose2d);
@@ -604,7 +605,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
      * Return robot heading in degrees
      */
     public double getHeading() {
-        return getState().RawHeading.getDegrees();
+        // return getState().RawHeading.getRadians();
+        return getState().Pose.getRotation().getRadians();
     }
 
     public double getPitch() {
