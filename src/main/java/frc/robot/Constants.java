@@ -37,7 +37,7 @@ public class Constants {
         public static final int ELEVATOR_FOLLOWER_RIGHT_CAN_ID = 1; // Right (reads bottom limit switch)
         public static final double ABS_ENC_OFFSET = 0;
 
-        public static final boolean LEADER_INVERTED = true;
+        public static final boolean LEADER_INVERTED = false;
         public static final boolean FOLLOWER_INVERTED_FROM_LEADER = true;
         // public static final double RAMP_RATE = 0.001; // Not used.
         public static final int CURRENT_LIMIT = 75;
