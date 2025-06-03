@@ -53,6 +53,7 @@ import frc.robot.Constants.robotInitConstants;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
 import frc.robot.utilities.DynamicRateLimiter;
 import frc.robot.utilities.FieldConstants;
+import frc.robot.utilities.FieldConstants.ReefSide;
 import frc.robot.utilities.RobotPoseLookup;
 
 import org.ejml.ops.MatrixIO;
@@ -725,7 +726,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         Pose2d nearestFace = FieldConstants.getNearestReefFace(currentPose);
         double distanceToReef = currentPose.getTranslation().getDistance(nearestFace.getTranslation());
         SmartDashboard.putNumber("Distance to Reef", distanceToReef);
-
+        SmartDashboard.putNumber("Distance to Left", -1*Units.metersToInches(currentPose.relativeTo(FieldConstants.getNearestReefBranch(currentPose, ReefSide.LEFT)).getTranslation().getY()));
+        SmartDashboard.putNumber("Distance to Right", -1*Units.metersToInches(currentPose.relativeTo(FieldConstants.getNearestReefBranch(currentPose, ReefSide.RIGHT)).getTranslation().getY()));
+        SmartDashboard.putNumber("Current Fudge Factor Left", FieldConstants.getBranchFudgeFactor(1, ReefSide.LEFT));
     }
 
     /*

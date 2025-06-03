@@ -9,6 +9,8 @@ package frc.robot.utilities;
 
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import java.util.ArrayList;
@@ -29,33 +31,33 @@ public class FieldConstants {
         Units.inchesToMeters(299.438); // Measured from the inside of starting line
 
     //Left Red Branches
-    public static final PropertyManager.DoubleProperty LEFT_RED_BRANCH_A = new PropertyManager.DoubleProperty("Left Red Branch A", 0);
-    public static final PropertyManager.DoubleProperty LEFT_RED_BRANCH_C = new PropertyManager.DoubleProperty("Left Red Branch C", 0);
-    public static final PropertyManager.DoubleProperty LEFT_RED_BRANCH_E = new PropertyManager.DoubleProperty("Left Red Branch E", 0);
-    public static final PropertyManager.DoubleProperty LEFT_RED_BRANCH_G = new PropertyManager.DoubleProperty("Left Red Branch G", 0.02);
-    public static final PropertyManager.DoubleProperty LEFT_RED_BRANCH_I = new PropertyManager.DoubleProperty("Left Red Branch I", 0);
-    public static final PropertyManager.DoubleProperty LEFT_RED_BRANCH_K = new PropertyManager.DoubleProperty("Left Red Branch K", 0);
+    public static final double LEFT_RED_BRANCH_A = 0;
+    public static final double LEFT_RED_BRANCH_C = 12;
+    public static final double LEFT_RED_BRANCH_E = 0;
+    public static final double LEFT_RED_BRANCH_G = 0;
+    public static final double LEFT_RED_BRANCH_I = 0;
+    public static final double LEFT_RED_BRANCH_K = 0;
     //Left Blue Branches
-    public static final PropertyManager.DoubleProperty LEFT_BLUE_BRANCH_A = new PropertyManager.DoubleProperty("Left Blue Branch A", 0);
-    public static final PropertyManager.DoubleProperty LEFT_BLUE_BRANCH_C = new PropertyManager.DoubleProperty("Left Blue Branch C", 0);
-    public static final PropertyManager.DoubleProperty LEFT_BLUE_BRANCH_E = new PropertyManager.DoubleProperty("Left Blue Branch E", 0);
-    public static final PropertyManager.DoubleProperty LEFT_BLUE_BRANCH_G = new PropertyManager.DoubleProperty("Left Blue Branch G", 0);
-    public static final PropertyManager.DoubleProperty LEFT_BLUE_BRANCH_I = new PropertyManager.DoubleProperty("Left Blue Branch I", 0);
-    public static final PropertyManager.DoubleProperty LEFT_BLUE_BRANCH_K = new PropertyManager.DoubleProperty("Left Blue Branch K", 0);
+    public static final double LEFT_BLUE_BRANCH_A = 0;
+    public static final double LEFT_BLUE_BRANCH_C = 0;
+    public static final double LEFT_BLUE_BRANCH_E = 0;
+    public static final double LEFT_BLUE_BRANCH_G = 0;
+    public static final double LEFT_BLUE_BRANCH_I = 0;
+    public static final double LEFT_BLUE_BRANCH_K = 0;
     //Right Red Branches
-    public static final PropertyManager.DoubleProperty RIGHT_RED_BRANCH_B = new PropertyManager.DoubleProperty("Right Red Branch B", 0.1);
-    public static final PropertyManager.DoubleProperty RIGHT_RED_BRANCH_D = new PropertyManager.DoubleProperty("Right Red Branch D", 0);
-    public static final PropertyManager.DoubleProperty RIGHT_RED_BRANCH_F = new PropertyManager.DoubleProperty("Right Red Branch F", 0.027);
-    public static final PropertyManager.DoubleProperty RIGHT_RED_BRANCH_H = new PropertyManager.DoubleProperty("Right Red Branch H", 0);
-    public static final PropertyManager.DoubleProperty RIGHT_RED_BRANCH_J = new PropertyManager.DoubleProperty("Right Red Branch J", 0);
-    public static final PropertyManager.DoubleProperty RIGHT_RED_BRANCH_L = new PropertyManager.DoubleProperty("Right Red Branch L", 0);
+    public static final double RIGHT_RED_BRANCH_B = 0;
+    public static final double RIGHT_RED_BRANCH_D = 0;
+    public static final double RIGHT_RED_BRANCH_F = 0;
+    public static final double RIGHT_RED_BRANCH_H = 0;
+    public static final double RIGHT_RED_BRANCH_J = 0;
+    public static final double RIGHT_RED_BRANCH_L = 0;
     //Right Blue Branches
-    public static final PropertyManager.DoubleProperty RIGHT_BLUE_BRANCH_B = new PropertyManager.DoubleProperty("Right Blue Branch B", 0);
-    public static final PropertyManager.DoubleProperty RIGHT_BLUE_BRANCH_D = new PropertyManager.DoubleProperty("Right Blue Branch D", 0);
-    public static final PropertyManager.DoubleProperty RIGHT_BLUE_BRANCH_F = new PropertyManager.DoubleProperty("Right Blue Branch F", 0);
-    public static final PropertyManager.DoubleProperty RIGHT_BLUE_BRANCH_H = new PropertyManager.DoubleProperty("Right Blue Branch H", 0);
-    public static final PropertyManager.DoubleProperty RIGHT_BLUE_BRANCH_J = new PropertyManager.DoubleProperty("Right Blue Branch J", 0);
-    public static final PropertyManager.DoubleProperty RIGHT_BLUE_BRANCH_L = new PropertyManager.DoubleProperty("Right Blue Branch L", 0);
+    public static final double RIGHT_BLUE_BRANCH_B = 0;
+    public static final double RIGHT_BLUE_BRANCH_D = 0;
+    public static final double RIGHT_BLUE_BRANCH_F = 0;
+    public static final double RIGHT_BLUE_BRANCH_H = 0;
+    public static final double RIGHT_BLUE_BRANCH_J = 0;
+    public static final double RIGHT_BLUE_BRANCH_L = 0;
     
 
     public static class Processor {
@@ -95,19 +97,19 @@ public class FieldConstants {
             case LEFT -> {
                 switch (face) {
                     /* Red */
-                    case 0 -> {ff = LEFT_RED_BRANCH_A.getValue();} // A
-                    case 1 -> {ff = LEFT_RED_BRANCH_C.getValue();} // C
-                    case 2 -> {ff = LEFT_RED_BRANCH_E.getValue();} // E
-                    case 3 -> {ff = LEFT_RED_BRANCH_G.getValue();} // G
-                    case 4 -> {ff = LEFT_RED_BRANCH_I.getValue();} // I
-                    case 5 -> {ff = LEFT_RED_BRANCH_K.getValue();} // K
+                    case 0 -> {ff = LEFT_RED_BRANCH_A;} // A
+                    case 1 -> {ff = LEFT_RED_BRANCH_C;} // C
+                    case 2 -> {ff = LEFT_RED_BRANCH_E;} // E
+                    case 3 -> {ff = LEFT_RED_BRANCH_G;} // G
+                    case 4 -> {ff = LEFT_RED_BRANCH_I;} // I
+                    case 5 -> {ff = LEFT_RED_BRANCH_K;} // K
                     /* Blue */
-                    case 6 -> {ff = LEFT_BLUE_BRANCH_A.getValue();} // A
-                    case 7 -> {ff = LEFT_BLUE_BRANCH_C.getValue();} // C
-                    case 8 -> {ff = LEFT_BLUE_BRANCH_E.getValue();} // E
-                    case 9 -> {ff = LEFT_BLUE_BRANCH_G.getValue();} // G
-                    case 10 -> {ff = LEFT_BLUE_BRANCH_I.getValue();} // I
-                    case 11 -> {ff = LEFT_BLUE_BRANCH_K.getValue();} // K
+                    case 6 -> {ff = LEFT_BLUE_BRANCH_A;} // A
+                    case 7 -> {ff = LEFT_BLUE_BRANCH_C;} // C
+                    case 8 -> {ff = LEFT_BLUE_BRANCH_E;} // E
+                    case 9 -> {ff = LEFT_BLUE_BRANCH_G;} // G
+                    case 10 -> {ff = LEFT_BLUE_BRANCH_I;} // I
+                    case 11 -> {ff = LEFT_BLUE_BRANCH_K;} // K
                     default -> {ff = 0;}
                 }
                 return -ff;
@@ -115,19 +117,19 @@ public class FieldConstants {
             case RIGHT -> {
                 switch (face) {
                     /* Red */
-                    case 0 -> {ff = RIGHT_RED_BRANCH_B.getValue();} // B
-                    case 1 -> {ff = RIGHT_RED_BRANCH_D.getValue();} // D
-                    case 2 -> {ff = RIGHT_RED_BRANCH_F.getValue();} // F
-                    case 3 -> {ff = RIGHT_RED_BRANCH_H.getValue();} // H
-                    case 4 -> {ff = RIGHT_RED_BRANCH_J.getValue();} // J
-                    case 5 -> {ff = RIGHT_RED_BRANCH_L.getValue();} // L
+                    case 0 -> {ff = RIGHT_RED_BRANCH_B;} // B
+                    case 1 -> {ff = RIGHT_RED_BRANCH_D;} // D
+                    case 2 -> {ff = RIGHT_RED_BRANCH_F;} // F
+                    case 3 -> {ff = RIGHT_RED_BRANCH_H;} // H
+                    case 4 -> {ff = RIGHT_RED_BRANCH_J;} // J
+                    case 5 -> {ff = RIGHT_RED_BRANCH_L;} // L
                     /* Blue */
-                    case 6 -> {ff = RIGHT_BLUE_BRANCH_B.getValue();} // B
-                    case 7 -> {ff = RIGHT_BLUE_BRANCH_D.getValue();} // D
-                    case 8 -> {ff = RIGHT_BLUE_BRANCH_F.getValue();} // F
-                    case 9 -> {ff = RIGHT_BLUE_BRANCH_H.getValue();} // H
-                    case 10 -> {ff = RIGHT_BLUE_BRANCH_J.getValue();} // J
-                    case 11 -> {ff = RIGHT_BLUE_BRANCH_L.getValue();} // L
+                    case 6 -> {ff = RIGHT_BLUE_BRANCH_B;} // B
+                    case 7 -> {ff = RIGHT_BLUE_BRANCH_D;} // D
+                    case 8 -> {ff = RIGHT_BLUE_BRANCH_F;} // F
+                    case 9 -> {ff = RIGHT_BLUE_BRANCH_H;} // H
+                    case 10 -> {ff = RIGHT_BLUE_BRANCH_J;} // J
+                    case 11 -> {ff = RIGHT_BLUE_BRANCH_L;} // L
                     default -> {ff = 0;}
                 }
                 return ff;
@@ -197,6 +199,7 @@ public class FieldConstants {
             for (int face = 0; face < centerFaces.length; face++) {
                 Map<ReefHeight, Pose3d> fillRight = new HashMap<>();
                 Map<ReefHeight, Pose3d> fillLeft = new HashMap<>();
+                System.out.println(getBranchFudgeFactor(face, ReefSide.LEFT));
                 for (var level : ReefHeight.values()) {
                     Pose2d poseDirection = new Pose2d();
                     if (face < 6) {
