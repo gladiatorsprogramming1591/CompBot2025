@@ -25,7 +25,7 @@ public class AutoReefPoseCommand extends Command {
     // private RobotState state;
 
     private PIDController distanceController = new PIDController(2,0, 0.0);
-    private PIDController strafeController = new PIDController(10, 0, 0.0);
+    private PIDController strafeController = new PIDController(7, 0, 0.0);
     private PIDController angleController = new PIDController(0.5, 0, 0.02);
 
     private DoubleSupplier controllerX;

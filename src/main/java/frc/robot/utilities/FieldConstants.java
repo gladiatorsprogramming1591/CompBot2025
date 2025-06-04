@@ -31,12 +31,12 @@ public class FieldConstants {
         Units.inchesToMeters(299.438); // Measured from the inside of starting line
 
     //Left Red Branches
-    public static final double LEFT_RED_BRANCH_A = 0;
-    public static final double LEFT_RED_BRANCH_C = 12;
-    public static final double LEFT_RED_BRANCH_E = 0;
-    public static final double LEFT_RED_BRANCH_G = 0;
-    public static final double LEFT_RED_BRANCH_I = 0;
-    public static final double LEFT_RED_BRANCH_K = 0;
+    public static final double LEFT_RED_BRANCH_A = 1.5;
+    public static final double LEFT_RED_BRANCH_C = 3.3;
+    public static final double LEFT_RED_BRANCH_E = 3;
+    public static final double LEFT_RED_BRANCH_G = 1.5;
+    public static final double LEFT_RED_BRANCH_I = 2;
+    public static final double LEFT_RED_BRANCH_K = 2;
     //Left Blue Branches
     public static final double LEFT_BLUE_BRANCH_A = 0;
     public static final double LEFT_BLUE_BRANCH_C = 0;
@@ -46,13 +46,13 @@ public class FieldConstants {
     public static final double LEFT_BLUE_BRANCH_K = 0;
     //Right Red Branches
     public static final double RIGHT_RED_BRANCH_B = 0;
-    public static final double RIGHT_RED_BRANCH_D = 0;
+    public static final double RIGHT_RED_BRANCH_D = -2.35;
     public static final double RIGHT_RED_BRANCH_F = 0;
     public static final double RIGHT_RED_BRANCH_H = 0;
-    public static final double RIGHT_RED_BRANCH_J = 0;
-    public static final double RIGHT_RED_BRANCH_L = 0;
+    public static final double RIGHT_RED_BRANCH_J = -1.5;
+    public static final double RIGHT_RED_BRANCH_L = -1;
     //Right Blue Branches
-    public static final double RIGHT_BLUE_BRANCH_B = 0;
+    public static final double RIGHT_BLUE_BRANCH_B = 1.5;
     public static final double RIGHT_BLUE_BRANCH_D = 0;
     public static final double RIGHT_BLUE_BRANCH_F = 0;
     public static final double RIGHT_BLUE_BRANCH_H = 0;
@@ -97,19 +97,19 @@ public class FieldConstants {
             case LEFT -> {
                 switch (face) {
                     /* Red */
-                    case 0 -> {ff = LEFT_RED_BRANCH_A;} // A
-                    case 1 -> {ff = LEFT_RED_BRANCH_C;} // C
-                    case 2 -> {ff = LEFT_RED_BRANCH_E;} // E
-                    case 3 -> {ff = LEFT_RED_BRANCH_G;} // G
-                    case 4 -> {ff = LEFT_RED_BRANCH_I;} // I
-                    case 5 -> {ff = LEFT_RED_BRANCH_K;} // K
+                    case 0 -> {ff = LEFT_BLUE_BRANCH_A;} // A
+                    case 1 -> {ff = LEFT_BLUE_BRANCH_C;} // C
+                    case 2 -> {ff = LEFT_BLUE_BRANCH_E;} // E
+                    case 3 -> {ff = LEFT_BLUE_BRANCH_G;} // G
+                    case 4 -> {ff = LEFT_BLUE_BRANCH_I;} // I
+                    case 5 -> {ff = LEFT_BLUE_BRANCH_K;} // K
                     /* Blue */
-                    case 6 -> {ff = LEFT_BLUE_BRANCH_A;} // A
-                    case 7 -> {ff = LEFT_BLUE_BRANCH_C;} // C
-                    case 8 -> {ff = LEFT_BLUE_BRANCH_E;} // E
-                    case 9 -> {ff = LEFT_BLUE_BRANCH_G;} // G
-                    case 10 -> {ff = LEFT_BLUE_BRANCH_I;} // I
-                    case 11 -> {ff = LEFT_BLUE_BRANCH_K;} // K
+                    case 6 -> {ff = LEFT_RED_BRANCH_A;} // A
+                    case 11 -> {ff = LEFT_RED_BRANCH_C;} // C
+                    case 10 -> {ff = LEFT_RED_BRANCH_E;} // E
+                    case 9 -> {ff = LEFT_RED_BRANCH_G;} // G
+                    case 8 -> {ff = LEFT_RED_BRANCH_I;} // I
+                    case 7 -> {ff = LEFT_RED_BRANCH_K;} // K
                     default -> {ff = 0;}
                 }
                 return -ff;
@@ -117,19 +117,19 @@ public class FieldConstants {
             case RIGHT -> {
                 switch (face) {
                     /* Red */
-                    case 0 -> {ff = RIGHT_RED_BRANCH_B;} // B
-                    case 1 -> {ff = RIGHT_RED_BRANCH_D;} // D
-                    case 2 -> {ff = RIGHT_RED_BRANCH_F;} // F
-                    case 3 -> {ff = RIGHT_RED_BRANCH_H;} // H
-                    case 4 -> {ff = RIGHT_RED_BRANCH_J;} // J
-                    case 5 -> {ff = RIGHT_RED_BRANCH_L;} // L
+                    case 0 -> {ff = RIGHT_BLUE_BRANCH_B;} // B
+                    case 1 -> {ff = RIGHT_BLUE_BRANCH_D;} // D
+                    case 2 -> {ff = RIGHT_BLUE_BRANCH_F;} // F
+                    case 3 -> {ff = RIGHT_BLUE_BRANCH_H;} // H
+                    case 4 -> {ff = RIGHT_BLUE_BRANCH_J;} // J
+                    case 5 -> {ff = RIGHT_BLUE_BRANCH_L;} // L
                     /* Blue */
-                    case 6 -> {ff = RIGHT_BLUE_BRANCH_B;} // B
-                    case 7 -> {ff = RIGHT_BLUE_BRANCH_D;} // D
-                    case 8 -> {ff = RIGHT_BLUE_BRANCH_F;} // F
-                    case 9 -> {ff = RIGHT_BLUE_BRANCH_H;} // H
-                    case 10 -> {ff = RIGHT_BLUE_BRANCH_J;} // J
-                    case 11 -> {ff = RIGHT_BLUE_BRANCH_L;} // L
+                    case 6 -> {ff = RIGHT_RED_BRANCH_B;} // B
+                    case 11 -> {ff = RIGHT_RED_BRANCH_D;} // D
+                    case 10 -> {ff = RIGHT_RED_BRANCH_F;} // F
+                    case 9 -> {ff = RIGHT_RED_BRANCH_H;} // H
+                    case 8 -> {ff = RIGHT_RED_BRANCH_J;} // J
+                    case 7 -> {ff = RIGHT_RED_BRANCH_L;} // L
                     default -> {ff = 0;}
                 }
                 return ff;
