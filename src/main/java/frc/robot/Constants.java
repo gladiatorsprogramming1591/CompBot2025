@@ -22,10 +22,10 @@ public class Constants {
         public static final double KINETIC_DEADBAND = 0.01; // 1% Deadband to perpendicular axis while robot is in
                                                             // motion
 
-        public static final double TIME_TO_STOP = 0.75;
-        public static final double INITIAL_LIMIT = 10.0;
-        public static final double LIMIT_SCALE_PER_INCH = 0.96;
-        public static final double LIMIT_SCALE_PER_INCH_AUTO_ALIGN = 0.96;
+        public static final double TIME_TO_STOP = 0.5;
+        public static final double INITIAL_LIMIT = 11.0;
+        public static final double LIMIT_SCALE_PER_INCH = 0.93;
+        public static final double LIMIT_SCALE_PER_INCH_AUTO_ALIGN = 0.93;
     }
 
     public static final class PathPlannerConstants {

@@ -72,8 +72,8 @@ public class RobotContainer {
             : ChazTunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 1 1/2 of a rotation per second
                                                                                       // max angular velocity
-    private double maxSpeedPercent = 1.0;
-    private double maxAngularRatePercent = 0.40;
+    private double maxSpeedPercent = 0.8;
+    private double maxAngularRatePercent = 0.20;
     public static double kineticDeadband = KINETIC_DEADBAND;
 
     /* Setting up bindings for necessary control of the swerve drive platform */
@@ -446,93 +446,6 @@ public class RobotContainer {
                 .andThen(new ElevatorToPosition(elevator, position))
                 .andThen(new WaitUntilCommand(elevator::atSetpointExternalEnc))
                 .andThen(wrist.StowPositionCommand());
-    }
-
-    public void AutoScoreAlign() {
-        // if(state.getDesiredElevatorLevel() == Level.L1)
-        // {
-        // return;
-        // }
-        SwerveRequest.FieldCentric teleopDrive = drive
-                .withVelocityX(xLimiter.calculate(
-                        -drivetrain.apply2dDynamicDeadband(driverController.getLeftY(), driverController.getLeftX(),
-                                STATIC_DEADBAND, KINETIC_DEADBAND, false) * MaxSpeed * maxSpeedPercent,
-                        INITIAL_LIMIT * Math.pow(LIMIT_SCALE_PER_INCH, elevator.getExternalPositionInches()), TIME_TO_STOP)) // Drive
-                                                                                                                     // forward
-                                                                                                                     // with
-                                                                                                                     // negative
-                                                                                                                     // Y
-                                                                                                                     // (forward)
-                .withVelocityY(yLimiter.calculate(
-                        -drivetrain.apply2dDynamicDeadband(driverController.getLeftX(), driverController.getLeftY(),
-                                STATIC_DEADBAND, KINETIC_DEADBAND, false) * MaxSpeed * maxSpeedPercent,
-                        INITIAL_LIMIT * Math.pow(LIMIT_SCALE_PER_INCH, elevator.getExternalPositionInches()), TIME_TO_STOP)) // Drive
-                                                                                                                     // left
-                                                                                                                     // with
-                                                                                                                     // negative
-                                                                                                                     // X
-                                                                                                                     // (left)
-                .withRotationalRate(
-                        -MathUtil.applyDeadband(driverController.getRightX(), ROTATION_DEADBAND, maxAngularRatePercent)
-                                * MaxAngularRate); // Drive counterclockwise with negative X (left)
-
-        boolean isTeleopActive = (Math.abs(teleopDrive.VelocityX) > STATIC_DEADBAND ||
-                Math.abs(teleopDrive.VelocityY) > STATIC_DEADBAND);
-        // Get the current robot pose.
-        Pose2d currentPose = drivetrain.getState().Pose;
-        double desiredHeading = 0;
-        double commandedX = 0;
-        double commandedY = 0;
-        double rotationCmd = 0;
-        Pose2d nearestFace = FieldConstants.getNearestReefFace(currentPose);
-        double distanceToReef = currentPose.getTranslation().getDistance(nearestFace.getTranslation());
-        SmartDashboard.putNumber("Distance to Reef", distanceToReef);
-        if (isTeleopActive) {
-            // While driving, use teleop translation.
-            commandedX = teleopDrive.VelocityX;
-            commandedY = teleopDrive.VelocityY;
-            // "Look at the reef": use the nearest reef face as reference.
-            // Option 1: Use the rotation defined for the reef face.
-            // Alternatively, you could compute the direction vector:
-            // desiredHeading =
-            // nearestFace.getTranslation().minus(currentPose.getTranslation()).getAngle().getDegrees();
-            double currentYaw = currentPose.getRotation().getDegrees();
-            if (distanceToReef < 2) {
-                desiredHeading = nearestFace.getRotation().plus(Rotation2d.k180deg).getDegrees();
-            } else {
-                desiredHeading = currentYaw;
-            }
-            rotationCmd = headingController.calculate(currentYaw, desiredHeading);
-            // Command teleop translation plus the rotation correction.
-            drivetrain.setControl(
-                    teleopDrive.withVelocityX(commandedX)
-                            .withVelocityY(commandedY)
-                            .withRotationalRate(rotationCmd * 0.5));
-        } else {
-            if (!aligning && distanceToReef < 1) {
-                new AlignToReefCommand(drivetrain,
-                        () -> drive
-                                .withVelocityX(xLimiter.calculate(
-                                        -drivetrain.apply2dDynamicDeadband(driverController.getLeftY(),
-                                                driverController.getLeftX(), STATIC_DEADBAND, KINETIC_DEADBAND, false)
-                                                * MaxSpeed * maxSpeedPercent,
-                                        INITIAL_LIMIT * Math.pow(LIMIT_SCALE_PER_INCH, elevator.getExternalPositionInches()),
-                                        TIME_TO_STOP)) // Drive forward with negative Y (forward)
-                                .withVelocityY(yLimiter.calculate(
-                                        -drivetrain.apply2dDynamicDeadband(driverController.getLeftX(),
-                                                driverController.getLeftY(), STATIC_DEADBAND, KINETIC_DEADBAND, false)
-                                                * MaxSpeed * maxSpeedPercent,
-                                        INITIAL_LIMIT * Math.pow(LIMIT_SCALE_PER_INCH, elevator.getExternalPositionInches()),
-                                        TIME_TO_STOP)) // Drive left with negative X (left)
-                                .withRotationalRate(-MathUtil.applyDeadband(driverController.getRightX(),
-                                        ROTATION_DEADBAND, maxAngularRatePercent) * MaxAngularRate), // Drive
-                                                                                                     // counterclockwise
-                                                                                                     // with negative X
-                                                                                                     // (left)
-                        reefAlign, true, 0).schedule();
-                aligning = true;
-            }
-        }
     }
 
     /**

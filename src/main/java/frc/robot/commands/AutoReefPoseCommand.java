@@ -105,6 +105,10 @@ public class AutoReefPoseCommand extends Command {
     
             /* Drive */
             double deadband = 0.00;
+            double maxRoationalRatePercent = 0.35;
+            double maxVelocityXPercent = 0.75; // This is the max velocity % in the X direction, which is left/right
+            double maxVelocityYPercent = 1.00; // This is the max velocity % in the Y direction, which is forward/backward (not limited, as it's limited by the slew-rate limiter)
+            // Get the controller values and apply deadband
             double velocityX = controllerX.getAsDouble() + MathUtil.applyDeadband(strafeVal, deadband);
             double velocityY = controllerY.getAsDouble() - MathUtil.applyDeadband(distanceVal, deadband);
             double rotationalRate = controllerT.getAsDouble() - MathUtil.applyDeadband(rotationVal, deadband);
@@ -113,10 +117,10 @@ public class AutoReefPoseCommand extends Command {
             double velocityYSign = velocityY / Math.abs(velocityY);
             double rotationalRateSign = rotationalRate / Math.abs(rotationalRate);
 
-            double velocityXLimited = Math.min(Math.abs(velocityX), 0.75) * velocityXSign;
+            double velocityXLimited = Math.min(Math.abs(velocityX), maxVelocityXPercent) * velocityXSign;
             // Limited to 0.22 max output at elevator height of 26.4 (L4)
-            double velocityYLimited = Math.min(Math.abs(velocityY), Math.min(Math.pow(DriveConstants.LIMIT_SCALE_PER_INCH_AUTO_ALIGN, elevatorHeight.getAsDouble()), 1.0)) * velocityYSign;
-            double rotationalRateLimited = Math.min(Math.abs(rotationalRate), 0.35) * rotationalRateSign;
+            double velocityYLimited = Math.min(Math.abs(velocityY), Math.min(Math.pow(DriveConstants.LIMIT_SCALE_PER_INCH_AUTO_ALIGN, elevatorHeight.getAsDouble()), maxVelocityYPercent)) * velocityYSign;
+            double rotationalRateLimited = Math.min(Math.abs(rotationalRate), maxRoationalRatePercent) * rotationalRateSign;
 
 
         drivetrain.setControl(
