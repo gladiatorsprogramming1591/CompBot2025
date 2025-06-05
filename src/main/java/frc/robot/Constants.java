@@ -33,7 +33,7 @@ public class Constants {
         public static final int ELEVATOR_FOLLOWER_RIGHT_CAN_ID = 1; // Right (reads bottom limit switch)
         public static final double ABS_ENC_OFFSET = 0;
 
-        public static final boolean LEADER_INVERTED = true;
+        public static final boolean LEADER_INVERTED = false;
         public static final boolean FOLLOWER_INVERTED_FROM_LEADER = true;
         // public static final double RAMP_RATE = 0.001; // Not used.
         public static final int CURRENT_LIMIT = 75;
@@ -56,8 +56,9 @@ public class Constants {
         public static final double TOLERANCE_INCHES = 1.0;
 
         // Constants for going up
-        public static final double P_UP = 0.22;
+        public static final double P_UP = 0.4; //0.22, 0.25, 0.3
         public static final double I_UP = 0;
+
         public static final double D_UP = 0;
         public static final double FF_UP = .623;
 
@@ -80,7 +81,7 @@ public class Constants {
         public static final double kL1 = 2.75;
         public static final double kL2 = 7.04;
         public static final double kL3 = 15.3;
-        public static final double kL4 = 26.4;
+        public static final double kL4 = 27; //26.5
         public static final double kPROCESSOR = 0.5;
         public static final double kNET = 27.75;
         public static final double ALGAE_HIGH = 10.53;
@@ -172,7 +173,7 @@ public class Constants {
         public static final double WRIST_L1 = WRIST_INTAKE + 16.0;
         public static final double WRIST_L2 = WRIST_INTAKE + 39.0;
         public static final double WRIST_L3 = WRIST_L2;
-        public static final double WRIST_L4 = WRIST_INTAKE + 46.0; 
+        public static final double WRIST_L4 = WRIST_INTAKE + 40.0;  //46
         // public static final double WRIST_DEFAULT = WRIST_L3;
         public static final double WRIST_ALGAE_LOW = WRIST_INTAKE + 34.0;
         public static final double WRIST_ALGAE_HIGH = WRIST_INTAKE + 33.0;
