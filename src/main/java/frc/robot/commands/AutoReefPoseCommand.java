@@ -22,7 +22,6 @@ public class AutoReefPoseCommand extends Command {
     private CommandSwerveDrivetrain drivetrain; 
     private SwerveRequest.RobotCentric reefAlign;   
     private Supplier<ReefSide> position;
-    // private RobotState state;
 
     private PIDController distanceController = new PIDController(2,0, 0.0);
     private PIDController strafeController = new PIDController(7, 0, 0.0);
@@ -40,12 +39,9 @@ public class AutoReefPoseCommand extends Command {
                                         DoubleSupplier controllerT,
                                         Supplier<ReefSide> position,
                                         DoubleSupplier elevatorHeight) {
-                                            // Supplier<ReefSide> position,
-                                        // RobotState state) {
             this.drivetrain = drivetrain;
             this.reefAlign = reefAlign;
             this.position = position;
-            // this.state = state;
             distanceController.setTolerance(0.0);
             strafeController.setTolerance(0.0);
             angleController.setTolerance(0.0);
@@ -56,91 +52,50 @@ public class AutoReefPoseCommand extends Command {
             this.controllerT = controllerT;
             this.elevatorHeight = elevatorHeight;
         }
-    
-        public void initialize() {
-            // if(position.get() == ReefSide.RIGHT) {
-            //     CommandSwerveDrivetrain.onlyUseRightCamera();
-            // } else{
-            //     CommandSwerveDrivetrain.onlyUseLeftCamera();
-            // }
-        }
-    
-        @Override
-        public void execute() {
-            double distanceVal = 0;
-            double strafeVal = 0;
-            double rotationVal = 0;
-            Pose2d currentPose = drivetrain.getState().Pose;
-            if(position == null)
-            {
-                position = () -> FieldConstants.getNearestReefSide(drivetrain.getState().Pose);
-            }
-            
-            // boolean isCoral = state.getCurrentMode() == GamePiece.CORAL;
-            Pose2d reefPose = FieldConstants.getNearestReefBranch(currentPose, position.get());
-            // Need to uncomment below when we add RobotState or want to test ALGAE
-            // Pose2d reefPose = FieldConstants.getNearestReefBranch(currentPose, state.getReefPos(position.get()));
-            reefPose = reefPose.rotateAround(reefPose.getTranslation(), Rotation2d.k180deg);
-            Pose2d goal = FieldConstants.toRobotRelative(currentPose, reefPose);
-            
-            distanceController.setSetpoint(0.095); 
-            strafeController.setSetpoint(position.get() == ReefSide.RIGHT ? 0: 0);
-            angleController.setSetpoint(position.get() == ReefSide.RIGHT ? -0.5 : -0.5);   
-            
-            double goalX = goal.getX();
-            double goalY = goal.getY();
-            double goalRotation = goal.getRotation().getDegrees();
-    
-            strafeVal = distanceController.calculate(goalX); 
-            distanceVal = strafeController.calculate(goalY);
-            rotationVal = angleController.calculate(goalRotation);
-            strafeVal = 1/(Math.exp(Math.abs(distanceVal)*2));  
-    
-            if (strafeController.atSetpoint())
-                strafeVal = 0;
-            if (distanceController.atSetpoint())
-                distanceVal = 0;
-            if (angleController.atSetpoint())
-                rotationVal = 0;
-    
-            /* Drive */
-            double deadband = 0.00;
-            double maxRoationalRatePercent = 0.35;
-            double maxVelocityXPercent = 0.75; // This is the max velocity % in the X direction, which is left/right
-            double maxVelocityYPercent = 1.00; // This is the max velocity % in the Y direction, which is forward/backward (not limited, as it's limited by the slew-rate limiter)
-            // Get the controller values and apply deadband
-            double velocityX = controllerX.getAsDouble() + MathUtil.applyDeadband(strafeVal, deadband);
-            double velocityY = controllerY.getAsDouble() - MathUtil.applyDeadband(distanceVal, deadband);
-            double rotationalRate = controllerT.getAsDouble() - MathUtil.applyDeadband(rotationVal, deadband);
 
-            double velocityXSign = velocityX / Math.abs(velocityX);
-            double velocityYSign = velocityY / Math.abs(velocityY);
-            double rotationalRateSign = rotationalRate / Math.abs(rotationalRate);
+    public void initialize() {
+    }
 
-            double velocityXLimited = Math.min(Math.abs(velocityX), maxVelocityXPercent) * velocityXSign;
-            // Limited to 0.22 max output at elevator height of 26.4 (L4)
-            double velocityYLimited = Math.min(Math.abs(velocityY), Math.min(Math.pow(DriveConstants.LIMIT_SCALE_PER_INCH_AUTO_ALIGN, elevatorHeight.getAsDouble()), maxVelocityYPercent)) * velocityYSign;
-            double rotationalRateLimited = Math.min(Math.abs(rotationalRate), maxRoationalRatePercent) * rotationalRateSign;
+    @Override
+    public void execute() {
+        double distanceVal = 0;
+        double strafeVal = 0;
+        double rotationVal = 0;
+        Pose2d currentPose = drivetrain.getState().Pose;
 
+         Pose2d reefPose = FieldConstants.getNearestReefBranch(currentPose, position.get());
+        reefPose = reefPose.rotateAround(reefPose.getTranslation(), Rotation2d.k180deg);
 
+        Pose2d goal = FieldConstants.toRobotRelative(currentPose, reefPose);
+
+        distanceController.setSetpoint(0.095);
+        strafeController.setSetpoint(0);
+        angleController.setSetpoint(0);
+
+        distanceVal = distanceController.calculate(goal.getX());
+        strafeVal = strafeController.calculate(goal.getY());
+        rotationVal = angleController.calculate(goal.getRotation().getDegrees());
+        distanceVal = 1.5 / (Math.exp(Math.abs(strafeVal) * 3));
+        SmartDashboard.putNumber("Strafe", strafeVal);
+        SmartDashboard.putNumber("Distance", distanceVal);
+
+        if (strafeController.atSetpoint())
+            strafeVal = 0;
+        if (distanceController.atSetpoint())
+            distanceVal = 0;
+        if (angleController.atSetpoint())
+            rotationVal = 0;
+
+        /* Drive */
         drivetrain.setControl(
-            reefAlign.withVelocityX(velocityXLimited) // Drive forward with negative Y (forward) strafeController
-                .withVelocityY(velocityYLimited) // Drive left with negative X (left)
-                .withRotationalRate(rotationalRateLimited) // Drive counterclockwise with negative X (left)
+                reefAlign.withVelocityX((controllerX.getAsDouble() + distanceVal) * 0.75) // Drive forward with negative Y (forward) strafeController
+                        .withVelocityY((controllerY.getAsDouble() - strafeVal) * 1.15) // Drive left with negative X (left)
+                        .withRotationalRate((controllerT.getAsDouble() - rotationVal) * 0.35) // Drive counterclockwise with negative X (left)
         );
 
-        SmartDashboard.putNumber("goalX", goalX);
-        SmartDashboard.putNumber("goalY", goalY);
-        SmartDashboard.putNumber("goalRotation", goalRotation);
-        SmartDashboard.putNumber("strafeVal", strafeVal);
-        SmartDashboard.putNumber("distanceVal", distanceVal);
-        SmartDashboard.putNumber("rotationVal", rotationVal);
-        SmartDashboard.putNumber("Auto align velocity X", velocityX);
-        SmartDashboard.putNumber("Auto align velocity Y", velocityY);
-        SmartDashboard.putNumber("Auto align rot rate", rotationalRate);
-        
     }
-      // Make this return true when this Command no longer needs to run execute()
+
+    // Make this return true when this Command no longer needs to run execute()
     public boolean isFinished() {
         // If all 3 PIDs are at their target, we're done
         return distanceController.atSetpoint()
@@ -150,7 +105,6 @@ public class AutoReefPoseCommand extends Command {
 
     // Called once after isFinished returns true
     protected void end() {
-        // CommandSwerveDrivetrain.useBothCameras();
         // RobotContainer.candleSubsystem.setAnimate("Rainbow");
     }
 

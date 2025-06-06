@@ -210,8 +210,10 @@ public class RobotContainer {
         operatorController.x().onTrue(new InstantCommand(() -> wrist.setAngle(WristConstants.GROUND_INTAKE)));
         operatorController.y().onTrue(new InstantCommand(() -> wrist.setAngle(WristConstants.WRIST_STOW)));
 
-        operatorController.leftTrigger().onTrue(complexLowAlgaeIntakeCommand(elevatorPositions.ALGAE_LOW));
-        operatorController.rightTrigger().onTrue(complexHighAlgaeIntakeCommand(elevatorPositions.ALGAE_HIGH));
+        // operatorController.leftTrigger().onTrue(complexLowAlgaeIntakeCommand(elevatorPositions.ALGAE_LOW));
+        // operatorController.rightTrigger().onTrue(complexHighAlgaeIntakeCommand(elevatorPositions.ALGAE_HIGH));
+        operatorController.leftTrigger().onTrue(prepElevatorScoreL2(elevatorPositions.L2));
+        operatorController.rightTrigger().onTrue(prepElevatorScoreL3(elevatorPositions.L3));
 
         // Wrist
 
@@ -354,9 +356,9 @@ public class RobotContainer {
                 .andThen((new ElevatorToPosition(elevator, position)))
                 .andThen(new WaitUntilCommand(elevator::atSetpointExternalEnc))
                 .andThen(wrist.HoverPositionCommandL4())
-                // .andThen(new RunCommand(() -> endEffector.setCoralSpeed(-0.15), endEffector).withTimeout(0.25)
-                //         .alongWith(new InstantCommand(() -> prepL4Finished(true))))
-                // .andThen(new InstantCommand(() -> endEffector.setCoralSpeed(0.0), endEffector))
+                .andThen(new RunCommand(() -> endEffector.setCoralSpeed(-0.1), endEffector).withTimeout(0.1)
+                        .alongWith(new InstantCommand(() -> prepL4Finished(true))))
+                .andThen(new InstantCommand(() -> endEffector.setCoralSpeed(0.0), endEffector))
                 .andThen(new InstantCommand(() -> prepL4Finished(true)));
     }
 
@@ -402,8 +404,8 @@ public class RobotContainer {
 
     public Command complexIntakeCoral() {
         return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
-                .andThen(new ElevatorToPosition(elevator, elevatorPositions.STOW))
-                .andThen(new WaitUntilCommand(elevator::atSetpointExternalEnc))
+                // .andThen(new ElevatorToPosition(elevator, elevatorPositions.STOW))
+                // .andThen(new WaitUntilCommand(elevator::atSetpointExternalEnc))
                 .andThen(wrist.IntakePositionCommand())
                 .andThen(new WaitUntilCommand(wrist::atSetpoint))
                 .andThen(endEffector.intakeCoralCommand2())
