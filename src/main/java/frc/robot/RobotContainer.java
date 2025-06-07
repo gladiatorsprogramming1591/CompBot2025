@@ -10,6 +10,7 @@ import static frc.robot.Constants.DriveConstants.*;
 import org.ejml.sparse.csc.mult.MatrixVectorMultWithSemiRing_DSCC;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix6.controls.compound.Diff_TorqueCurrentFOC_Velocity;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
@@ -86,8 +87,7 @@ public class RobotContainer {
             // .withDeadband(MaxSpeed * 0.05).withRotationalDeadband(MaxAngularRate * 0.05)
             // // Add a 5% deadband
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
-    // private final SwerveRequest.SwerveDriveBrake brake = new
-    // SwerveRequest.SwerveDriveBrake();
+    private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
     // private final SwerveRequest.PointWheelsAt point = new
     // SwerveRequest.PointWheelsAt();
 
@@ -154,7 +154,9 @@ public class RobotContainer {
 
         // reset the field-centric heading on back button press
         driverController.back().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
-        driverController.start().onTrue(new InstantCommand(() -> slowMode(true)))
+        driverController.start().whileTrue(drivetrain.applyRequest(() -> brake));
+        driverController.b().whileTrue(new InstantCommand(() -> slowMode(true)))
+                // .alongWith(new InstantCommand(drivetrain.))
                 .onFalse(new InstantCommand(() -> slowMode(false)));
 
         // End Effector
@@ -173,6 +175,11 @@ public class RobotContainer {
         driverController.rightTrigger().onTrue(ejectCoralAndStowWrist()) // Coral Eject Speed = 0.5
                 .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(0), endEffector)
                 .alongWith(stowElevatorOnly()));
+        
+        driverController.povDownLeft().or(driverController.povDownRight()).or(driverController.povDown())
+                .onTrue(ejectCoralAndStowWristL1()) // Coral Eject Speed = 0.25
+                .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(0), endEffector)
+                .alongWith(stowElevatorOnly()));
 
         driverController.x().whileTrue(new AutoReefPoseCommand(drivetrain, reefAlign, this::driveX, this::driveY,
                 this::driveT, () -> ReefSide.LEFT, () -> elevator.getExternalPositionInches()));
@@ -180,35 +187,36 @@ public class RobotContainer {
                 this::driveT, () -> ReefSide.RIGHT, () -> elevator.getExternalPositionInches()));
         driverController.a().whileTrue(new AutoReefPoseCommand(drivetrain, reefAlign, this::driveX, this::driveY,
         this::driveT, () -> ReefSide.CENTER, () -> elevator.getExternalPositionInches()));
+        // driverController.b().whileTrue(new RunCommand(() -> AutoIntakeAlign()));
 
-        driverController.b()
-                .onTrue(
-                        new ParallelCommandGroup(
-                                prepElevatorOnly(elevatorPositions.NETSHOOT),
-                                endEffector.holdTopAlgaeCommand().withTimeout(0.50)
-                                        .andThen(endEffector.ejectTopAlgaeCommand()
-                                                .alongWith(new WaitCommand(0.25)
-                                                        .andThen(wrist.HoverPositionCommand(WristConstants.WRIST_NET_FLICK))))
-                                        .withTimeout(1.0)
-                                        .andThen(endEffector.stopIntakeCommand()))
-                        .andThen(new WaitUntilCommand(elevator::atSetpointExternalEnc))
-                        .andThen(complexElevatorStowCommand(elevatorPositions.STOW))
-                );
+        // driverController.b()
+        //         .onTrue(
+        //                 new ParallelCommandGroup(
+        //                         prepElevatorOnly(elevatorPositions.NETSHOOT),
+        //                         endEffector.holdTopAlgaeCommand().withTimeout(0.50)
+        //                                 .andThen(endEffector.ejectTopAlgaeCommand()
+        //                                         .alongWith(new WaitCommand(0.25)
+        //                                                 .andThen(wrist.HoverPositionCommand(WristConstants.WRIST_NET_FLICK))))
+        //                                 .withTimeout(1.0)
+        //                                 .andThen(endEffector.stopIntakeCommand()))
+        //                 .andThen(new WaitUntilCommand(elevator::atSetpointExternalEnc))
+        //                 .andThen(complexElevatorStowCommand(elevatorPositions.STOW))
+        //         );
         // ===================================== Operator Controls
         // =====================================
         // Elevator
-        operatorController.back().onTrue(new InstantCommand(() -> elevator.zeroElevatorExternalEncCommand()));
+        // operatorController.back().onTrue(new InstantCommand(() -> elevator.zeroElevatorExternalEncCommand()));
         // operatorController.povDown().onTrue(prepElevatorScoreL1(elevatorPositions.L1));
         operatorController.povLeft().onTrue(prepElevatorScoreL2(elevatorPositions.L2));
         operatorController.povUp().onTrue(prepElevatorScoreL3(elevatorPositions.L3));
         operatorController.povRight().onTrue(prepElevatorScoreL4(elevatorPositions.L4));
  
         operatorController.leftBumper().onTrue(complexElevatorStowCommand(elevatorPositions.STOW));
-        operatorController.rightBumper().onTrue(complexBargeCommand(elevatorPositions.NETSHOOT)); 
+        // operatorController.rightBumper().onTrue(complexBargeCommand(elevatorPositions.NETSHOOT)); 
         operatorController.b().onTrue(complexProcessorCommand(elevatorPositions.PROCESSOR));
 
         operatorController.x().onTrue(new InstantCommand(() -> wrist.setAngle(WristConstants.GROUND_INTAKE)));
-        operatorController.y().onTrue(new InstantCommand(() -> wrist.setAngle(WristConstants.WRIST_STOW)));
+        // operatorController.y().onTrue(new InstantCommand(() -> wrist.setAngle(WristConstants.WRIST_STOW))); // not needed without tophat
 
         // operatorController.leftTrigger().onTrue(complexLowAlgaeIntakeCommand(elevatorPositions.ALGAE_LOW));
         // operatorController.rightTrigger().onTrue(complexHighAlgaeIntakeCommand(elevatorPositions.ALGAE_HIGH));
@@ -217,8 +225,8 @@ public class RobotContainer {
 
         // Wrist
 
-        operatorController.start().onTrue(new InstantCommand(() ->endEffector.setCoralSpeed(-1.0), endEffector))
-                .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(1.0), endEffector));
+        // operatorController.start().onTrue(new InstantCommand(() ->endEffector.setCoralSpeed(-1.0), endEffector))
+        //         .onFalse(new InstantCommand(() -> endEffector.setCoralSpeed(1.0), endEffector)); // not needed without top, was used to shoot algae farther
 
         
         //Deep Climb
@@ -263,8 +271,10 @@ public class RobotContainer {
 
         // reset the field-centric heading on left bumper press
         driverController.back().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
-        driverController.start().onTrue(new InstantCommand(() -> slowMode(true))) 
-                .onFalse(new InstantCommand(() -> slowMode(false)));
+        // driverController.start().onTrue(new InstantCommand(() -> slowMode(true))) 
+        driverController.start().whileTrue(drivetrain.applyRequest(() -> brake));
+
+                // .onFalse(new InstantCommand(() -> slowMode(false)));
 
         driverController.x().whileTrue(new AutoReefPoseCommand(drivetrain, reefAlign, this::driveXChassis,
                 this::driveYChassis, this::driveT, () -> ReefSide.LEFT, () -> 0));
@@ -404,8 +414,8 @@ public class RobotContainer {
 
     public Command complexIntakeCoral() {
         return wrist.StowPositionCommand().andThen(new WaitUntilCommand(wrist::atSetpoint))
-                // .andThen(new ElevatorToPosition(elevator, elevatorPositions.STOW))
-                // .andThen(new WaitUntilCommand(elevator::atSetpointExternalEnc))
+                .andThen(new ElevatorToPosition(elevator, elevatorPositions.STOW))
+                .andThen(new WaitUntilCommand(elevator::atSetpointExternalEnc))
                 .andThen(wrist.IntakePositionCommand())
                 .andThen(new WaitUntilCommand(wrist::atSetpoint))
                 .andThen(endEffector.intakeCoralCommand2())
@@ -430,6 +440,11 @@ public class RobotContainer {
     }
     public Command ejectCoralAndStowWrist() {
         return endEffector.ejectCoralCommand()
+                .andThen(wrist.StowPositionCommand())
+                .andThen(new WaitUntilCommand(wrist::atSetpoint));
+    }
+    public Command ejectCoralAndStowWristL1() {
+        return endEffector.ejectCoralCommandL1()
                 .andThen(wrist.StowPositionCommand())
                 .andThen(new WaitUntilCommand(wrist::atSetpoint));
     }

@@ -45,6 +45,10 @@ public class EndEffector extends SubsystemBase {
         intakeMotor.set(EndEffectorConstants.CORAL_EJECT_SPEED);
     }
 
+    public void ejectCoralL1() {
+        intakeMotor.set(EndEffectorConstants.L1_CORAL_EJECT_SPEED);
+    }
+
     public boolean isCoralFrontBeamBroken() {
         return coralFrontBeam.isPressed();
     }
@@ -150,6 +154,11 @@ public class EndEffector extends SubsystemBase {
 
     public Command ejectCoralCommand() {
         return new SequentialCommandGroup(new RunCommand(() -> ejectCoral())
+                .until(() -> (!isCoralRearBeamBroken()) && !isCoralFrontBeamBroken()),
+                new InstantCommand(() -> setCoralSpeed(0)));
+    }
+    public Command ejectCoralCommandL1() {
+        return new SequentialCommandGroup(new RunCommand(() -> ejectCoralL1())
                 .until(() -> (!isCoralRearBeamBroken()) && !isCoralFrontBeamBroken()),
                 new InstantCommand(() -> setCoralSpeed(0)));
     }

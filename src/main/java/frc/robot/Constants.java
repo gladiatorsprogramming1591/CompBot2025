@@ -88,8 +88,8 @@ public class Constants {
         public static final double kL4 = 26.5; //27
         public static final double kPROCESSOR = 0.5;
         public static final double kNET = 27.75;
-        public static final double ALGAE_HIGH = 10.53;
-        public static final double ALGAE_LOW = 2.75;
+        public static final double ALGAE_HIGH = kL3; // 10.53 for tophat
+        public static final double ALGAE_LOW = kL2; // 2.75 for tophat
         // public static final double kSTOW = 0.4;
         // public static final double kL1 = 2.75;
         // public static final double kL2 = 7.04;
@@ -145,7 +145,7 @@ public class Constants {
         public static final double CORAL_REVERSE_SPEED2 = -0.25;
         public static final double CORAL_EJECT_SPEED = 0.5;
         public static final double ARM_CORAL_SPEED = 0;
-        public static final double L1_CORAL_EJECT_SPEED = 0.75;
+        public static final double L1_CORAL_EJECT_SPEED = 0.25;
 
         // Algae Constants
         public static final double HAS_ALGAE_CURRENT = 30;

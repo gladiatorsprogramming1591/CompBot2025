@@ -16,12 +16,12 @@
     },
     {
       "anchor": {
-        "x": 3.689,
-        "y": 4.944
+        "x": 3.8360655737657448,
+        "y": 5.037961065570524
       },
       "prevControl": {
-        "x": 3.09605818005297,
-        "y": 5.489945050493091
+        "x": 3.2431237538187148,
+        "y": 5.583906116063615
       },
       "nextControl": null,
       "isLocked": false,
@@ -93,7 +93,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -54.0
+    "rotation": -59.00000000000001
   },
   "reversed": false,
   "folder": "StartLineICoral",
