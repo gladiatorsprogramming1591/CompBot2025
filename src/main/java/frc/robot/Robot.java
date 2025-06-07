@@ -86,6 +86,8 @@ public class Robot extends TimedRobot {
     NamedCommands.registerCommand("startLineFCoral Start Path", AutoBuilder.followPath(m_robotContainer.startLineFCoralStartPath));
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
+    m_robotContainer.drivetrain.robotIsInAuto = true;
+
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
     }
@@ -95,11 +97,16 @@ public class Robot extends TimedRobot {
   public void autonomousPeriodic() {}
 
   @Override
-  public void autonomousExit() {}
+  public void autonomousExit() {
+    m_robotContainer.drivetrain.robotIsInAuto = false;
+  }
 
   @Override
   public void teleopInit() {
     m_robotContainer.endEffector.setCoralSpeed(0);
+
+    m_robotContainer.drivetrain.robotIsInAuto = false;
+
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }

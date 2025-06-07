@@ -68,6 +68,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private Notifier m_simNotifier = null;
     private double m_lastSimTime;
     Pose2d currentPose;
+    public boolean robotIsInAuto = true;
     PowerDistribution m_pdh = robotInitConstants.isCompBot ? new PowerDistribution(1, ModuleType.kRev) : new PowerDistribution(21, ModuleType.kRev);
 
     /* Blue alliance sees forward as 0 degrees (toward red alliance wall) */
@@ -435,7 +436,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             return Optional.empty();
         }
     
-        public void updatePoseEstimationWithFilter() {
+        public void teleopUpdatePoseEstimationWithFilter() {
             currentPose = getState().Pose;
             Optional<EstimatedRobotPose> pose = null;
             for (int cameraIdx = CommandSwerveDrivetrain.cameraIdx; cameraIdx < maxCameras; cameraIdx++) {
@@ -501,6 +502,93 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                         SmartDashboard.putNumber("Robot ts", Utils.getCurrentTimeSeconds());
                         SmartDashboard.putNumber("Vision xyStd", xyStd);
                         SmartDashboard.putNumber("Vision rotStd", rotStd);
+                        SmartDashboard.putNumber("stdScale", stdScale);
+                        addVisionMeasurement(pose2d, Utils.fpgaToCurrentTime(pose.get().timestampSeconds), VecBuilder.fill(xyStd, xyStd, rotStd));
+                        if(!m_hasAppliedVisionPose) {
+                            resetPose(pose2d);
+                            m_hasAppliedVisionPose = true;
+                        }
+
+                        // if(xyStd < 0.15){
+                        //     addVisionMeasurement(pose2d, Utils.fpgaToCurrentTime(pose.get().timestampSeconds));
+                        // }
+
+                        continue;
+                    }
+                }
+            }
+        }
+
+        /**
+         * This resembles the method used during FLR and TVR. This will only be utilized during auto.
+         */
+        public void autoUpdatePoseEstimationWithFilter()
+        {
+            currentPose = getState().Pose;
+            for (int cameraIdx = CommandSwerveDrivetrain.cameraIdx; cameraIdx < maxCameras; cameraIdx++) {
+                // TODO: need to find the camera associated with a pose estimator, hard coded to front
+                // var results = m_frontCamera.getAllUnreadResults();
+                // if (m_photonPoseEstimators[0].equals(poseEstimator)) {
+                //     List<PhotonPipelineResult> results = m_leftCamera.getAllUnreadResults();
+                // } else if (m_photonPoseEstimators[1].equals(poseEstimator)) {
+                //     List<PhotonPipelineResult> results = m_rightCamera.getAllUnreadResults();
+                // } else {
+                //     continue;
+                // }
+                var results = cameras[cameraIdx].getAllUnreadResults();
+                PhotonPipelineResult result;
+                Optional<EstimatedRobotPose> pose = null;
+                if (!results.isEmpty()) {
+                    // Camera processed a new frame since last
+                    // Get the last one in the list.
+                    result = results.get(results.size() - 1);    
+                    boolean hasTargets = result.hasTargets();
+                    SmartDashboard.putBoolean("Vision Has Targets", hasTargets);
+                    if(!hasTargets) continue;
+                    lastTarget = result.getBestTarget();
+                    double latency = result.metadata.getLatencyMillis();  
+                    SmartDashboard.putNumber("Vision Latency", latency); 
+                    double latencyThreshold = 12.0;
+                    SmartDashboard.putBoolean("Vision Latency OK", latency > latencyThreshold);
+                    pose = m_photonPoseEstimators[cameraIdx].update(result);
+                    if(pose != null) pose = filterPose(pose, cameraIdx);
+                }
+                if (pose != null && pose.isPresent()) {
+                    Pose3d pose3d = pose.get().estimatedPose;
+                    Pose2d pose2d = pose3d.toPose2d();
+                    if (
+                        pose3d.getX() >= -VISION_FIELD_MARGIN &&
+                        pose3d.getX() <= FIELD_LENGTH + VISION_FIELD_MARGIN &&
+                        pose3d.getY() >= -VISION_FIELD_MARGIN &&
+                        pose3d.getY() <= FIELD_WIDTH + VISION_FIELD_MARGIN &&
+                        pose3d.getZ() >= -VISION_Z_MARGIN &&
+                        pose3d.getZ() <= VISION_Z_MARGIN
+                    ) {
+                        double sum = 0.0;
+                        for (PhotonTrackedTarget target : pose.get().targetsUsed) {
+                            int fiducialId = target.getFiducialId();
+                            ignoredTags(fiducialId);
+                            Optional<Pose3d> tagPose = fieldLayout.getTagPose(fiducialId);
+                            if (tagPose.isEmpty()) continue;
+                            sum += currentPose.getTranslation().getDistance(tagPose.get().getTranslation().toTranslation2d());
+                        }
+
+                        double estPoseOffset = currentPose.getTranslation().getDistance(pose2d.getTranslation());
+                        SmartDashboard.putNumber("estPoseOffset", estPoseOffset);
+
+                        int tagCount = pose.get().targetsUsed.size();
+                        double stdScale = Math.pow(sum / tagCount, 2.0) / tagCount;
+                        double xyStd = VISION_STD_XY_SCALE * stdScale;
+                        double rotStd = VISION_STD_ROT_SCALE * stdScale;
+                        //time this as well
+                        SmartDashboard.putNumber("Vision x", pose2d.getX());
+                        SmartDashboard.putNumber("Vision y", pose2d.getY());
+                        SmartDashboard.putNumber("Vision rot", pose2d.getRotation().getDegrees());
+                        SmartDashboard.putNumber("Vision ts", pose.get().timestampSeconds);
+                        SmartDashboard.putNumber("Robot ts", Utils.getCurrentTimeSeconds());
+                        SmartDashboard.putNumber("Vision xyStd", xyStd);
+                        SmartDashboard.putNumber("Vision rotStd", rotStd);
+                        SmartDashboard.putNumber("stdScale", stdScale);
                         addVisionMeasurement(pose2d, Utils.fpgaToCurrentTime(pose.get().timestampSeconds), VecBuilder.fill(xyStd, xyStd, rotStd));
                         if(!m_hasAppliedVisionPose) {
                             resetPose(pose2d);
@@ -548,7 +636,14 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     @Override
     public void periodic() {
-        updatePoseEstimationWithFilter();
+        if (robotIsInAuto)
+        {
+            autoUpdatePoseEstimationWithFilter();
+        }
+        else
+        {
+            teleopUpdatePoseEstimationWithFilter();
+        }
         
         // SmartDashboard.putBoolean("FrontConnected", m_frontCamera.isConnected());
         SmartDashboard.putBoolean("LeftConnected", cameras[0].isConnected());
@@ -598,6 +693,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         SmartDashboard.putNumber("Distance to Reef", distanceToReef);
         SmartDashboard.putNumber("Distance to Left Peg",  1*Units.metersToInches(currentPose.relativeTo(FieldConstants.getNearestReefBranch(currentPose, ReefSide.LEFT )).getTranslation().getY()));
         SmartDashboard.putNumber("Distance to Right Peg", 1*Units.metersToInches(currentPose.relativeTo(FieldConstants.getNearestReefBranch(currentPose, ReefSide.RIGHT)).getTranslation().getY()));
+        SmartDashboard.putBoolean("robotIsInAuto", robotIsInAuto);
     }
 
     /*
