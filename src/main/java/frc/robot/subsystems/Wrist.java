@@ -109,7 +109,7 @@ public class Wrist extends SubsystemBase {
     }
 
     public Command IntakePositionCommand(){
-         return new InstantCommand(()->setAngle(WristConstants.WRIST_INTAKE + 3)); // TODO: New funnel adjustment.
+         return new InstantCommand(()->setAngle(WristConstants.WRIST_INTAKE + 2)); // TODO: New funnel adjustment.
     }
 
     public Command ProcessorPositionCommand(){ 
