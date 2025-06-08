@@ -11,7 +11,7 @@ public class AutoManager {
     private SendableChooser<Command> autos;
     private CommandSwerveDrivetrain drivetrain;
     private String leftSide3PieceName = "StartLineJCoral";
-    private String rightSide3PieceName = "Right StartLineJCoral";
+    private String rightSide3PieceName = "Red Right StartLineJCoral";
 
     private PathConstraints constraints = new PathConstraints(
             7, 3, 1, 1
