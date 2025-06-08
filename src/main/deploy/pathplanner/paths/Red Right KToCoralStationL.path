@@ -3,40 +3,40 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.306,
-        "y": 7.342
+        "x": 3.9199795081967217,
+        "y": 5.061936475409836
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.1773607721197537,
-        "y": 6.573251403376327
+        "x": 3.4851931167143566,
+        "y": 5.70348600099749
       },
       "isLocked": false,
-      "linkedName": "Right CoralStationL"
+      "linkedName": "Red Right K"
     },
     {
       "anchor": {
-        "x": 3.6442622950819668,
-        "y": 4.918084016393442
+        "x": 1.306,
+        "y": 7.342
       },
       "prevControl": {
-        "x": 3.0513204751349368,
-        "y": 5.464029066886533
+        "x": 1.959240154457698,
+        "y": 6.815503750626766
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Right L"
+      "linkedName": "Red Right CoralStationL"
     }
   ],
   "rotationTargets": [],
   "constraintZones": [
     {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 0.6,
+      "minWaypointRelativePos": 0.75,
       "maxWaypointRelativePos": 1.0,
       "constraints": {
-        "maxVelocity": 3.0,
-        "maxAcceleration": 2.5,
+        "maxVelocity": 2.0,
+        "maxAcceleration": 7.0,
         "maxAngularVelocity": 540.0,
         "maxAngularAcceleration": 720.0,
         "nominalVoltage": 12.0,
@@ -47,8 +47,8 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "Intake, Home, Raise L4 Coral",
-      "waypointRelativePos": 0.0,
+      "name": "Stow",
+      "waypointRelativePos": 0,
       "endWaypointRelativePos": null,
       "command": {
         "type": "sequential",
@@ -57,25 +57,7 @@
             {
               "type": "named",
               "data": {
-                "name": "Auto Intake Coral"
-              }
-            },
-            {
-              "type": "named",
-              "data": {
-                "name": "Home Coral"
-              }
-            },
-            {
-              "type": "wait",
-              "data": {
-                "waitTime": 0.2
-              }
-            },
-            {
-              "type": "named",
-              "data": {
-                "name": "Prep L4"
+                "name": "Stow"
               }
             }
           ]
@@ -93,13 +75,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -59.00000000000001
+    "rotation": -54.0
   },
   "reversed": false,
   "folder": "StartLineICoral",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -54.0
+    "rotation": -59.99999999999999
   },
   "useDefaultConstraints": false
 }
