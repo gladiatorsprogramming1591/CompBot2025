@@ -11,7 +11,7 @@ public class AutoManager {
     private SendableChooser<Command> autos;
     private CommandSwerveDrivetrain drivetrain;
     private String leftSide3PieceName = "StartLineJCoral";
-    private String rightSide3PieceName = "StartLineFCoral";
+    private String rightSide3PieceName = "Right StartLineJCoral";
 
     private PathConstraints constraints = new PathConstraints(
             7, 3, 1, 1
@@ -22,7 +22,7 @@ public class AutoManager {
 
         autos = new SendableChooser<>();
         autos.addOption("Left L4 3 Piece", wrapAutoWithPose(new PathPlannerAuto(leftSide3PieceName)));
-        autos.addOption("Right L4 3 Piece", wrapAutoWithPose(new PathPlannerAuto(leftSide3PieceName, true)));
+        autos.addOption("New Right L4 3 Piece", wrapAutoWithPose(new PathPlannerAuto(rightSide3PieceName, true)));
         autos.addOption("CenterAuto", wrapAutoWithPose(new PathPlannerAuto("CenterAuto", false)));
     }
 
